@@ -116,6 +116,7 @@
   --control-ease: 120ms;
   --caret: 5px;
   --split-breakpoint: 900px;
+  --split-columns: 1fr 1fr;
   --app-row: 44px;
   --app-control: 34px;
   --app-rail: 15rem;
@@ -171,7 +172,7 @@
 .badge[data-tier="FRAMEWORK"] { border-style: var(--tiers-framework-border-style); }
 
 @media (max-width: 900px) {
-  .split { grid-template-columns: 1fr; }
+  :root { --split-columns: 1fr; }
 }
 
 :root[data-theme="light"] {

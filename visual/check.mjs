@@ -64,6 +64,42 @@ check("the display face is the self-hosted one", /Fraunces/.test(face), face);
 const options = await page.$$eval("[data-testid=split-backend] option", (n) => n.length);
 check("every backend is selectable from one control", options > 1, `${options} options`);
 
+// The layout, at both sides of the declared breakpoint.
+//
+// The breakpoint was a media query that never fired: this page's stylesheet loads after
+// the generated one and set the same property at the same specificity, so the later sheet
+// won at every width and the two frames stayed side by side down to 400px — 168px each.
+// Nothing checked it, because checking a media query needs a browser at two widths, and
+// every check here ran at one.
+const breakpoint = Number(
+  (await page.evaluate(() => getComputedStyle(document.documentElement)
+    .getPropertyValue("--split-breakpoint"))).replace("px", "").trim(),
+);
+check("the page declares its breakpoint as a token", Number.isFinite(breakpoint) && breakpoint > 0,
+      `${breakpoint}px`);
+
+const columnsAt = async (width) => {
+  const probe = await browser.newPage({ viewport: { width, height: 900 } });
+  await probe.goto(`${PAGE}/`, { waitUntil: "domcontentloaded" });
+  await probe.waitForTimeout(400);
+  const seen = await probe.evaluate(() => ({
+    cols: getComputedStyle(document.querySelector("[data-testid=split]"))
+      .gridTemplateColumns.split(" ").filter(Boolean).length,
+    overflow: document.documentElement.scrollWidth - window.innerWidth,
+  }));
+  await probe.close();
+  return seen;
+};
+
+const wide = await columnsAt(breakpoint + 380);
+const narrow = await columnsAt(Math.max(360, Math.round(breakpoint / 2)));
+check("above the breakpoint the frames sit side by side", wide.cols === 2, `${wide.cols} columns`);
+check("below the breakpoint they stack rather than shrink", narrow.cols === 1,
+      `${narrow.cols} column(s)`);
+check("neither width scrolls the document sideways",
+      wide.overflow <= 0 && narrow.overflow <= 0,
+      `wide ${wide.overflow}px, narrow ${narrow.overflow}px`);
+
 // The frames must actually load. An iframe pointing at a dead origin renders an empty
 // box, and the page above it looks entirely correct.
 for (const [name] of FRONTENDS) {

@@ -126,6 +126,8 @@ def token_css() -> str:
     lines.append(f"  --control-ease: {seam.get('control_ms')}ms;")
     lines.append(f"  --caret: {seam.get('caret_px')}px;")
     lines.append(f"  --split-breakpoint: {seam.get('split_breakpoint')}px;")
+    # The wide default. The media query below flips it to a single column.
+    lines.append("  --split-columns: 1fr 1fr;")
 
     # A19: the application surface. Dark under :root, light under an explicit theme, so the
     # default is dark and the choice is one attribute on the document.
@@ -189,11 +191,19 @@ def token_css() -> str:
                     f'.badge[data-{attribute}="{member}"] {{ '
                     f"border-style: var(--{group}-{slug}-border-style); }}"
                 )
-    # The one consumer of the breakpoint. Emitted here rather than written into the
-    # stylesheet so the value stays declared in exactly one file.
+    # The breakpoint, emitted as a custom PROPERTY rather than as a rule.
+    #
+    # It was a rule — `.split { grid-template-columns: 1fr }` inside a media query — and it
+    # never fired. The page's own stylesheet loads after this one and sets the same
+    # property at the same specificity, so the later sheet won at every width and the two
+    # frames stayed side by side down to 400px, 168px each. A media query that loses on
+    # source order is a media query that does nothing, and nothing said so.
+    #
+    # A custom property on :root cannot lose that way: the media query overrides the VALUE,
+    # and whichever rule consumes it resolves the overridden one regardless of order.
     lines.append("")
     lines.append(f"@media (max-width: {seam.get('split_breakpoint')}px) {{")
-    lines.append("  .split { grid-template-columns: 1fr; }")
+    lines.append("  :root { --split-columns: 1fr; }")
     lines.append("}")
     lines.extend(trailing)
     return "\n".join(lines) + "\n"

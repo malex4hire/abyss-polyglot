@@ -16,10 +16,24 @@ body {
   line-height: 1.55;
 }
 
+/* The page is full width and the PROSE is what gets constrained, not the frames.
+ *
+ * It was the other way round: one centred column at --measure-page held everything, so
+ * each frame got half of 62rem — about 480px — and the work item table lost its last
+ * column to the edge. Two half-width applications are two applications nobody can read,
+ * which defeats the one thing this page exists to show.
+ *
+ * Full-bleed by widening the container rather than by pulling the section out of it with
+ * a 100vw trick: 100vw counts the scrollbar, so that spelling adds a horizontal scrollbar
+ * on every desktop browser that reserves gutter space. */
 main {
-  max-width: var(--measure-page);
-  margin: 0 auto;
   padding: var(--space-6) var(--space-4) var(--space-8);
+}
+
+/* Reading measure for the words. Long lines of prose across a wide monitor are the other
+ * half of this mistake, and widening the page is exactly what causes them. */
+.page-head {
+  max-width: var(--measure-prose);
 }
 
 h1, h2 {
@@ -75,7 +89,9 @@ h1 { font-size: var(--type-xxl); }
 
 .split {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* Resolved from the token, so the breakpoint below it actually applies. Writing
+   * `1fr 1fr` here is what silently defeated it: this sheet loads last and won. */
+  grid-template-columns: var(--split-columns);
   gap: var(--space-3);
   align-items: start;
 }
@@ -84,7 +100,9 @@ h1 { font-size: var(--type-xxl); }
 
 .split-side iframe {
   width: 100%;
-  height: var(--measure-frame);
+  /* Tall enough to show the table without its own scrollbar, and bounded by the window so
+   * the frame never runs off the bottom on a laptop screen. */
+  height: min(var(--measure-frame), calc(100vh - var(--space-8) * 2));
   border: thin solid var(--surface-panel);
   border-radius: var(--space-1);
   background: var(--surface-panel);

@@ -95,12 +95,14 @@ def render() -> str:
 </head>
 <body>
 <main>
+<div class="page-head">
 <h1>The same application, twice</h1>
 <p class="lede">Two frameworks, one contract, one stylesheet generated from one token
 file. Change something on either side and watch it arrive on the other: that is the
 change stream, not a refresh.</p>
 <section class="split-controls"><label>backend
 <select data-testid="split-backend">{options}</select></label></section>
+</div>
 <section class="split" data-testid="split">{frames}</section>
 </main>
 </body>
