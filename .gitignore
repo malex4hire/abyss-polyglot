@@ -33,3 +33,6 @@ visual/results.json
 
 # review output written per commit by tooling outside this repository
 code-review/
+
+# a locally-run demo.py transcript, never an artifact
+demo-dev.log
