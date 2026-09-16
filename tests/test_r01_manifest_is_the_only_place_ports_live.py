@@ -127,13 +127,48 @@ def test_no_port_literal_appears_outside_the_manifest():
         ".yml", ".yaml", ".sh", ".py", ".ts", ".tsx", ".js", ".mjs", ".java",
         ".xml", ".properties", ".env", ".md", ".html", ".css", ".conf",
     )):
-        if path == spine.MANIFEST or _is_generated(path):
+        if path == spine.MANIFEST or path.name in spine.JOURNALS or _is_generated(path):
             continue
         for n, line in enumerate(spine.text_of(path).splitlines(), start=1):
             if pattern.search(line):
                 offenders.append(f"{spine._rel(path)}:{n}: {line.strip()}")
     assert not offenders, (
         "port literals must appear only in the manifest and be derived elsewhere:\n  "
+        + "\n  ".join(offenders)
+    )
+
+
+def test_no_fixed_address_appears_outside_the_manifest():
+    """The same rule as ports, for the one address the demo pins.
+
+    This is the check that did not exist. The address was written into compose three
+    times — once as the pinned endpoint, twice as an /etc/hosts entry on a client. When
+    the pinned endpoint silently failed to apply, its two copies went on naming an address
+    nothing was listening on, and the demo failed offline with a Hibernate dialect error
+    three layers from the cause.
+    """
+    addresses = {
+        str(spec["ip"]) for spec in spine.infrastructure().values()
+        if isinstance(spec, dict) and spec.get("ip")
+    }
+    if not addresses:
+        pytest.skip("the manifest pins no fixed address, so there is nothing to duplicate")
+
+    pattern = re.compile(r"(?<![\w.])(" + "|".join(re.escape(a) for a in sorted(addresses)) + r")(?![\w.])")
+    offenders = []
+    for path in spine.iter_repo_files((
+        ".yml", ".yaml", ".sh", ".py", ".ts", ".tsx", ".js", ".mjs", ".java",
+        ".xml", ".properties", ".env", ".md", ".conf",
+    )):
+        if path == spine.MANIFEST or path.name in spine.JOURNALS or _is_generated(path):
+            continue
+        for n, line in enumerate(spine.text_of(path).splitlines(), start=1):
+            if spine.is_comment_line(line):
+                continue
+            if pattern.search(line):
+                offenders.append(f"{spine._rel(path)}:{n}: {line.strip()}")
+    assert not offenders, (
+        "a pinned address must be declared in the manifest and derived everywhere else:\n  "
         + "\n  ".join(offenders)
     )
 

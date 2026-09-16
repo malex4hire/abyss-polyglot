@@ -33,7 +33,7 @@ services:
     # client resolves at request time.
     networks:
       default:
-        ipv4_address: 172.28.0.10
+        ipv4_address: ${POSTGRES_IP}
     ports:
       - "${POSTGRES_PORT}:5432"
     healthcheck:
@@ -94,7 +94,7 @@ services:
     # wait-for-postgres.sh stays as a harmless fallback; with this entry present it
     # should never need to retry.
     extra_hosts:
-      - "postgres:172.28.0.10"
+      - "postgres:${POSTGRES_IP}"
     environment:
       PORT: 8080
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
@@ -134,7 +134,7 @@ services:
     # wait-for-postgres.sh stays as a harmless fallback; with this entry present it
     # should never need to retry.
     extra_hosts:
-      - "postgres:172.28.0.10"
+      - "postgres:${POSTGRES_IP}"
     environment:
       SERVER_PORT: 8080
       SPRING_PROFILES_ACTIVE: container

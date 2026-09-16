@@ -19,8 +19,14 @@ lines = ["# GENERATED from stacks/manifest.yaml by scripts/render-env.py — do 
 
 infra = manifest.get("infrastructure") or {}
 for name, spec in infra.items():
-    if isinstance(spec, dict) and spec.get("port"):
+    if not isinstance(spec, dict):
+        continue
+    if spec.get("port"):
         lines.append(f"{name.replace('-', '_').upper()}_PORT={spec['port']}")
+    # Some infrastructure needs a fixed address as well as a port. Same rule as the port:
+    # declared once in the manifest, derived by everything that needs it.
+    if spec.get("ip"):
+        lines.append(f"{name.replace('-', '_').upper()}_IP={spec['ip']}")
 
 for stack_id, stack in (manifest.get("stacks") or {}).items():
     if stack.get("active") and stack.get("port"):

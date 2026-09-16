@@ -39,13 +39,47 @@ print(f"http://127.0.0.1:{spec['port']}")
 PY
 }
 
+# The driver library, installed on demand into visual/node_modules.
+#
+# It is not committed — a browser automation package and its binaries do not belong in a
+# repository — so a fresh clone has nothing to import and every driver would die on its
+# first line with a module-resolution error. Installed through the same image the drivers
+# run in, so this needs no node on the host, and skipped entirely once it is there.
+ensure_driver() {
+  [ -d visual/node_modules/playwright ] && return 0
+  echo "--- installing the browser driver into visual/node_modules (first run only)"
+  docker run --rm -v "$PWD/visual:/w" -w /w "$IMAGE" npm ci --no-audit --no-fund \
+    || docker run --rm -v "$PWD/visual:/w" -w /w "$IMAGE" npm install --no-audit --no-fund
+}
+
+# Failures are collected, not fatal. Under `set -e` the first red aborted the run, so a
+# flaky timing check in the first frontend's drivers meant the second frontend, the
+# cross-frontend live check and the page check never ran at all — and the report named one
+# failure out of a suite that had not finished. A verification run reports everything it
+# saw and then fails.
+FAILED=""
+
 drive() {  # drive <script> [env assignments...]
   local script="$1"; shift
   local envs=()
   for pair in "$@"; do envs+=(-e "$pair"); done
-  docker run --rm --network host "${envs[@]}" \
-    -v "$PWD/visual:/w" -w /w "$IMAGE" node "$script"
+  if ! docker run --rm --network host "${envs[@]}" \
+       -v "$PWD/visual:/w" -w /w "$IMAGE" node "$script"; then
+    FAILED="$FAILED $script${LABEL_SUFFIX:-}"
+  fi
 }
+
+report() {
+  if [ -n "$FAILED" ]; then
+    echo
+    echo "  browser checks FAILED:$FAILED"
+    exit 1
+  fi
+  echo
+  echo "  all browser checks passed"
+}
+
+ensure_driver
 
 frontends=$(read_stacks frontend)
 backends=$(read_stacks backend)
@@ -70,17 +104,23 @@ live() {
 
 if [ "$ONLY" = "live" ]; then
   live
-  exit $?
+  report
 fi
 
 # Per-frontend checks, against every frontend rather than against one.
-echo "$frontends" | while read -r name origin; do
+#
+# A here-string rather than a pipe: `echo ... | while` runs the loop in a subshell, so
+# every failure it recorded was discarded when the subshell exited and the run reported
+# success over a red check.
+while read -r name origin; do
   [ -n "$name" ] || continue
   echo "--- $name ($origin)"
+  LABEL_SUFFIX=" ($name)"
   for check in integrity-drive.mjs runtime-drive.mjs tracker-drive.mjs; do
     drive "$check" "APP=$origin" "LABEL=$name" "SHOT=$check-$name"
   done
-done
+  LABEL_SUFFIX=""
+done <<< "$frontends"
 
 # The cross-frontend check, which needs two of them at once.
 live
@@ -89,3 +129,5 @@ live
 drive check.mjs \
   "SIDE_BY_SIDE=$(read_infra side-by-side)" \
   "FRONTENDS=$(echo "$frontends" | tr ' ' '=' | tr '\n' ' ')"
+
+report

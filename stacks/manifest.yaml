@@ -21,8 +21,19 @@ nouns:
 infrastructure:
   postgres:
     service: postgres
-    # Host listeners occupy the range below this. Declared once, derived everywhere.
-    port: 5438
+    # A fixed address on the declared subnet, because under the egress-blocked overlay the
+    # embedded DNS resolver does not answer — measured, not assumed: a service with no
+    # /etc/hosts entry does not resolve there and is unreachable by name. Compose needs
+    # this same value in two places (the pinned endpoint, and an /etc/hosts entry on each
+    # client), so it is declared HERE and rendered into the environment. Written into
+    # compose directly it appeared three times, and when the pinned endpoint silently
+    # failed to apply, its two copies kept pointing at an address nothing was listening
+    # on. One dead address, three declarations, and no check.
+    ip: 172.28.0.10
+    # Chosen to sit clear of the 5432-5441 band, where a developer machine tends to
+    # already have a Postgres or several. Moving it is this one line: compose reads it
+    # through the generated environment, and nothing else in the repository names it.
+    port: 5450
     schema_per_stack: true
 
   # Serves the side-by-side page and nothing else: two frames, one selector.

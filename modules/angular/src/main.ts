@@ -22,8 +22,17 @@ bootstrapApplication(TrackerComponent, {
     provideHttpClient(),
     provideRouter([
       { path: "items/:id", component: DetailComponent },
-      // The component gallery stays reachable, so no component in this module is dead
-      // code kept alive only by a test. The tracker is what the application is.
+      // KNOWN GAP, stated rather than implied: these routes are registered and never
+      // render. This application bootstraps TrackerComponent directly and there is no
+      // <router-outlet> anywhere in the module, so BoardComponent and DetailComponent are
+      // reachable only from their unit tests. React's equivalent works because it reads
+      // location.pathname itself (main.tsx) rather than going through a router.
+      //
+      // Left as a gap rather than papered over: closing it means bootstrapping a shell
+      // component with an outlet, which is a change to how the application starts, and
+      // this file is not the place to make that quietly. A comment claiming the gallery
+      // "stays reachable" stood here first, which is the worse of the two states — an
+      // untrue comment is read as a fact and costs the next person the time to disprove it.
       { path: "components", component: BoardComponent },
     ]),
     provideBoardSettings({ pageSize: 5, apiBase: API_BASE }),

@@ -30,3 +30,6 @@ worklog.log
 visual/node_modules/
 visual/shots/
 visual/results.json
+
+# review output written per commit by tooling outside this repository
+code-review/

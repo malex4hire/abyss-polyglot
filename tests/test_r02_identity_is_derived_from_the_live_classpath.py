@@ -140,6 +140,49 @@ def test_every_active_stack_reports_healthy_and_answers_for_a_reason():
 
 
 @pytest.mark.needs_stacks
+def test_a_pinned_address_is_the_address_the_container_actually_has():
+    """The declared address and the running one, compared.
+
+    Postgres pins an address because the egress-blocked overlay leaves the embedded DNS
+    resolver unable to answer, and every JVM client gets that same address written into
+    /etc/hosts at create time. The pin is applied when a container is CREATED and not when
+    an existing one is reconnected to a recreated network — so switching between the normal
+    stack and the overlay silently moved Postgres while its two copies went on naming the
+    old address.
+
+    Nothing compared the two, which is why it took a Hibernate dialect error to notice.
+    """
+    import json
+    import subprocess
+
+    pinned = {
+        name: str(spec["ip"]) for name, spec in spine.infrastructure().items()
+        if isinstance(spec, dict) and spec.get("ip")
+    }
+    if not pinned:
+        pytest.skip("the manifest pins no fixed address")
+
+    wrong = []
+    for name, declared in sorted(pinned.items()):
+        service = spine.infrastructure()[name].get("service", name)
+        cid, _ = spine.container_identity(service)
+        res = subprocess.run(
+            ["docker", "inspect", "-f", "{{json .NetworkSettings.Networks}}", cid],
+            capture_output=True, text=True, timeout=30,
+        )
+        assert res.returncode == 0, f"could not inspect {service}: {res.stderr.strip()}"
+        actual = {net.get("IPAddress") for net in json.loads(res.stdout).values()}
+        if declared not in actual:
+            wrong.append(
+                f"'{name}' is declared at {declared} and is actually at "
+                f"{', '.join(sorted(a for a in actual if a)) or 'no address'}. Every client "
+                "was created with the declared one in /etc/hosts, so they are all talking "
+                "to nothing. Bring the demo up with `make up`, which recreates containers."
+            )
+    assert not wrong, "a pinned address is not the address in use:\n  " + "\n  ".join(wrong)
+
+
+@pytest.mark.needs_stacks
 def test_the_identity_endpoint_reports_data_and_never_a_claimed_identity():
     """A module asserting its own identity is not proof."""
     offenders = []

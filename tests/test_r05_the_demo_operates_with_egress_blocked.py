@@ -98,6 +98,12 @@ def offline_up():
     on the overlay.
     """
     spine.require_file(spine.OFFLINE_COMPOSE, "offline compose overlay")
+    # From a clean network, for the reason `make up-offline` states: the overlay brought up
+    # over a running stack reconnects containers rather than recreating them, Postgres does
+    # not get its pinned address back, and the /etc/hosts entry each client was created
+    # with still names the old one. The stack then fails for a reason that has nothing to
+    # do with egress, which is the worst way for this file to go red.
+    spine.compose_offline("down", "--remove-orphans", timeout=300)
     return spine.compose_offline("up", "-d", "--wait", timeout=1800)
 
 

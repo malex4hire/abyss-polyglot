@@ -15,7 +15,23 @@ render:             ## regenerate everything derived from the manifest and the t
 	python3 scripts/render-side-by-side.py
 	python3 scripts/render-readme.py
 
+# Both bring-up targets tear down first, and it is not tidiness.
+#
+# Postgres holds a pinned address on a declared subnet, because the egress-blocked overlay
+# leaves the embedded DNS resolver unable to answer. That pin is applied when a container
+# is CREATED and never when an existing one is reconnected to a recreated network — and
+# switching between the normal stack and the overlay recreates the network every time.
+# Compose then reconnects the running containers, Postgres lands on whatever address is
+# free, and the /etc/hosts entry every JVM client was created with still names the old one.
+#
+# Measured in both directions: overlay-over-normal and normal-over-overlay each left
+# spring-boot dead with a Hibernate "unable to determine dialect" error, three layers away
+# from the cause, while six other services reported healthy.
+#
+# `down` without -v, so the Postgres volume survives. Images are cached, so the cost is
+# seconds; a demo that comes up wrong in a way this hard to read is not worth them.
 up: render          ## bring the whole demo up
+	docker compose down --remove-orphans
 	# --wait, because `up -d` returns when the containers are created, not when the
 	# services answer. A suite started immediately afterwards read connection resets from
 	# stacks that were still booting and reported four stacks broken that were merely
@@ -23,6 +39,7 @@ up: render          ## bring the whole demo up
 	docker compose up -d --build --wait
 
 up-offline: render  ## bring the demo up with no route out of the containers
+	docker compose -f docker-compose.yml -f docker-compose.offline.yml down --remove-orphans
 	docker compose -f docker-compose.yml -f docker-compose.offline.yml up -d --wait
 
 down:               ## stop everything, keep the data
