@@ -7,8 +7,15 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* A column that is at least the height of the window, so the frames below can be told to
+ * take whatever is left over. Measuring the chrome above them and subtracting it with a
+ * calc() was the alternative, and it is a number that goes stale the first time the lede
+ * gains a line. */
 body {
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   background: var(--surface-ground);
   color: var(--fg-ink);
   font-family: var(--face-body);
@@ -27,7 +34,14 @@ body {
  * a 100vw trick: 100vw counts the scrollbar, so that spelling adds a horizontal scrollbar
  * on every desktop browser that reserves gutter space. */
 main {
-  padding: var(--space-6) var(--space-4) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  /* The bottom gutter matches the sides rather than the generous document spacing above
+   * it. A page that ends in prose wants air underneath; this one ends in two frames that
+   * were told to fill the window, and 96px of it was being held back from them. */
+  padding: var(--space-6) var(--space-4) var(--space-4);
 }
 
 /* Reading measure for the words. Long lines of prose across a wide monitor are the other
@@ -93,16 +107,29 @@ h1 { font-size: var(--type-xxl); }
    * `1fr 1fr` here is what silently defeated it: this sheet loads last and won. */
   grid-template-columns: var(--split-columns);
   gap: var(--space-3);
-  align-items: start;
+  /* stretch, not start: the sides have to fill the row for the frames to grow into it. */
+  align-items: stretch;
+  flex: 1;
+  /* Without this a grid item refuses to shrink below its content and the page scrolls
+   * instead of the frames fitting. */
+  min-height: 0;
+}
+
+.split-side {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .split-side h2 { font-size: var(--type-md); margin: 0 0 var(--space-1); }
 
 .split-side iframe {
   width: 100%;
-  /* Tall enough to show the table without its own scrollbar, and bounded by the window so
-   * the frame never runs off the bottom on a laptop screen. */
-  height: min(var(--measure-frame), calc(100vh - var(--space-8) * 2));
+  /* Grow into whatever the page has left, and never below the declared floor. A fixed
+   * height left dead space under the frames on a tall window and ran off the bottom on a
+   * short one — the same literal being wrong in both directions. */
+  flex: 1;
+  min-height: var(--measure-frame);
   border: thin solid var(--surface-panel);
   border-radius: var(--space-1);
   background: var(--surface-panel);

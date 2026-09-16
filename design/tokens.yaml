@@ -150,7 +150,10 @@ spacing:
     # Two panes that hold running output. Both are layout decisions and belong here rather
     # than in a stylesheet, for the same reason the three above do.
     output: 22
-    frame: 46
+    # The SHORTEST an embedded application frame may be, not its height. The frames grow
+    # to fill whatever vertical space the page has left; this is the floor that keeps one
+    # usable on a short window, below which the page scrolls instead.
+    frame: 26
 
 # ---------------------------------------------------------------------------
 # Floors — read at test time by the token check. Not advisory.
