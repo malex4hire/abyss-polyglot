@@ -1,0 +1,40 @@
+# The fast gate, and the badge.
+#
+# Everything here runs on the host and compiles nothing: no JDK, no Node, no docker, no
+# containers. That is deliberate — it is what lets this run on every push in well under a
+# minute, which is the only kind of gate people actually keep.
+#
+# The full docker gate lives in docker-gate.yml and does NOT run on push. It builds four
+# JVM images and two Node images, and it is flaky against Maven Central and npm. A badge
+# that goes red because a registry was slow is a badge nobody reads.
+name: host gate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: install
+        run: python3 -m pip install --upgrade pip && pip install -e ".[verify]"
+
+      - name: everything derived is regenerated and committed
+        # Run the renderers first so the reproducibility check has something to compare,
+        # then let the suite fail if what they produce differs from what is in the tree.
+        run: make render
+
+      - name: audits
+        run: |
+          python3 scripts/audit-guards.py
+          python3 scripts/audit-names.py
+
+      - name: host suite
+        run: python3 -m pytest tests -m "not needs_stacks and not needs_docker" -v

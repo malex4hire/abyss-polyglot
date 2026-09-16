@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- The parent is the first half of the contrast: it supplies dependency versions,
+       plugin configuration and sensible defaults, none of which appear in this file.
+       The traditional module pins every version by hand. -->
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>4.1.0</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>com.abyss.polyglot</groupId>
+  <artifactId>spring-boot</artifactId>
+  <version>1.0.0</version>
+
+  <properties>
+    <surefire.version>3.5.6</surefire.version>
+    <java.version>25</java.version>
+  </properties>
+
+  <dependencies>
+    <!-- Each starter is a dependency that brings a capability AND the auto-configuration
+         that switches it on. That is the whole mechanism: no bean here is declared by
+         this module. The autoconfiguration-delta check reads Boot's live condition
+         evaluation to see which beans arrived from the running context, and compares it
+         with the traditional module's hand-declared set. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Surefire supplies its own junit-platform-launcher, which does not track the
+         JUnit the Boot parent manages: engine 6.0.3 next to launcher 1.12.2 fails
+         discovery with "OutputDirectoryCreator not available". Declaring the launcher
+         puts it under the parent's version management alongside the engine. -->
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-launcher</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Boot 4 split each test slice into its own module; @WebMvcTest is no longer
+         carried by spring-boot-starter-test and has to be asked for by name. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>spring-boot</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${surefire.version}</version>
+        <dependencies>
+          <!-- surefire resolves its provider at execution time, which needs the network.
+               Declaring it here makes it an ordinary build-time dependency, so it is
+               cached in the image and the in-container test suite runs with no
+               network. -->
+          <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-junit-platform</artifactId>
+            <version>${surefire.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <!-- The module runs from an exploded classpath rather than the fat jar. A fat jar
+           collapses java.class.path to a single entry, which blinds both the
+           runtime-identity check and StarterDependenciesTest: neither can then see which
+           artifacts actually resolved. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-deps</id><phase>package</phase>
+            <goals><goal>copy-dependencies</goal></goals>
+            <configuration><outputDirectory>${project.build.directory}/lib</outputDirectory></configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

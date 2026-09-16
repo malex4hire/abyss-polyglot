@@ -1,0 +1,61 @@
+# The full gate: every stack built and running, the contract suite against all four
+# backends, the autoconfiguration delta computed live, and the browser checks.
+#
+# NOT on push, and that is a decision rather than an oversight. It builds four JVM images
+# and two Node images and takes around an hour; it reaches Maven Central and npm, so it
+# fails for reasons that have nothing to do with the change under test. A red badge that
+# means "a registry was slow" trains people to ignore the badge, which costs more than the
+# coverage buys. The fast host gate is what guards every push.
+name: docker gate
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly. Enough to catch a base image or an upstream dependency moving underneath the
+    # declared floors, which is the class of failure this gate exists for.
+    - cron: "0 6 * * 1"
+
+jobs:
+  full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: install
+        run: pip install -e ".[verify]"
+
+      - name: bring the whole demo up
+        run: make up
+
+      - name: compute the auto-configuration delta from the two running artifacts
+        run: make delta
+
+      - name: type-check both frontends in their own containers
+        run: python3 scripts/audit-types.py
+
+      - name: the whole host suite, against the running demo
+        run: python3 -m pytest tests -v
+
+      - name: browser checks
+        run: make visual
+
+      - name: what the browser saw
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: visual/shots/
+          if-no-files-found: ignore
+
+      - name: container logs, when something failed
+        if: failure()
+        run: docker compose logs --no-color --tail=200
+
+      - name: down
+        if: always()
+        run: make down

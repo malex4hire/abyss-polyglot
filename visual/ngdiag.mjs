@@ -1,0 +1,12 @@
+import { chromium } from "playwright";
+import { requireEnv } from "./env.mjs";
+const browser = await chromium.launch();
+const page = await browser.newPage();
+const errors = [];
+page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+page.on("pageerror", (e) => errors.push("pageerror: " + e.message));
+await page.goto(requireEnv("APP") + "/", { waitUntil: "networkidle" });
+await page.waitForTimeout(2000);
+console.log("BODY:", (await page.$eval("body", n => n.innerText)).slice(0, 200).replace(/\n/g, " | "));
+console.log("ERRORS:", errors.slice(0, 4).join("\n  ") || "none");
+await browser.close();

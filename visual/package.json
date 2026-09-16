@@ -1,0 +1,7 @@
+{
+  "name": "visual-verification",
+  "private": true,
+  "type": "module",
+  "description": "Drives a real browser against the running demo. The RSTs prove the parts; this is the only thing that looks at a page.",
+  "dependencies": { "playwright": "1.45.0" }
+}

@@ -1,0 +1,75 @@
+# The claim the README opens with, checked on a machine that has nothing installed.
+#
+# Separate from the host gate on purpose: this job installs NOTHING, so a dependency
+# creeping into demo.py or into the Python backend fails here even if the host gate's
+# own install would have satisfied it. A check that runs in an environment where the
+# thing it forbids is already present is not checking anything.
+name: demo and contract
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  bare-interpreter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: python3 demo.py, with nothing installed
+        # -S -I: no site-packages, no user site, no inherited environment. Nothing on this
+        # runner can satisfy an import by accident.
+        run: |
+          timeout 120 python3 -S -I demo.py > demo.log 2>&1 &
+          pid=$!
+          for _ in $(seq 1 60); do
+            grep -q "Ctrl-C to stop" demo.log && break
+            sleep 1
+          done
+          kill $pid 2>/dev/null || true
+          cat demo.log
+          grep -q "Ctrl-C to stop" demo.log \
+            || { echo "::error::the walkthrough did not run to completion"; exit 1; }
+          ! grep -q "EXPECTED" demo.log \
+            || { echo "::error::the walkthrough printed an unmet expectation"; exit 1; }
+
+  contract-suite:
+    # The contract suite against the one backend that needs no image. It is the same file
+    # the full gate runs against all four; running it here means a change that breaks the
+    # contract is caught in a minute rather than at the weekly build.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: install the suite's own dependencies
+        run: pip install pytest requests pyyaml
+
+      - name: start the standard-library backend and run the contract suite
+        # The backend is started here rather than in its own step: a background process
+        # started in one `run` block is not something to rely on surviving into the next.
+        #
+        # The port is asked of the kernel, the same way demo.py asks. A number typed here
+        # would be a port literal outside the manifest, and one day it would collide with
+        # whatever this runner already has listening on it.
+        run: |
+          PORT=$(python3 -c "import socket; s = socket.socket(); s.bind(('127.0.0.1', 0)); print(s.getsockname()[1]); s.close()")
+          echo "backend on 127.0.0.1:$PORT"
+          PORT=$PORT PYTHONPATH="$PWD/modules/python-modern/src" python3 -m app > backend.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS "http://127.0.0.1:$PORT/health" >/dev/null 2>&1 && break
+            sleep 1
+          done
+          curl -fsS "http://127.0.0.1:$PORT/health" >/dev/null || {
+            echo "::error::the backend never answered /health"
+            cat backend.log
+            exit 1
+          }
+          CONTRACT_BASE_URL="http://127.0.0.1:$PORT" python3 -m pytest contract/suite -q

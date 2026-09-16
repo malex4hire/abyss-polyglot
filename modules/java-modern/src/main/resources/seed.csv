@@ -1,0 +1,7 @@
+id,title,status,priority,assignee,tags
+WI-001,Migrate batch scheduler,OPEN,5,avery,backend;legacy
+WI-002,Rewrite claims parser,IN_PROGRESS,8,briar,backend;parser
+WI-003,Retire SOAP endpoint,OPEN,3,avery,legacy
+WI-004,Add audit trail export,BLOCKED,6,casey,audit
+WI-005,Tune connection pool,IN_PROGRESS,7,briar,backend;performance
+WI-006,Document transition rules,OPEN,2,casey,docs

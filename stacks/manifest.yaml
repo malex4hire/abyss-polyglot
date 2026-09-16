@@ -1,0 +1,210 @@
+# The stack set. Single source for tier, role, pair, language, ports, source and test
+# roots, runtime floors, derivable identity, and the active flag.
+#
+# Every consumer derives from this file: compose services, the generated .env, health
+# checks, the contract suite's target set, the browser checks' target set, and the
+# side-by-side page's frame and backend lists. A port literal anywhere outside this file
+# is a second place ports are declared, and the host suite fails on one.
+
+# The words that name this set in prose. A README that types a count of stacks instead of
+# deriving one is how the count and the manifest drift apart, so the check that catches
+# that reads the nouns from here.
+nouns:
+  stacks:
+    - stack
+    - stacks
+    - runtime
+    - runtimes
+    - module
+    - modules
+
+infrastructure:
+  postgres:
+    service: postgres
+    # Host listeners occupy the range below this. Declared once, derived everywhere.
+    port: 5438
+    schema_per_stack: true
+
+  # Serves the side-by-side page and nothing else: two frames, one selector.
+  #
+  # Deliberately not 8080. Every container in this demo listens on 8080 internally — that
+  # is a fixed convention, and it appears as a literal in compose, in each server and in
+  # each Dockerfile. Publishing a host port with the same number would make every one of
+  # those literals ambiguous: a reader, and the check below, could no longer tell a
+  # container's own listen port from a second copy of a declared host port. The rule that
+  # host ports live only here stays absolute by not colliding with the convention.
+  side-by-side:
+    service: side-by-side
+    port: 8087
+
+stacks:
+
+  java-modern:
+    active: true
+    tier: LANGUAGE
+    role: backend
+    language: java
+    pair: python-modern
+    service: java-modern
+    port: 8081
+    source_root: modules/java-modern/src
+    test_root: modules/java-modern/src/test/java
+    test_command: "mvn -o -q -DfailIfNoTests=false test"
+    health_endpoint: /health
+    identity_endpoint: /__instrumentation/identity
+    runtime_version_floor: "25"
+    # No framework, by design. Declared rather than omitted: an absent floor is what
+    # let a stack run on an unsupported major without any check noticing.
+    framework_artifact: none
+    # Identity is derived from what resolves at runtime, never from a claimed label.
+    # The JDK HTTP server, with Jackson scoped to serialization.
+    required_artifacts:
+      - jackson-databind
+    forbidden_artifacts:
+      - spring
+      - javalin
+      - jetty
+      - helidon
+      - vertx
+      - micronaut
+      - quarkus
+      - tomcat
+      - undertow
+
+  spring-traditional:
+    active: true
+    tier: FRAMEWORK
+    role: backend
+    language: java
+    pair: spring-boot
+    configuration_style: explicit
+    service: spring-traditional
+    port: 8082
+    source_root: modules/spring-traditional/src
+    test_root: modules/spring-traditional/src/test/java
+    test_command: "mvn -o -q -DfailIfNoTests=false test"
+    health_endpoint: /health
+    identity_endpoint: /__instrumentation/identity
+    beans_endpoint: /__instrumentation/beans
+    runtime_version_floor: "25"
+    framework_artifact: spring-core
+    framework_version_floor: "7.0"
+    servlet_container_artifact: tomcat-embed-core
+    servlet_container_version_floor: "11.0"
+    required_artifacts:
+      - spring-webmvc
+      - spring-jdbc
+      - spring-tx
+    forbidden_artifacts:
+      - spring-boot
+      - spring-boot-autoconfigure
+      - spring-boot-starter
+
+  spring-boot:
+    active: true
+    tier: FRAMEWORK
+    role: backend
+    language: java
+    pair: spring-traditional
+    configuration_style: auto
+    service: spring-boot
+    port: 8083
+    source_root: modules/spring-boot/src
+    test_root: modules/spring-boot/src/test/java
+    test_command: "mvn -o -q -DfailIfNoTests=false test"
+    health_endpoint: /actuator/health
+    identity_endpoint: /__instrumentation/identity
+    autoconfig_endpoint: /__instrumentation/autoconfig
+    runtime_version_floor: "25"
+    framework_artifact: spring-boot
+    framework_version_floor: "4.1"
+    servlet_container_artifact: tomcat-embed-core
+    servlet_container_version_floor: "11.0"
+    required_artifacts:
+      - spring-boot-autoconfigure
+      - spring-boot-starter-web
+    forbidden_artifacts: []
+
+  python-modern:
+    active: true
+    tier: LANGUAGE
+    role: backend
+    language: python
+    pair: java-modern
+    service: python-modern
+    port: 8084
+    source_root: modules/python-modern/src
+    test_root: modules/python-modern/src/test
+    test_command: "python -m pytest -q -p no:cacheprovider"
+    health_endpoint: /health
+    identity_endpoint: /__instrumentation/identity
+    runtime_version_floor: "3.14"
+    framework_artifact: none
+    # Deliberately empty, and declared rather than omitted. This module imports only the
+    # standard library, so there is no third-party artifact whose presence could stand
+    # for its identity — the identity IS the absence below. A database driver was listed
+    # here and pinned in requirements.txt for the life of the build with nothing
+    # importing it, which is what a required artifact nobody checks against the running
+    # process looks like.
+    required_artifacts: []
+    forbidden_artifacts:
+      - django
+      - flask
+      - fastapi
+      - starlette
+      - uvicorn
+
+  angular:
+    active: true
+    tier: FRAMEWORK
+    role: frontend
+    language: typescript
+    # npm names are packages, not families: react and react-is are unrelated, where a
+    # Maven coordinate prefix legitimately covers a whole family.
+    artifact_match: exact
+    pair: react
+    service: angular
+    port: 8085
+    source_root: modules/angular/src
+    test_root: modules/angular/src/test
+    test_command: "npm test --silent --"
+    # The Angular compiler, not tsc. Templates are the half of an Angular component that
+    # tsc cannot see: a template naming a member the class does not have type-checks clean
+    # under tsc and is caught by ngc. Verified by injecting exactly that.
+    type_check_command: "npx ngc --noEmit -p tsconfig.json"
+    health_endpoint: /
+    identity_endpoint: /__instrumentation/identity
+    runtime_version_floor: "24"
+    framework_artifact: "@angular/core"
+    framework_version_floor: "22.1"
+    required_artifacts:
+      - "@angular/core"
+    forbidden_artifacts:
+      - react
+      - react-dom
+
+  react:
+    active: true
+    tier: FRAMEWORK
+    role: frontend
+    language: typescript
+    # npm names are packages, not families: react and react-is are unrelated, where a
+    # Maven coordinate prefix legitimately covers a whole family.
+    artifact_match: exact
+    pair: angular
+    service: react
+    port: 8086
+    source_root: modules/react/src
+    test_root: modules/react/src/test
+    test_command: "npm test --silent --"
+    # No template dialect to compile: JSX is TypeScript, so tsc sees all of it.
+    type_check_command: "npx tsc --noEmit -p tsconfig.json"
+    health_endpoint: /
+    identity_endpoint: /__instrumentation/identity
+    runtime_version_floor: "24"
+    framework_artifact: react-dom
+    framework_version_floor: "19.2"
+    required_artifacts:
+      - react-dom
+    forbidden_artifacts:
+      - "@angular/core"

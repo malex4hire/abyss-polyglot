@@ -1,0 +1,246 @@
+openapi: 3.0.3
+info:
+  title: Work Item API
+  version: "1.0.0"
+  description: >-
+    One contract, served identically by every backend. The suite that exercises it runs
+    unmodified against each, which is what makes the pair comparison a comparison of
+    implementations rather than of APIs.
+
+    Instrumentation endpoints — identity, beans, autoconfig — are deliberately absent.
+    They are declared in stacks/manifest.yaml, report resolved runtime data, and are not
+    part of what any client may depend on.
+
+paths:
+
+  /work-items:
+    get:
+      summary: B1 — list with status filter and tag containment
+      description: >-
+        B1 Query. Multi-field sort is part of the contract: priority descending, then
+        title ascending, so the ordering is total and every backend returns the same
+        sequence for the same data.
+      parameters:
+        - { name: status, in: query, required: false, schema: { $ref: "#/components/schemas/Status" } }
+        - name: tag
+          in: query
+          required: false
+          description: >-
+            Matches any item carrying a tag that contains this text, case-insensitively.
+            Partial rather than exact: a filter box that only answers to a whole tag makes
+            the person type a value they have to already know, which is a search that
+            requires the answer as its input.
+          schema: { type: string }
+      responses:
+        "200":
+          description: Matching work items, ordered
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: "#/components/schemas/WorkItem" }
+
+    post:
+      summary: B5 — create a work item, idempotently on its key
+      description: >-
+        B5 Idempotent writes. The key is supplied by the caller and is the identity of the
+        row, so a create repeated with the same key produces one row, one honest response
+        and one change event. The second call created nothing and must not answer 201; it
+        answers 200 with the existing representation. A missing or malformed key is
+        rejected rather than coerced — a key that arrives as the literal string "null" is a
+        row nobody can address.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, title, status, priority, assignee]
+              properties:
+                id: { type: string }
+                title: { type: string }
+                status: { $ref: "#/components/schemas/Status" }
+                priority: { type: integer }
+                assignee: { type: string }
+                tags:
+                  type: array
+                  items: { type: string }
+      responses:
+        "201":
+          description: Created. The key was new and a row was written.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [item]
+                properties:
+                  item: { $ref: "#/components/schemas/WorkItem" }
+
+        "200":
+          description: >-
+            The key already existed. Nothing was written and nothing was announced; this is
+            the row as it stands.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [item]
+                properties:
+                  item: { $ref: "#/components/schemas/WorkItem" }
+        "400":
+          description: >-
+            The key was missing or malformed. Nothing was stored. Coercing an absent key
+            into a string is what produces a row addressed as "null".
+  /work-items/{id}:
+    get:
+      summary: Fetch a work item by id
+      description: >-
+        Absent from this contract until now, which was an oversight rather than a decision:
+        every backend already stores by id and the frontends hold one. An archived item
+        resolves here. Archive is a soft delete, so the list is the active view and this
+        addresses the record — the same answer the contract already gives by letting a
+        transition against an archived item succeed rather than 404.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: The work item, archived or not. archivedAt says which.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [item]
+                properties:
+                  item: { $ref: "#/components/schemas/WorkItem" }
+        "404":
+          description: No work item with that id.
+
+  /work-items/{id}/transition:
+    post:
+      summary: B2 — status change under an explicit state machine
+      description: >-
+        B2 Transition. An illegal move is refused with a typed rejection rather than an
+        error string, and refusing it changes nothing.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { $ref: "#/components/schemas/Status" }
+      responses:
+        "200":
+          description: Applied
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [item]
+                properties:
+                  item: { $ref: "#/components/schemas/WorkItem" }
+        "404": { description: No such work item }
+        "422":
+          description: Refused by the state machine
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [rejected]
+                properties:
+                  rejected: { type: object }
+
+  /work-items/{id}/archive:
+    post:
+      summary: Soft delete
+      description: >-
+        Archive sets a timestamp; the record is never removed. No hard deletes anywhere in
+        this repository. An archived item leaves the B1 result and stays retrievable.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Archived
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [archived]
+                properties:
+                  archived: { type: string }
+
+  /workload:
+    get:
+      summary: B3 — per-assignee workload rollup
+      description: >-
+        B3 Aggregate. Each backend fans this out however its runtime makes natural; the
+        contract fixes only the result.
+      responses:
+        "200":
+          description: Rollup by assignee
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [byAssignee]
+                properties:
+                  byAssignee:
+                    type: object
+                    additionalProperties: { type: integer }
+
+  /events:
+    get:
+      summary: B4 — live update stream
+      description: >-
+        B4 Live update. A server-sent event stream carrying a change event whenever an item
+        is created, transitioned or archived. The stream is part of the contract, not
+        instrumentation: every backend serves it and both frontends consume it, so a change
+        made in one client appears in the other with nobody clicking anything.
+
+        Each event is `event: change` with a JSON payload naming what happened and to which
+        item. Clients re-fetch on receipt rather than patching from the payload, which keeps
+        the stream a notification rather than a second source of truth.
+      responses:
+        "200":
+          description: An event stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: >-
+                  Lines of the form `event: change` followed by `data: {"kind": "...",
+                  "id": "..."}`, separated by a blank line.
+
+  /health:
+    get:
+      summary: Liveness
+      responses:
+        "200": { description: Alive }
+
+components:
+  schemas:
+    Status:
+      type: string
+      enum: [OPEN, IN_PROGRESS, BLOCKED, DONE, CANCELLED]
+    WorkItem:
+      type: object
+      required: [id, title, status, priority, assignee, createdAt, updatedAt, tags]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        status: { $ref: "#/components/schemas/Status" }
+        priority: { type: integer }
+        assignee: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        tags:
+          type: array
+          items: { type: string }
+        archivedAt: { type: string, format: date-time, nullable: true }

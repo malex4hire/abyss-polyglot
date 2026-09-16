@@ -1,0 +1,26 @@
+[project]
+name = "abyss-polyglot"
+version = "1.0.0"
+description = "One contract, four backends, two frontends, one suite that runs against all of them."
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+# The host-side suite and the contract suite. `python3 demo.py` needs none of this:
+# it is standard library only, on purpose.
+verify = [
+    "pytest>=8.0",
+    "requests>=2.31",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra --strict-markers"
+markers = [
+    "needs_stacks: requires the compose stacks to be running and healthy",
+    "needs_docker: drives docker directly; a host check, but not a host-only one",
+    "slow: brings a stack up or down, or drives a browser",
+]

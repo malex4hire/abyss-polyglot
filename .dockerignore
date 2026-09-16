@@ -1,0 +1,11 @@
+# spring-boot and spring-traditional build from the repo root (to reach
+# scripts/wait-for-postgres.sh, shared with each other), which would otherwise send
+# .git, every module's target/build output, and node_modules into the build context.
+.git
+build/
+**/target/
+**/node_modules/
+**/dist/
+side-by-side/dist/
+visual/node_modules/
+visual/shots/

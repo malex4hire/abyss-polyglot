@@ -1,0 +1,294 @@
+# The project name is stated rather than derived. Compose defaults it to the directory
+# name, so anything running `docker compose` against this file from a different working
+# directory addresses a different project and reports every service as not running. A
+# name that changes with the caller's working directory is not a name.
+name: abyss-polyglot
+
+# The demo stack.
+#
+# Every port here comes from .env, which scripts/render-env.py generates from
+# stacks/manifest.yaml. A port literal in this file would be a second place ports are
+# declared, and the host suite fails on one.
+#
+# Module source is bind-mounted into each service so a module's own test suite can run
+# inside the already-running container with no rebuild and no restart. That is why the
+# JVM images carry Maven rather than a slim JRE.
+
+services:
+
+  postgres:
+    image: postgres:18-alpine@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # a static address, not a name to resolve. Under the offline
+    # overlay's enable_ip_masquerade: false, a raw UDP probe to the embedded DNS
+    # resolver at 127.0.0.11:53 gets no response at all — not a slow answer, no answer,
+    # reproduced with a clean host and nothing else touching this network. Docker's
+    # embedded resolver depends on masquerade for its own internal proxying, which the
+    # overlay exists specifically to turn off. A pinned address sidesteps the resolver
+    # for exactly the one lookup that has to survive it; every other cross-container
+    # call in this demo already uses a static compose service port, not a hostname a
+    # client resolves at request time.
+    networks:
+      default:
+        ipv4_address: 172.28.0.10
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    volumes:
+      # PostgreSQL 18 changed the recommended mount point: a single mount at
+      # /var/lib/postgresql, with the data directory a subdirectory of it, so that
+      # pg_upgrade --link can work across the boundary. The 16-era mount at
+      # .../data made 18 refuse to start on the existing directory.
+      - postgres-data:/var/lib/postgresql
+      - ./infra/postgres-init.sql:/docker-entrypoint-initdb.d/10-schemas.sql:ro
+
+  java-modern:
+    # curl rather than wget: the Temurin 25 base image carries curl and not wget, and the
+    # JVM healthchecks failed on the base-image upgrade rather than on anything the
+    # application does. The assertion is unchanged — a body from the health endpoint, and
+    # an unknown path that is not 200.
+    build: ./modules/java-modern
+    # Running a test runner inside this container leaves children behind. Whatever the
+    # CMD is becomes PID 1, inherits those orphans and never reaps them — an ordinary
+    # server process calls wait() for nobody. Docker's init sits in front as PID 1 and
+    # does, which is the difference between a suite you can re-run all afternoon and one
+    # that leaks a process table entry per iteration.
+    init: true
+    environment:
+      PORT: 8080
+    ports:
+      - "${JAVA_MODERN_PORT}:8080"
+    volumes:
+      - ./modules/java-modern/src:/app/src
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/health | grep -q . && ! curl -fsS http://127.0.0.1:8080/__healthcheck_no_such_path >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  spring-traditional:
+    # Repo root, not ./modules/spring-traditional: the Dockerfile COPYs
+    # scripts/wait-for-postgres.sh, shared with spring-boot below.
+    build:
+      context: .
+      dockerfile: modules/spring-traditional/Dockerfile
+    # Running a test runner inside this container leaves children behind. Whatever the
+    # CMD is becomes PID 1, inherits those orphans and never reaps them — an ordinary
+    # server process calls wait() for nobody. Docker's init sits in front as PID 1 and
+    # does, which is the difference between a suite you can re-run all afternoon and one
+    # that leaks a process table entry per iteration.
+    init: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # postgres's static address, written into /etc/hosts at
+    # container create — see the comment on postgres's own service block for why the
+    # embedded DNS resolver cannot be trusted for this lookup under the offline overlay.
+    # wait-for-postgres.sh stays as a harmless fallback; with this entry present it
+    # should never need to retry.
+    extra_hosts:
+      - "postgres:172.28.0.10"
+    environment:
+      PORT: 8080
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${SPRING_TRADITIONAL_PORT}:8080"
+    volumes:
+      - ./modules/spring-traditional/src:/app/src
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/health | grep -q . && ! curl -fsS http://127.0.0.1:8080/__healthcheck_no_such_path >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 3s
+      # 36, not 30: wait-for-postgres.sh can add up to 30s before mvn package even
+      # starts, on top of the retries budget the healthcheck already needed for a slow
+      # build. 6 extra retries at this interval covers exactly that.
+      retries: 36
+
+  spring-boot:
+    # Repo root, not ./modules/spring-boot: the Dockerfile COPYs
+    # scripts/wait-for-postgres.sh, shared with spring-traditional above.
+    build:
+      context: .
+      dockerfile: modules/spring-boot/Dockerfile
+    # Running a test runner inside this container leaves children behind. Whatever the
+    # CMD is becomes PID 1, inherits those orphans and never reaps them — an ordinary
+    # server process calls wait() for nobody. Docker's init sits in front as PID 1 and
+    # does, which is the difference between a suite you can re-run all afternoon and one
+    # that leaks a process table entry per iteration.
+    init: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # postgres's static address, written into /etc/hosts at
+    # container create — see the comment on postgres's own service block for why the
+    # embedded DNS resolver cannot be trusted for this lookup under the offline overlay.
+    # wait-for-postgres.sh stays as a harmless fallback; with this entry present it
+    # should never need to retry.
+    extra_hosts:
+      - "postgres:172.28.0.10"
+    environment:
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: container
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${SPRING_BOOT_PORT}:8080"
+    volumes:
+      - ./modules/spring-boot/src:/app/src
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/actuator/health | grep -q . && ! curl -fsS http://127.0.0.1:8080/__healthcheck_no_such_path >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 3s
+      # 36, not 30: wait-for-postgres.sh can add up to 30s before mvn package even
+      # starts, on top of the retries budget the healthcheck already needed for a slow
+      # build. 6 extra retries at this interval covers exactly that.
+      retries: 36
+
+  python-modern:
+    build: ./modules/python-modern
+    # Running a test runner inside this container leaves children behind. Whatever the
+    # CMD is becomes PID 1, inherits those orphans and never reaps them — an ordinary
+    # server process calls wait() for nobody. Docker's init sits in front as PID 1 and
+    # does, which is the difference between a suite you can re-run all afternoon and one
+    # that leaks a process table entry per iteration.
+    init: true
+    environment:
+      PORT: 8080
+    ports:
+      - "${PYTHON_MODERN_PORT}:8080"
+    volumes:
+      - ./modules/python-modern/src:/app/src
+    healthcheck:
+      # This image carries no wget, so the same two-part check is written in python:
+      # a non-empty body from the health endpoint, and an unknown path that is not 200.
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request as u,sys\nassert u.urlopen('http://127.0.0.1:8080/health').read()\ntry:\n u.urlopen('http://127.0.0.1:8080/__healthcheck_no_such_path')\n sys.exit(1)\nexcept Exception as e:\n sys.exit(0 if getattr(e, 'code', 0) == 404 else 1)\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  angular:
+    build: ./modules/angular
+    # Running a test runner inside this container leaves children behind. Whatever the
+    # CMD is becomes PID 1, inherits those orphans and never reaps them — an ordinary
+    # server process calls wait() for nobody. Docker's init sits in front as PID 1 and
+    # does, which is the difference between a suite you can re-run all afternoon and one
+    # that leaks a process table entry per iteration.
+    init: true
+    environment:
+      # The API base is derived from the manifest by scripts/render-env.py; a port
+      # literal in a frontend would be a second place ports are declared.
+      # Same-origin at the browser; the static server proxies to this backend.
+      API_BASE: "http://java-modern:8080"
+      # Every selectable backend, from the manifest. The frontend reads this from its own
+      # server at runtime, so it carries no stack list of its own.
+      BACKENDS_JSON: "${BACKENDS_JSON}"
+    ports:
+      - "${ANGULAR_PORT}:8080"
+    volumes:
+      - ./modules/angular/src:/app/src
+      # The static server is mounted for the same reason source is: editing it should not
+      # cost an image rebuild. Without this the container keeps serving the copy baked at
+      # build time, and every change appears to do nothing.
+      - ./modules/angular/serve.mjs:/app/serve.mjs
+      # Mounted for the same reason: the document is what the app bootstraps
+      # into, and a root-selector change that never reaches the container
+      # renders a blank page on a green build.
+      - ./modules/angular/index.html:/app/index.html
+    healthcheck:
+      # Fetches the built bundle, discovered by its hashed name from the document.
+      #
+      # The previous check requested "/" and accepted any status under 400. This server
+      # answers every unknown path with index.html, so it returned 200 whenever the process
+      # was listening — including with a broken or empty bundle. A frontend reporting
+      # healthy with a bundle that renders nothing is the state that lets a demo start
+      # broken, and everything that waits on health inherits that blindness.
+      test:
+        ["CMD-SHELL", "node -e \"const h=require('http');const g=(p,cb)=>h.get('http://localhost:8080'+p,r=>{let d='',n=0;r.on('data',c=>{d+=c;n+=c.length});r.on('end',()=>cb(r.statusCode,d,n))}).on('error',()=>process.exit(1));g('/',(s,d)=>{const m=/src=[\\\"']([^\\\"']*assets[^\\\"']+\\.js)/.exec(d);if(s!==200||!m)process.exit(1);g(m[1],(s2,_d,n)=>process.exit(s2===200&&n>20000?0:1))})\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  react:
+    build: ./modules/react
+    # Running a test runner inside this container leaves children behind. Whatever the
+    # CMD is becomes PID 1, inherits those orphans and never reaps them — an ordinary
+    # server process calls wait() for nobody. Docker's init sits in front as PID 1 and
+    # does, which is the difference between a suite you can re-run all afternoon and one
+    # that leaks a process table entry per iteration.
+    init: true
+    environment:
+      # Same-origin at the browser; the static server proxies to this backend.
+      API_BASE: "http://java-modern:8080"
+      # Every selectable backend, from the manifest.
+      BACKENDS_JSON: "${BACKENDS_JSON}"
+    ports:
+      - "${REACT_PORT}:8080"
+    volumes:
+      - ./modules/react/src:/app/src
+      # The static server is mounted for the same reason source is: editing it should not
+      # cost an image rebuild. Without this the container keeps serving the copy baked at
+      # build time, and every change appears to do nothing.
+      - ./modules/react/serve.mjs:/app/serve.mjs
+      # Mounted for the same reason: the document is what the app bootstraps
+      # into, and a root-selector change that never reaches the container
+      # renders a blank page on a green build.
+      - ./modules/react/index.html:/app/index.html
+    healthcheck:
+      # Fetches the built bundle, discovered by its hashed name from the document.
+      #
+      # The previous check requested "/" and accepted any status under 400. This server
+      # answers every unknown path with index.html, so it returned 200 whenever the process
+      # was listening — including with a broken or empty bundle. A frontend reporting
+      # healthy with a bundle that renders nothing is the state that lets a demo start
+      # broken, and everything that waits on health inherits that blindness.
+      test:
+        ["CMD-SHELL", "node -e \"const h=require('http');const g=(p,cb)=>h.get('http://localhost:8080'+p,r=>{let d='',n=0;r.on('data',c=>{d+=c;n+=c.length});r.on('end',()=>cb(r.statusCode,d,n))}).on('error',()=>process.exit(1));g('/',(s,d)=>{const m=/src=[\\\"']([^\\\"']*assets[^\\\"']+\\.js)/.exec(d);if(s!==200||!m)process.exit(1);g(m[1],(s2,_d,n)=>process.exit(s2===200&&n>20000?0:1))})\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  side-by-side:
+    image: nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
+    ports:
+      - "${SIDE_BY_SIDE_PORT}:80"
+    volumes:
+      - ./side-by-side/dist:/usr/share/nginx/html:ro
+      - ./side-by-side/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    healthcheck:
+      # Fetches the page AND the stylesheet it depends on.
+      #
+      # Reading index.html proved nginx could return a file from disk. It could not tell a
+      # working page from one whose generated stylesheet was missing, because that one
+      # file was the only thing ever fetched.
+      #
+      # 127.0.0.1 rather than localhost. Observed here: localhost resolved to ::1 and
+      # nginx listens on IPv4 only, so the request was refused. Whether that resolution
+      # order is stable across restarts was never established — which is the reason to
+      # name the address that answers rather than one that sometimes does.
+      test:
+        ["CMD-SHELL", "wget -qO- http://127.0.0.1/index.html | grep -q data-app-frame && wget -qO- http://127.0.0.1/tokens.generated.css | grep -q -- --surface-ground"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  postgres-data:
+
+networks:
+  default:
+    # Explicit rather than auto-assigned: postgres's static address above needs a known
+    # subnet to be pinned into. 172.28.0.0/16 was checked against `docker network ls`
+    # against every other network already running on this host and is free.
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

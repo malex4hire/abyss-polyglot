@@ -1,0 +1,13 @@
+# A language module, not a framework module: no Django, no Flask, no FastAPI. HTTP is
+# served by http.server from the standard library, which is the Python counterpart to
+# the modern Java module serving the contract from the JDK's own HTTP server.
+#
+# The application imports nothing from this file. It stores in memory and imports only
+# the standard library, which is what lets `python3 demo.py` run on a bare interpreter
+# with nothing installed — the strongest thing this repository can say in one command.
+# A database driver was pinned here, and declared a required runtime artifact in the
+# manifest, for the life of the build. Nothing imported it. Both are gone.
+#
+# pytest is the module's own test runner and is installed in the image so the suite can
+# be run inside the running container. It is a development dependency, not a runtime one.
+pytest==9.1.1

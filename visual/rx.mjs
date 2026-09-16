@@ -1,0 +1,10 @@
+import { chromium } from "playwright";
+import { requireEnv } from "./env.mjs";
+const b = await chromium.launch(); const p = await b.newPage();
+const errs=[]; p.on("pageerror",e=>errs.push(String(e))); p.on("console",m=>{if(m.type()==="error")errs.push(m.text())});
+await p.goto(requireEnv("APP")+"/",{waitUntil:"domcontentloaded"});
+await p.waitForTimeout(4000);
+console.log("BODY:", (await p.evaluate(()=>document.body.innerText)).slice(0,200).replace(/\n/g," | "));
+console.log("HAS TRACKER:", await p.locator("[data-testid=tracker]").count());
+console.log("ERRORS:", errs.slice(0,3).join(" ~~ "));
+await b.close();

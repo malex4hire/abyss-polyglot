@@ -1,0 +1,32 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# computed at demo time from the two running artifacts, never hand-authored
+build/
+
+# rendered by scripts/render-side-by-side.py from the manifest and the tokens
+side-by-side/dist/
+
+# module build products
+target/
+node_modules/
+dist/
+*.class
+*.jar
+*.war
+
+.DS_Store
+
+# local observation surface, never an artifact
+worklog.log
+
+# generated from stacks/manifest.yaml by scripts/render-env.py
+.env
+
+# browser driver for the visual check, installed on demand
+visual/node_modules/
+visual/shots/
+visual/results.json

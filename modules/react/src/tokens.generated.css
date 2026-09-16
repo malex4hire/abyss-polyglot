@@ -1,0 +1,197 @@
+/* GENERATED from design/tokens.yaml. Do not edit; edit the tokens. */
+
+@font-face {
+  font-family: "Fraunces";
+  src: url("fonts/Fraunces-0.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 100 900;
+}
+@font-face {
+  font-family: "Fraunces";
+  src: url("fonts/Fraunces-1.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 100 900;
+}
+@font-face {
+  font-family: "Public Sans";
+  src: url("fonts/PublicSans-0.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 100 900;
+}
+@font-face {
+  font-family: "Public Sans";
+  src: url("fonts/PublicSans-1.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 100 900;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("fonts/JetBrainsMono-0.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 100 900;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("fonts/JetBrainsMono-1.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 100 900;
+}
+
+:root {
+  --surface-ground: #FAF7F2;
+  --surface-panel: #FFFFFF;
+  --rule: #E4DED4;
+  --arrival: #EFF4F8;
+  --arrival-wash: var(--arrival);
+  --fg-ink: #14110E;
+  --fg-muted: #5F584E;
+  --stacks-spring-traditional-color: #7C4403;
+  --stacks-spring-traditional-label: Traditional Spring;
+  --stacks-spring-traditional-glyph: ◧;
+  --stacks-spring-boot-color: #2D5E02;
+  --stacks-spring-boot-label: Spring Boot;
+  --stacks-spring-boot-glyph: ◨;
+  --stacks-java-modern-color: #036336;
+  --stacks-java-modern-label: Modern Java;
+  --stacks-java-modern-glyph: ◆;
+  --stacks-python-modern-color: #044FA4;
+  --stacks-python-modern-label: Modern Python;
+  --stacks-python-modern-glyph: ◇;
+  --stacks-react-color: #7505D6;
+  --stacks-react-label: React;
+  --stacks-react-glyph: ○;
+  --stacks-angular-color: #A90436;
+  --stacks-angular-label: Angular;
+  --stacks-angular-glyph: ●;
+  --tiers-language-label: LANG;
+  --tiers-language-weight: 600;
+  --tiers-language-border-style: solid;
+  --tiers-framework-label: FRWK;
+  --tiers-framework-weight: 400;
+  --tiers-framework-border-style: dashed;
+  --status-open-color: #42759A;
+  --status-open-label: OPEN;
+  --status-open-glyph: ○;
+  --status-in-progress-color: #816E37;
+  --status-in-progress-label: IN_PROGRESS;
+  --status-in-progress-glyph: ◐;
+  --status-blocked-color: #CD3744;
+  --status-blocked-label: BLOCKED;
+  --status-blocked-glyph: ▨;
+  --status-done-color: #367D4D;
+  --status-done-label: DONE;
+  --status-done-glyph: ●;
+  --status-cancelled-color: #AB26ED;
+  --status-cancelled-label: CANCELLED;
+  --status-cancelled-glyph: ✕;
+  --type-xs: 13.6px;
+  --type-sm: 17px;
+  --type-md: 21.25px;
+  --type-lg: 26.6px;
+  --type-xl: 33.2px;
+  --type-xxl: 41.5px;
+  --type-xxxl: 51.9px;
+  --code-size: 16px;
+  --code-line: 1.6;
+  --face-display: "Fraunces";
+  --face-body: "Public Sans";
+  --face-mono: "JetBrains Mono";
+  --space-0: 4px;
+  --space-1: 8px;
+  --space-2: 12px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --space-7: 64px;
+  --space-8: 96px;
+  --measure-page: 62rem;
+  --measure-prose: 46rem;
+  --measure-card: 40rem;
+  --measure-output: 22rem;
+  --measure-frame: 46rem;
+  --seam-rule: 3px;
+  --seam-reveal: 240ms;
+  --seam-wash: 0.08;
+  --control-ease: 120ms;
+  --caret: 5px;
+  --split-breakpoint: 900px;
+  --app-row: 44px;
+  --app-control: 34px;
+  --app-rail: 15rem;
+  --app-bar: 56px;
+  --app-radius: 10px;
+  --app-radius-sm: 6px;
+  --app-radius-pill: 999px;
+  --app-nudge: 1px;
+  --app-icon: 1em;
+  --app-control-min: 11rem;
+  --app-meter-label: 7rem;
+  --app-meter-label-narrow: 5rem;
+  --app-meter-value: 3rem;
+  --app-meter-value-narrow: 2.5rem;
+  --app-display-weight: 650;
+  --app-label-tracking: 0.06em;
+  --app-bg: #0F1116;
+  --app-card: #171B22;
+  --app-raised: #1E232C;
+  --app-ink: #E8ECF4;
+  --app-muted: #9BA4B5;
+  --app-hairline: #252B36;
+  --app-shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.28);
+  --app-overlay: rgba(255,255,255,.06);
+  --app-accent-angular: #FC839B;
+  --app-accent-react: #C983FC;
+  --app-accent-java-modern: #83FCCD;
+  --app-accent-python-modern: #83B9FC;
+  --app-accent-spring-traditional: #FCC183;
+  --app-accent-spring-boot: #B5FC83;
+  --app-status-OPEN: #92D0FC;
+  --app-status-IN_PROGRESS: #FCE292;
+  --app-status-BLOCKED: #FC929A;
+  --app-status-DONE: #92FCB5;
+  --app-status-CANCELLED: #D992FC;
+}
+
+.chip[data-stack="spring-traditional"] { background: var(--stacks-spring-traditional-color); }
+.side[data-stack="spring-traditional"] { box-shadow: inset var(--seam-rule) 0 0 var(--stacks-spring-traditional-color); }
+.chip[data-stack="spring-boot"] { background: var(--stacks-spring-boot-color); }
+.side[data-stack="spring-boot"] { box-shadow: inset var(--seam-rule) 0 0 var(--stacks-spring-boot-color); }
+.chip[data-stack="java-modern"] { background: var(--stacks-java-modern-color); }
+.side[data-stack="java-modern"] { box-shadow: inset var(--seam-rule) 0 0 var(--stacks-java-modern-color); }
+.chip[data-stack="python-modern"] { background: var(--stacks-python-modern-color); }
+.side[data-stack="python-modern"] { box-shadow: inset var(--seam-rule) 0 0 var(--stacks-python-modern-color); }
+.chip[data-stack="react"] { background: var(--stacks-react-color); }
+.side[data-stack="react"] { box-shadow: inset var(--seam-rule) 0 0 var(--stacks-react-color); }
+.chip[data-stack="angular"] { background: var(--stacks-angular-color); }
+.side[data-stack="angular"] { box-shadow: inset var(--seam-rule) 0 0 var(--stacks-angular-color); }
+.badge[data-tier="LANGUAGE"] { font-weight: var(--tiers-language-weight); }
+.badge[data-tier="LANGUAGE"] { border-style: var(--tiers-language-border-style); }
+.badge[data-tier="FRAMEWORK"] { font-weight: var(--tiers-framework-weight); }
+.badge[data-tier="FRAMEWORK"] { border-style: var(--tiers-framework-border-style); }
+
+@media (max-width: 900px) {
+  .split { grid-template-columns: 1fr; }
+}
+
+:root[data-theme="light"] {
+  --app-bg: #F2F4F8;
+  --app-card: #FFFFFF;
+  --app-raised: #F7F9FC;
+  --app-ink: #10141C;
+  --app-muted: #545C6B;
+  --app-hairline: #E2E6ED;
+  --app-shadow: 0 1px 2px rgba(16,20,28,.06), 0 8px 24px rgba(16,20,28,.08);
+  --app-overlay: rgba(16,20,28,.05);
+  --app-accent-angular: #A90436;
+  --app-accent-react: #7505D6;
+  --app-accent-java-modern: #036336;
+  --app-accent-python-modern: #044FA4;
+  --app-accent-spring-traditional: #7C4403;
+  --app-accent-spring-boot: #2D5E02;
+  --app-status-OPEN: #42759A;
+  --app-status-IN_PROGRESS: #816E37;
+  --app-status-BLOCKED: #CD3744;
+  --app-status-DONE: #367D4D;
+  --app-status-CANCELLED: #AB26ED;
+}

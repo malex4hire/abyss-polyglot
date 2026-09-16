@@ -1,0 +1,287 @@
+# The single token source. Every visual value this repository renders resolves here.
+#
+# Direction is specimen plate: warm paper ground, generous margins, saturated identity
+# hues carrying the specimens. Colour does work; nothing in the palette is decoration.
+# Boldness is spent at the seam and nowhere else.
+#
+# Every value below was measured, not eyeballed. Ratios in the comments are computed
+# against surface.ground and surface.panel and are re-verified by the token check at test time
+# against the floors declared at the bottom of this file. Lowering a floor to make a
+# colour fit is explicitly forbidden.
+#
+# Each governed set declares color_encoded. Hue separation applies to colour-encoded
+# sets only. A non-colour encoding is required of every member of every set regardless,
+# because screen share compresses hue hard and some viewers are colourblind.
+
+# ---------------------------------------------------------------------------
+# Ground and ink. Declared as separate groups so contrast is checked across them and
+# never within one: ink is a foreground, not a candidate background.
+# ---------------------------------------------------------------------------
+
+surface:
+  ground: "#FAF7F2"   # warm paper
+  panel: "#FFFFFF"    # specimen card
+
+
+# Decoration: colours that are neither a foreground nor a background. A separator draws
+# the edge where one surface meets another and never carries text, and a wash marks a row
+# for a moment. Declaring them under surface made the token check test contrast against a hairline,
+# which is a question with no meaning — the fix is the declaration, not the floor.
+decoration:
+  rule: "#E4DED4"
+  arrival: "#EFF4F8"
+
+foreground:
+  ink: "#14110E"      # 17.60:1 on ground, 18.81:1 on panel
+  muted: "#5F584E"    #  6.57:1 on ground,  7.02:1 on panel
+
+# ---------------------------------------------------------------------------
+# Stack identity — six owned hues on an even ring, minimum separation 50.4deg
+#
+# Framework brand colours are rejected and stay rejected: Angular red, React cyan,
+# Python blue and Spring green put React and Python roughly 11deg apart, which fails
+# the separation floor outright and is unreadable once screen share compresses it.
+# ---------------------------------------------------------------------------
+
+stacks:
+  color_encoded: true
+  members:
+    spring-traditional:
+      color: "#7C4403"   # hue  32.2   7.32:1 ground   7.82:1 panel
+      label: Traditional Spring
+      glyph: "◧"
+    spring-boot:
+      color: "#2D5E02"   # hue  92.0   7.24:1 ground   7.74:1 panel
+      label: Spring Boot
+      glyph: "◨"
+    java-modern:
+      color: "#036336"   # hue 151.9   6.91:1 ground   7.39:1 panel
+      label: Modern Java
+      glyph: "◆"
+    python-modern:
+      color: "#044FA4"   # hue 211.9   7.39:1 ground   7.90:1 panel
+      label: Modern Python
+      glyph: "◇"
+    react:
+      color: "#7505D6"   # hue 272.2   7.15:1 ground   7.64:1 panel
+      label: React
+      glyph: "○"
+    angular:
+      color: "#A90436"   # hue 341.8   7.13:1 ground   7.62:1 panel
+      label: Angular
+      glyph: "●"
+
+# Seam washes: identity at 8% over ground. Ink holds at or above 15.2:1 on every one.
+seam:
+  wash_alpha: 0.08
+  rule_width: 3
+  reveal_ms: 240
+  split_breakpoint: 900
+  # Control feedback. Short enough to read as response rather than animation.
+  control_ms: 120
+  # The caret drawn on a select, in pixels. Small enough that the spacing scale would be
+  # the wrong instrument.
+  caret_px: 5
+
+# ---------------------------------------------------------------------------
+# Tier — ink weight, not colour. Deliberately not colour-encoded.
+#
+# An earlier revision of this file gave tier two quiet hues because the token check
+# demanded a colour token from every member of every set. That was the check being wrong:
+# where a closed decision and a test disagree, the test is the thing that changed by
+# mistake. Scoping hue separation to colour-encoded sets put tier back on weight.
+# ---------------------------------------------------------------------------
+
+tiers:
+  color_encoded: false
+  members:
+    LANGUAGE:
+      label: LANG
+      weight: 600
+      border_style: solid
+    FRAMEWORK:
+      label: FRWK
+      weight: 400
+      border_style: dashed
+
+# ---------------------------------------------------------------------------
+# Typography — self-hosted from the first commit. A webfont CDN is a blank page on a
+# machine with no route out, so it is prohibited from the start rather than at hardening.
+# ---------------------------------------------------------------------------
+
+type:
+  faces:
+    display:
+      family: Fraunces
+      role: headings and stack names only — this is where the character lives
+      formats: [woff2]
+    body:
+      family: Public Sans
+      role: prose and interface text
+      formats: [woff2]
+    mono:
+      family: JetBrains Mono
+      role: all rendered code
+      formats: [woff2]
+  # Base is larger than a typical web base on purpose: the real viewing condition is a
+  # browser shared at reduced resolution, not a developer's own monitor.
+  base_px: 17
+  ratio: 1.25
+  scale:
+    xs: 13.6
+    sm: 17
+    md: 21.25
+    lg: 26.6
+    xl: 33.2
+    xxl: 41.5
+    xxxl: 51.9
+  code:
+    size_px: 16
+    line_height: 1.6
+
+spacing:
+  scale: [4, 8, 12, 16, 24, 32, 48, 64, 96]
+  # Measures are lengths too. Leaving them as literals in the stylesheet put three
+  # layout decisions outside the token set, where changing them means editing CSS.
+  measures:
+    page: 62
+    prose: 46
+    card: 40
+    # Two panes that hold running output. Both are layout decisions and belong here rather
+    # than in a stylesheet, for the same reason the three above do.
+    output: 22
+    frame: 46
+
+# ---------------------------------------------------------------------------
+# Floors — read at test time by the token check. Not advisory.
+# ---------------------------------------------------------------------------
+
+floors:
+  contrast: 4.5          # WCAG AA for normal text
+  hue_separation: 40     # degrees; every colour-encoded set clears this with margin
+
+# ---------------------------------------------------------------------------
+# The applications wear one system, generated into both.
+#
+# Status is a governed set like the others: five members, each with its own hue, its own
+# label and its own dot, so the pill is readable to someone who cannot separate the colours.
+# Hues sit 50 degrees apart at the closest, above the declared separation floor, and every
+# one clears the contrast floor against both the ground and the panel.
+
+status:
+  color_encoded: true
+  members:
+    open:
+      color: "#42759A"   # hue 205.0   4.63:1 ground   4.95:1 panel
+      label: OPEN
+      glyph: "○"
+    in-progress:
+      color: "#816E37"   # hue  45.0   4.66:1 ground   4.98:1 panel
+      label: IN_PROGRESS
+      glyph: "◐"
+    blocked:
+      color: "#CD3744"   # hue 355.0   4.65:1 ground   4.97:1 panel
+      label: BLOCKED
+      glyph: "▨"
+    done:
+      color: "#367D4D"   # hue 140.0   4.68:1 ground   5.00:1 panel
+      label: DONE
+      glyph: "●"
+    cancelled:
+      color: "#AB26ED"   # hue 280.0   4.64:1 ground   4.96:1 panel
+      label: CANCELLED
+      glyph: "✕"
+
+# ---------------------------------------------------------------------------
+# The application surface.
+#
+# The type-specimen treatment above — paper ground, serif display, editorial margins — is a
+# field guide, not an application. Applying it to a work item tracker produced a styled
+# document. This surface has its own scales: dark by default, layered elevation rather than
+# rules, a sans display face, and a decided density.
+#
+# Separation is spacing and elevation. Borders are a last resort here, because a layout
+# held together by lines reads as dated no matter what the values are.
+
+app:
+  # Both themes clear the declared contrast floor. Dark is the default; light is a choice.
+  themes:
+    dark:
+      bg: "#0F1116"        # recessed ground
+      card: "#171B22"      # elevated content
+      raised: "#1E232C"    # controls and headers on a card
+      ink: "#E8ECF4"       # 15.95:1 on bg, 14.58:1 on card
+      muted: "#9BA4B5"     #  7.53:1 on bg,  6.88:1 on card
+      hairline: "#252B36"  # used only where elevation cannot carry the separation
+      shadow: "0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.28)"
+      overlay: "rgba(255,255,255,.06)"
+    light:
+      bg: "#F2F4F8"
+      card: "#FFFFFF"
+      raised: "#F7F9FC"
+      ink: "#10141C"       # 18.44:1 on card, 16.75:1 on bg
+      muted: "#545C6B"     #  6.73:1 on card,  6.11:1 on bg
+      hairline: "#E2E6ED"
+      shadow: "0 1px 2px rgba(16,20,28,.06), 0 8px 24px rgba(16,20,28,.08)"
+      overlay: "rgba(16,20,28,.05)"
+
+  # Identity per stack, lifted for a dark ground. The hues above were tuned against warm
+  # paper and go muddy here, so the application carries its own — same hue, different
+  # lightness, still one declared value per stack.
+  accents:
+    dark:
+      angular: "#FC839B"
+      react: "#C983FC"
+      java-modern: "#83FCCD"
+      python-modern: "#83B9FC"
+      spring-traditional: "#FCC183"
+      spring-boot: "#B5FC83"
+    light:
+      angular: "#A90436"
+      react: "#7505D6"
+      java-modern: "#036336"
+      python-modern: "#044FA4"
+      spring-traditional: "#7C4403"
+      spring-boot: "#2D5E02"
+
+  # Status, on the application surface. The same hues as the set above, lifted the same
+  # way, so the pill reads on a dark card.
+  status:
+    dark:
+      OPEN: "#92D0FC"
+      IN_PROGRESS: "#FCE292"
+      BLOCKED: "#FC929A"
+      DONE: "#92FCB5"
+      CANCELLED: "#D992FC"
+    light:
+      OPEN: "#42759A"
+      IN_PROGRESS: "#816E37"
+      BLOCKED: "#CD3744"
+      DONE: "#367D4D"
+      CANCELLED: "#AB26ED"
+
+  # Density is decided, not defaulted: one row height, one control height, everywhere.
+  density:
+    row_px: 44
+    control_px: 34
+    rail_rem: 15
+    bar_px: 56
+    radius_px: 10
+    radius_sm_px: 6
+    # A fully rounded end, a one-pixel press, an icon sized to its text, and the four
+    # column widths the meter and the bar use. Every one of these was a literal in the
+    # stylesheet until the token check named it.
+    radius_pill_px: 999
+    nudge_px: 1
+    icon_em: 1
+    control_min_rem: 11
+    meter_label_rem: 7
+    meter_label_narrow_rem: 5
+    meter_value_rem: 3
+    meter_value_narrow_rem: 2.5
+
+  # A sans display face for the applications. Fraunces stays with the specimen page, which is the
+  # point of them being different.
+  type:
+    display_weight: 650
+    label_tracking_em: 0.06

@@ -1,0 +1,422 @@
+/* The application surface. One stylesheet, both frontends.
+ *
+ * Deliberately not the type-specimen treatment the side-by-side page wears — paper,
+ * serif, editorial margins. Applying that to a work item tracker produced a styled
+ * document rather than an application. Here: dark by default, a fixed bar, a left rail,
+ * content on elevated cards over a recessed ground.
+ *
+ * Separation is spacing and elevation. There is almost no border in this file, and that is
+ * deliberate: a layout held together by lines reads as dated whatever the values are. The
+ * hairline token exists for the two places elevation genuinely cannot do the work.
+ *
+ * Every value resolves through design/tokens.yaml. No component library, no CSS framework,
+ * no icon set — the icons are inline SVG in each component, hand-authored.
+ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { color-scheme: dark; }
+html[data-theme="light"] { color-scheme: light; }
+
+body {
+  margin: 0;
+  background: var(--app-bg);
+  color: var(--app-ink);
+  font-family: var(--face-body);
+  font-size: var(--type-sm);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* --- layout --------------------------------------------------------------- */
+
+.app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: var(--app-bar) 1fr;
+  grid-template-columns: var(--app-rail) minmax(0, 1fr);
+  grid-template-areas: "bar bar" "rail main";
+}
+
+.bar {
+  grid-area: bar;
+  height: var(--app-bar);
+  min-height: var(--app-bar);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-4);
+  background: var(--app-card);
+  box-shadow: var(--app-shadow);
+}
+
+.rail {
+  grid-area: rail;
+  align-self: start;
+  position: sticky;
+  top: var(--app-bar);
+  padding: var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.main {
+  grid-area: main;
+  padding: var(--space-4) var(--space-4) var(--space-8);
+  max-width: var(--measure-page);
+  width: 100%;
+}
+
+/* --- type ----------------------------------------------------------------- */
+
+.brand {
+  font-weight: var(--app-display-weight);
+  font-size: var(--type-md);
+  letter-spacing: -0.01em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.page-title {
+  font-size: var(--type-xxl);
+  font-weight: var(--app-display-weight);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0 0 var(--space-1);
+}
+
+.label {
+  display: block;
+  font-size: var(--type-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--app-label-tracking);
+  color: var(--app-muted);
+  margin-bottom: var(--space-0);
+}
+
+.sub { color: var(--app-muted); font-size: var(--type-xs); margin: 0; }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; text-align: right; }
+.mono { font-family: var(--face-mono); font-variant-numeric: tabular-nums; }
+
+/* --- surfaces ------------------------------------------------------------- */
+
+.card {
+  background: var(--app-card);
+  border-radius: var(--app-radius);
+  box-shadow: var(--app-shadow);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.card > h2 {
+  font-size: var(--type-sm);
+  font-weight: var(--app-display-weight);
+  letter-spacing: var(--app-label-tracking);
+  text-transform: uppercase;
+  color: var(--app-muted);
+  margin: 0 0 var(--space-2);
+}
+
+/* --- controls ------------------------------------------------------------- */
+
+input, select, button, textarea { font: inherit; color: inherit; }
+
+.control,
+input[type="text"], input:not([type]), select {
+  appearance: none;
+  height: var(--app-control);
+  padding: 0 var(--space-2);
+  background: var(--app-raised);
+  color: var(--app-ink);
+  border: 0;
+  border-radius: var(--app-radius-sm);
+  transition: background var(--control-ease), box-shadow var(--control-ease);
+}
+
+/* Full width only where the container is a column. In the bar a stretched select ate the
+ * whole row and pushed the brand off the top — a width rule with no container in mind. */
+.rail input, .rail select, .main form input { width: 100%; }
+.bar select { min-width: var(--app-control-min); }
+
+select {
+  padding-right: var(--space-4);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--app-muted) 50%),
+    linear-gradient(135deg, var(--app-muted) 50%, transparent 50%);
+  background-position: right var(--space-2) center, calc(100% - var(--space-1)) center;
+  background-size: var(--caret) var(--caret), var(--caret) var(--caret);
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+input::placeholder { color: var(--app-muted); }
+input:hover, select:hover { background: var(--app-overlay); }
+
+/* Focus is a ring, not a border swap, so nothing reflows when it appears. */
+input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 2px var(--app-bg), 0 0 0 4px var(--app-accent);
+}
+
+button {
+  height: var(--app-control);
+  padding: 0 var(--space-2);
+  background: var(--app-raised);
+  border: 0;
+  border-radius: var(--app-radius-sm);
+  font-size: var(--type-xs);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-0);
+  transition: background var(--control-ease), transform var(--control-ease), opacity var(--control-ease);
+}
+
+button:hover:not(:disabled) { background: var(--app-overlay); }
+button:active:not(:disabled) { transform: translateY(var(--app-nudge)); }
+button:disabled { opacity: .5; cursor: not-allowed; }
+
+button.primary { background: var(--app-accent); color: var(--app-bg); }
+button.primary:hover:not(:disabled) { background: var(--app-accent); filter: brightness(1.08); }
+button.ghost { background: transparent; color: var(--app-muted); }
+button.ghost:hover:not(:disabled) { background: var(--app-overlay); color: var(--app-ink); }
+
+.icon { width: var(--app-icon); height: var(--app-icon); flex: none; display: block; }
+
+.spacer { flex: 1 1 auto; }
+.bar .field { flex: none; }
+.bar .label { margin-bottom: 0; line-height: 1; }
+.field { display: block; }
+.field + .field { margin-top: var(--space-2); }
+
+/* --- status pill ---------------------------------------------------------- */
+
+/* Colour is never the only signal: the pill carries its label and a dot. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-0);
+  height: calc(var(--app-control) - var(--space-1));
+  padding: 0 var(--space-1);
+  border-radius: var(--app-radius-pill);
+  font-size: var(--type-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--pill-ink);
+  background: color-mix(in srgb, var(--pill-ink) 14%, transparent);
+}
+
+.pill::before {
+  content: "";
+  width: .5em; height: .5em;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+.pill select {
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  height: auto;
+  width: auto;
+  padding: 0 var(--space-2) 0 0;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right var(--app-nudge) center, right 0 center;
+  background-size: var(--space-0) var(--space-0), var(--space-0) var(--space-0);
+  background-repeat: no-repeat;
+}
+
+.pill[data-status="OPEN"] { --pill-ink: var(--app-status-OPEN); }
+.pill[data-status="IN_PROGRESS"] { --pill-ink: var(--app-status-IN_PROGRESS); }
+.pill[data-status="BLOCKED"] { --pill-ink: var(--app-status-BLOCKED); }
+.pill[data-status="DONE"] { --pill-ink: var(--app-status-DONE); }
+.pill[data-status="CANCELLED"] { --pill-ink: var(--app-status-CANCELLED); }
+
+/* --- table ---------------------------------------------------------------- */
+
+.table-card { padding: 0; overflow: hidden; }
+
+table { border-collapse: collapse; width: 100%; }
+
+thead th {
+  text-align: left;
+  font-size: var(--type-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--app-label-tracking);
+  color: var(--app-muted);
+  background: var(--app-raised);
+  padding: 0 var(--space-2);
+  height: var(--app-control);
+  white-space: nowrap;
+}
+
+tbody td {
+  height: var(--app-row);
+  padding: 0 var(--space-2);
+  vertical-align: middle;
+}
+
+/* Row rhythm without rules: alternating overlay, and hover lifts rather than outlines. */
+tbody tr:nth-child(even) { background: var(--app-overlay); }
+tbody tr { transition: background var(--control-ease); }
+tbody tr:hover { background: color-mix(in srgb, var(--app-accent) 10%, transparent); }
+
+.id { color: var(--app-muted); }
+.title { font-weight: 550; }
+
+.tags { display: flex; gap: var(--space-0); flex-wrap: wrap; }
+
+.tag {
+  font-size: var(--type-xs);
+  color: var(--app-muted);
+  background: var(--app-overlay);
+  border-radius: var(--app-radius-sm);
+  padding: 0 var(--space-0);
+}
+
+.row-actions { opacity: 0; transition: opacity var(--control-ease); }
+tr:hover .row-actions, tr:focus-within .row-actions { opacity: 1; }
+
+/* --- motion that carries meaning ------------------------------------------ */
+
+@keyframes row-arrive {
+  from { background: color-mix(in srgb, var(--app-accent) 34%, transparent); transform: translateY(-4px); }
+  to { background: transparent; transform: none; }
+}
+
+@keyframes row-leave {
+  from { opacity: 1; }
+  to { opacity: 0; transform: translateX(var(--space-3)); }
+}
+
+tr.arrived { animation: row-arrive 1s ease-out both; }
+tr.leaving { animation: row-leave var(--seam-reveal) ease-in both; }
+
+/* --- live notification ---------------------------------------------------- */
+
+/* A change from another browser is unmissable: the row animates and this appears. */
+.toasts {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 40;
+  display: grid;
+  gap: var(--space-1);
+  justify-items: end;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background: var(--app-card);
+  border-radius: var(--app-radius);
+  box-shadow: var(--app-shadow);
+  font-size: var(--type-xs);
+  animation: toast-in var(--seam-reveal) ease-out both;
+}
+
+.toast .dot { width: .5em; height: .5em; border-radius: 50%; background: var(--app-accent); flex: none; }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(var(--space-2)); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  tr.arrived, tr.leaving, .toast { animation: none; }
+}
+
+/* --- aggregate ------------------------------------------------------------ */
+
+/* The meter, not ".bar". The top chrome is .bar, and a descendant rule written for the
+ * workload meter painted every span in the header — two different things wearing one
+ * class name, which is a collision no amount of care survives. */
+.bars { display: grid; gap: var(--space-1); }
+.bar-row { display: grid; grid-template-columns: var(--app-meter-label) 1fr var(--app-meter-value); gap: var(--space-2); align-items: center; }
+.meter { height: var(--space-1); background: var(--app-overlay); border-radius: var(--app-radius-pill); overflow: hidden; }
+.meter > span { display: block; height: 100%; background: var(--app-accent); border-radius: var(--app-radius-pill); transition: width var(--seam-reveal) ease-out; }
+
+.progress { height: var(--space-0); background: var(--app-overlay); border-radius: var(--app-radius-pill); overflow: hidden; }
+.progress > span { display: block; height: 100%; background: var(--app-accent); transition: width 120ms linear; }
+
+/* --- states --------------------------------------------------------------- */
+
+.state {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  padding: var(--space-7) var(--space-3);
+  text-align: center;
+  color: var(--app-muted);
+}
+
+.state strong { color: var(--app-ink); font-size: var(--type-md); font-weight: var(--app-display-weight); }
+.state[data-kind="error"] strong { color: var(--app-status-BLOCKED); }
+.state .icon-lg { width: var(--space-5); height: var(--space-5); color: var(--app-muted); }
+
+/* A skeleton of the content, never the word loading. */
+.skeleton-row { display: grid; grid-template-columns: 6rem 1fr 8rem 3rem; gap: var(--space-2); align-items: center; height: var(--app-row); padding: 0 var(--space-2); }
+.skeleton { height: var(--type-xs); border-radius: var(--app-radius-sm); background: linear-gradient(90deg, var(--app-overlay), var(--app-raised), var(--app-overlay)); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
+
+/* --- inline validation ---------------------------------------------------- */
+
+.error { color: var(--app-status-BLOCKED); font-size: var(--type-xs); margin-top: var(--space-0); display: block; }
+.field.invalid input { box-shadow: 0 0 0 1px var(--app-status-BLOCKED); }
+
+.refused {
+  display: flex; align-items: center; gap: var(--space-1);
+  color: var(--app-status-BLOCKED);
+  background: color-mix(in srgb, var(--app-status-BLOCKED) 12%, transparent);
+  border-radius: var(--app-radius);
+  padding: var(--space-1) var(--space-2);
+  margin-bottom: var(--space-3);
+  font-size: var(--type-xs);
+}
+
+/* --- runtime panel -------------------------------------------------------- */
+
+/* Fully-qualified class names are long — DataSourceConfiguration$Hikari and its kin — and
+ * an unconstrained table let one of them push the whole document 300px wider than the
+ * window, so every page scrolled sideways whenever spring-boot was selected. Fixed layout
+ * gives the columns their share, and the name breaks inside its cell rather than deciding
+ * the width of the application.
+ */
+.runtime table { font-size: var(--type-xs); table-layout: fixed; width: 100%; }
+.runtime th, .runtime td { overflow-wrap: anywhere; word-break: break-word; }
+.runtime .where { font-family: var(--face-mono); color: var(--app-muted); }
+
+/* The last resort, so a value that still cannot fit scrolls its own card rather than the
+ * page. Nothing in the layout may make the document wider than the window. */
+.card { overflow-x: auto; }
+.app, .main { max-width: 100%; min-width: 0; }
+.pair-counts strong { font-variant-numeric: tabular-nums; color: var(--app-accent); }
+
+.live-count { font-variant-numeric: tabular-nums; }
+
+
+/* --- narrow --------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-areas: "bar" "rail" "main"; }
+  .rail { flex-direction: row; flex-wrap: wrap; }
+  .bar-row { grid-template-columns: var(--app-meter-label-narrow) 1fr var(--app-meter-value-narrow); }
+}
