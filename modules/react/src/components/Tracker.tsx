@@ -372,7 +372,7 @@ export function Tracker() {
         )}
 
         {workloadLoading ? (
-          <section className="card">
+          <section className="card" data-testid="workload-loading">
             <h2>workload</h2>
             <p className="sub">Fanning out one slow computation per assignee.</p>
             <div className="progress"><span style={{ width: `${workloadProgress}%` }} /></div>

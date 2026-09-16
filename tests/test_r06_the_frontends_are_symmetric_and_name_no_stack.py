@@ -123,6 +123,74 @@ def test_no_frontend_source_carries_a_list_of_backends():
         )
 
 
+def test_every_test_id_the_browser_drivers_query_exists_in_a_frontend():
+    """A driver querying a test id that no frontend renders cannot ever pass.
+
+    This is the check that was missing. A driver asserted on
+    `[data-testid=workload-loading]`, neither frontend carried that attribute, and the
+    count was therefore zero on every run for the life of the build — while the failure
+    message blamed the machine for answering too fast. It read as flakiness, so it was
+    tolerated rather than investigated.
+
+    Deterministic and host-side: the drivers name the ids, the frontends render them, and
+    the two sets are compared by reading. No browser, no timing, no judgement.
+    """
+    frontends = spine.frontends()
+    assert frontends, "no active frontends"
+
+    def ids_in(root) -> set:
+        found = set()
+        for path in spine.iter_repo_files((".ts", ".tsx", ".js", ".jsx", ".html", ".py"), root=root):
+            text = spine.text_of(path)
+            found |= set(re.findall(r'data-testid=[\"\']([^\"\']+)[\"\']', text))
+            # Angular binds some of them, and a bound attribute is still an attribute.
+            found |= set(re.findall(r'\[attr\.data-testid\]=[\"\']([^\"\']+)[\"\']', text))
+        return found
+
+    # Per frontend, not pooled. A union would let one frontend drop an id while the other
+    # kept it — which is the pair silently diverging, and the drivers run against both.
+    per_frontend = {
+        sid: ids_in(spine.source_root(sid, stack)) for sid, stack in sorted(frontends.items())
+    }
+    for sid, found in per_frontend.items():
+        assert found, f"'{sid}' renders no test id; there is nothing for a driver to find"
+
+    # The side-by-side page is a separate surface with its own ids, rendered by its own
+    # script rather than by either frontend.
+    page_ids = ids_in(spine.REPO_ROOT / "side-by-side") | ids_in(spine.REPO_ROOT / "scripts")
+
+    in_every_frontend = set.intersection(*per_frontend.values())
+    rendered = in_every_frontend | page_ids
+
+    drivers = spine.REPO_ROOT / "visual"
+    spine.require_dir(drivers, "browser drivers")
+
+    queried: dict[str, str] = {}
+    for path in spine.iter_repo_files((".mjs",), root=drivers):
+        source = spine.strip_comments(spine.text_of(path))
+        for match in re.finditer(r'data-testid=([A-Za-z0-9_-]+)', source):
+            queried.setdefault(match.group(1), spine._rel(path))
+        # at("x") / locator("[data-testid=x]") both reduce to the same name.
+        for match in re.finditer(r'\bat\(\s*[\"\']([A-Za-z0-9_-]+)[\"\']', source):
+            queried.setdefault(match.group(1), spine._rel(path))
+
+    missing = []
+    for name, where in sorted(queried.items()):
+        if name in rendered:
+            continue
+        carriers = sorted(sid for sid, found in per_frontend.items() if name in found)
+        detail = (
+            f"rendered only by {', '.join(carriers)}" if carriers
+            else "rendered by nothing in this repository"
+        )
+        missing.append(f"{name}  (queried by {where}; {detail})")
+    assert not missing, (
+        "browser drivers query test ids that not every frontend renders, so those "
+        "assertions cannot pass — or can pass against only one half of the pair:\n  "
+        + "\n  ".join(missing)
+    )
+
+
 def test_both_frontends_render_from_the_same_generated_stylesheet():
     """"They look identical" is a property of how they are built, or it is a claim.
 

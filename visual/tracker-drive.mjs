@@ -99,14 +99,17 @@ applied ? ok("legal transition applies") : bad("legal transition applies");
 
 // B3, and whichever of the two states the click produces first.
 //
-// This counted the loading element immediately after the click and failed when it found
-// none — so on a machine fast enough to answer before the count ran, a correct application
-// reported a failure. Its own message said "returned too fast to observe", which is a
-// check admitting it is measuring the machine rather than the software.
+// This counted [data-testid=workload-loading] immediately after the click and failed when
+// it found none. The count was not zero because the answer arrived first — it was zero
+// because NEITHER FRONTEND CARRIED THAT TEST ID. Both render a loading card with a
+// progress bar and neither labelled it, so the check was red on every run for the life of
+// the build and its failure message blamed the machine being fast. The test id is now on
+// both, which is what makes the assertion below able to pass at all.
 //
-// What is actually being asserted is that clicking produces a response path at all. So
-// race the two observable outcomes: the loading state, or the answer. Either is a pass,
-// and the report says which was seen. Neither, within the timeout, is the real failure.
+// Racing the two outcomes rather than counting one: the loading card can legitimately be
+// gone by the time a fast machine looks, and a check that fails on speed measures the
+// machine. Either state is a pass, the report says which was seen, and neither within the
+// timeout is the real failure.
 await at("run-workload").click();
 const outcome = await Promise.race([
   at("workload-loading").first().waitFor({ timeout: 30000 }).then(() => "loading"),

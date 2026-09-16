@@ -172,7 +172,7 @@ const STATUSES: Status[] = ["OPEN", "IN_PROGRESS", "BLOCKED", "DONE", "CANCELLED
         }
 
         @if (workloadLoading()) {
-          <section class="card">
+          <section class="card" data-testid="workload-loading">
             <h2>workload</h2>
             <p class="sub">Fanning out one slow computation per assignee.</p>
             <div class="progress"><span [style.width.%]="workloadProgress()"></span></div>

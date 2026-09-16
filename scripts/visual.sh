@@ -69,6 +69,12 @@ drive() {  # drive <script> [env assignments...]
   fi
 }
 
+# Always exits. Written to exit only on failure, it fell through on success — so
+# `visual.sh live`, which exists to run ONE cross-frontend check, carried on and ran the
+# whole suite: nine browser containers, the tracker data mutated twice, and any unrelated
+# driver failure reported by the live-update test as "a change did not reach the other
+# frontend". A reporting function that sometimes returns is a reporting function whose
+# callers have to remember which time it is.
 report() {
   if [ -n "$FAILED" ]; then
     echo
@@ -77,6 +83,7 @@ report() {
   fi
   echo
   echo "  all browser checks passed"
+  exit 0
 }
 
 ensure_driver
