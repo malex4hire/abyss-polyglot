@@ -19,8 +19,8 @@ verify = [
 # declare what the suites need and to configure pytest, which is why `pip install -e .`
 # has something to resolve at all.
 #
-# Without this, setuptools auto-discovery finds seven top-level directories — contract,
-# design, infra, licenses, modules, stacks, visual — and refuses to build rather than
+# Without this, setuptools auto-discovery finds seven top-level directories (contract,
+# design, infra, licenses, modules, stacks, visual) and refuses to build rather than
 # guess which is the package. Stating that there are none is the answer; a src-layout
 # would be rearranging the repository to satisfy a build backend that is not building
 # anything.

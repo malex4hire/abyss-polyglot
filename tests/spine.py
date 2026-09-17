@@ -28,7 +28,7 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 # ---------------------------------------------------------------------------
-# Declared locations. Paths only — no content, no cardinalities.
+# Declared locations. Paths only: no content, no cardinalities.
 # ---------------------------------------------------------------------------
 
 MANIFEST = REPO_ROOT / "stacks" / "manifest.yaml"
@@ -107,7 +107,7 @@ def _section(doc: dict, key: str, what: str, path: Path) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# The manifest — the source of the stack set
+# The manifest: the source of the stack set
 # ---------------------------------------------------------------------------
 
 def stacks() -> dict:
@@ -152,7 +152,7 @@ def declared_ports() -> dict[str, int]:
     """Every port the manifest declares, stacks and infrastructure alike, keyed by owner.
 
     Infrastructure is included deliberately. Postgres's port was once the one number
-    written directly into compose, on the reasoning that it is not a stack — which is how
+    written directly into compose, on the reasoning that it is not a stack, which is how
     a rule with an exception in it stops being a rule.
     """
     ports = {
@@ -197,14 +197,14 @@ def instrumentation_paths() -> set[str]:
 # The nouns that name the stack set in prose
 #
 # Detection is contextual, not value-based. An integer is a violation only where it is
-# used as a stated count of a set the manifest owns — so the nouns that name that set
+# used as a stated count of a set the manifest owns, so the nouns that name that set
 # have to be declared by the manifest itself.
 # ---------------------------------------------------------------------------
 
 COUNT_PLACEHOLDER_RE = re.compile(r"\{\{\s*count:([A-Za-z0-9_\[\]/.-]+)\s*\}\}")
 
 # "one" is deliberately absent. As a quantifier it is pervasive and never states a set
-# size — "exactly one contract", "the one stack with no framework" — and only use as a
+# size ("exactly one contract", "the one stack with no framework"), and only use as a
 # stated count is a violation.
 NUMERAL_WORDS = (
     "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
@@ -227,7 +227,7 @@ def prose_nouns() -> list[str]:
 
 
 def count_qualifier_pattern(nouns: list[str]) -> re.Pattern:
-    """A numeral — digits or words — qualifying one of these nouns.
+    """A numeral (digits or words) qualifying one of these nouns.
 
     At most one intervening word, so "four backends" is caught while a sentence that
     merely mentions a port number near the word "stack" is not. A wider window matched any
@@ -279,7 +279,7 @@ def strip_comments(text: str) -> str:
     """Blank out C-style comments, keeping line numbers intact.
 
     Checking `line.startswith("//")` finds the first line of a comment and misses every
-    continuation line under it — so a paragraph explaining why two stacks share a base
+    continuation line under it, so a paragraph explaining why two stacks share a base
     image read as frontend source naming two stacks. That is a false positive, and a check
     with a false positive gets disabled by whoever trusts it next.
 
@@ -296,7 +296,7 @@ def strip_comments(text: str) -> str:
 def interval_callbacks(text: str) -> list[str]:
     """The argument text of every setInterval(...) call, by balanced parentheses.
 
-    The question is never "does this file call setInterval" — a progress bar and a tick
+    The question is never "does this file call setInterval": a progress bar and a tick
     counter both do, legitimately. It is whether an interval FETCHES, because a timer that
     re-lists the data is a poll wearing the same clothes as live update. So the body is
     what gets read, not the call site.
@@ -435,7 +435,7 @@ def http_get(url: str, timeout: int = 10):
         pytest.fail("MISSING TOOL: `requests` is not installed; install the 'verify' extra")
     try:
         return requests.get(url, timeout=timeout)
-    except Exception as exc:  # noqa: BLE001 — any transport failure is a stack failure
+    except Exception as exc:  # noqa: BLE001 (any transport failure is a stack failure)
         pytest.fail(f"UNREACHABLE: {url} did not respond: {exc}")
 
 
@@ -474,7 +474,7 @@ def await_health(stack_id: str, stack: dict, timeout: int = 240):
             response = requests.get(url, timeout=5)
             if response.status_code == 200:
                 return response
-        except Exception:  # noqa: BLE001 — still coming up
+        except Exception:  # noqa: BLE001 (still coming up)
             pass
         time.sleep(2)
     return None

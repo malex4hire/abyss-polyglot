@@ -35,8 +35,8 @@ public class AppInitializer implements WebApplicationInitializer {
 
     /**
      * The context, configured in Java rather than XML and without a starter. An
-     * AnnotatedBeanDefinitionReader is handed the configuration classes by name — it is
-     * the mechanism Boot drives for you — so what is registered is exactly what this
+     * AnnotatedBeanDefinitionReader is handed the configuration classes by name (it is
+     * the mechanism Boot drives for you), so what is registered is exactly what this
      * method says and nothing scans the classpath deciding what to switch on.
      */
     GenericWebApplicationContext rootContext() {
@@ -70,8 +70,8 @@ public class AppInitializer implements WebApplicationInitializer {
         registration.setLoadOnStartup(1);
         registration.addMapping("/");
         // Async support is opt-in on the registration. Without it the container refuses
-        // startAsync — "a filter or servlet of the current chain does not support
-        // asynchronous operations" — and B4's stream cannot exist. Boot sets this for you;
+        // startAsync ("a filter or servlet of the current chain does not support
+        // asynchronous operations"), and B4's stream cannot exist. Boot sets this for you;
         // here it is one more registration decision that has to be made out loud.
         registration.setAsyncSupported(true);
         return registration;

@@ -34,7 +34,7 @@ class Junit5ParameterizedTest {
 
     /**
      * One test method, many cases. Each row of the CsvSource becomes its own invocation
-     * with its own name, its own pass or fail, and its own entry in the report — so a
+     * with its own name, its own pass or fail, and its own entry in the report, so a
      * failure names the case that broke rather than the loop that contained it, which is
      * what a hand-written for-loop over the same data cannot tell you.
      */
@@ -66,7 +66,7 @@ class Junit5ParameterizedTest {
      * built from that row; a hand-rolled @Test looping over the same rows is a single
      * invocation named after the method. This assertion lives outside grouping() so a
      * rewritten grouping() cannot drop it, and it does not care what grouping() asserts
-     * internally — only how many times, and under what names, the engine reports it ran.
+     * internally, only how many times, and under what names, the engine reports it ran.
      */
     @Test
     void theInvocationCarriesOneDisplayNamePerCase() {
@@ -82,7 +82,7 @@ class Junit5ParameterizedTest {
 
         // Reflect for the method rather than naming its parameter types: selectMethod's
         // string form resolves by reflectively looking up a method with that exact
-        // signature and fails discovery — not falls back to a name-only match — the one
+        // signature and fails discovery (not falls back to a name-only match), the one
         // time it does not match, confirmed by running discovery standalone and reading
         // the exception. A rewritten grouping() need not keep (String, int); finding it
         // by name first and building the selector from the java.lang.reflect.Method this

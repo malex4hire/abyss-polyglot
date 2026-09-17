@@ -13,7 +13,7 @@ def seeded(sample):
 
     Fixtures are dependency injection for tests: this one asks for `sample` by naming it
     as a parameter and pytest resolves it, so setup composes instead of being repeated.
-    The code after yield is teardown and runs even when the test fails — which is what a
+    The code after yield is teardown and runs even when the test fails, which is what a
     setUp/tearDown pair gives you without the class, and what a plain helper function
     does not give you at all.
 
@@ -39,9 +39,9 @@ def test_the_setup_is_composed_out_of_another_fixture(seeded, request):
     """The setup is composed out of another fixture, which the request makes readable.
 
     The assertions above are about the repository the fixture hands over, and a fixture
-    that builds the same items itself produces an identical one — correct, and what people
-    write before composition occurs to them. Dependency injection is the point: this
-    fixture asks for `sample` by naming it, and pytest resolves it.
+    that builds the same items itself produces an identical one. That is correct, and it
+    is what people write before composition occurs to them. Dependency injection is the
+    point: this fixture asks for `sample` by naming it, and pytest resolves it.
 
     That is readable from inside the test. The resolved fixture closure is on the request,
     so a fixture built out of another one names both, and a self-contained one names only

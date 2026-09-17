@@ -5,8 +5,8 @@
 // must arrive in the right; archive in the right and it must leave the left. No refresh,
 // no click on the far side, no polling loop anywhere in either application.
 //
-// Both directions are driven deliberately. One direction can pass by accident — a
-// re-fetch the receiving framework was going to do anyway — and the framework whose
+// Both directions are driven deliberately. One direction can pass by accident (a
+// re-fetch the receiving framework was going to do anyway), and the framework whose
 // change detection is doing the noticing is different in each direction, which is
 // exactly the asymmetry a single-direction check would hide.
 import { chromium } from "playwright";
@@ -23,9 +23,9 @@ const left = await browser.newPage();
 const right = await browser.newPage();
 
 const out = [];
-const ok = (n, d = "") => out.push(`  OK    ${n}${d ? "  — " + d : ""}`);
+const ok = (n, d = "") => out.push(`  OK    ${n}${d ? "  (" + d + ")" : ""}`);
 const bad = (n, d = "") => {
-  out.push(`  FAIL  ${n}${d ? "  — " + d : ""}`);
+  out.push(`  FAIL  ${n}${d ? "  (" + d + ")" : ""}`);
   process.exitCode = 1;
 };
 
@@ -75,6 +75,6 @@ await left
     bad(`an archive in ${rightName} reaches ${leftName} with no user action`,
         `${leftBefore} rows before, ${await rowsOf(left).count()} after`));
 
-console.log(`\n  live update — ${leftName} <-> ${rightName} over ${BACKEND}`);
+console.log(`\n  live update: ${leftName} <-> ${rightName} over ${BACKEND}`);
 console.log(out.join("\n"));
 await browser.close();

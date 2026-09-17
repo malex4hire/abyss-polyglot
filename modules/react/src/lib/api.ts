@@ -4,7 +4,7 @@ import { API_BASE, WorkItem } from "./types";
  * Talk to the backend with the platform's own fetch.
  *
  * There is no client library here and no interceptor chain: fetch returns a Response,
- * and a non-2xx is a perfectly normal Response rather than a thrown error — which is the
+ * and a non-2xx is a perfectly normal Response rather than a thrown error, which is the
  * detail everyone forgets, so the check is explicit. Angular's HttpClient returns an
  * Observable and throws on non-2xx; this returns a Promise and does not.
  */

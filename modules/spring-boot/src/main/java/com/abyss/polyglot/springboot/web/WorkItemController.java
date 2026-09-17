@@ -30,7 +30,7 @@ public class WorkItemController {
     /**
      * @RestController is @Controller plus @ResponseBody: every return value goes through
      * a message converter instead of being resolved as a view name. The converter itself
-     * arrived from the web starter — nothing in this module registers one, which is what
+     * arrived from the web starter. Nothing in this module registers one, which is what
      * the traditional module has to do by hand in WebConfig.
      */
     @GetMapping
@@ -51,7 +51,7 @@ public class WorkItemController {
     /**
      * Fetch by id. Archived items resolve: archive is a soft delete, so the list is the
      * active view and this addresses the record. Spring Data supplies findById, which is
-     * the pair's contrast — the traditional side reaches its own JdbcTemplate query.
+     * the pair's contrast: the traditional side reaches its own JdbcTemplate query.
      */
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, WorkItemEntity>> byId(@PathVariable String id) {
@@ -103,8 +103,9 @@ public class WorkItemController {
         return repository.findById(id)
                 .map(item -> {
                     // B5. Already there is not an illegal move, it is a move that has
-                    // happened — what a retry of a dropped response is asking about. Only
-                    // the self-edge changes; every genuine refusal still refuses.
+                    // happened, which is what a retry of a dropped response is asking
+                    // about. Only the self-edge changes; every genuine refusal still
+                    // refuses.
                     if (item.getStatus() == request.status()) {
                         return ResponseEntity.ok(Map.of("item", item));
                     }

@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 
 /**
  * B3 Aggregate: per-assignee rollup, fanned out over deliberately slow per-assignee work.
- * The slowness is the point — it is what makes the concurrency model visible.
+ * The slowness is the point, because it is what makes the concurrency model visible.
  */
 public final class Workload {
 
@@ -72,7 +72,7 @@ public final class Workload {
     /**
      * The same, with each task reporting the thread it ran on.
      *
-     * Scores alone cannot tell a bounded pool from a loop that fans out nothing — both
+     * Scores alone cannot tell a bounded pool from a loop that fans out nothing. Both
      * produce the same numbers for the same input. The observer is how the property
      * becomes checkable from outside, the same move {@code virtual} already makes below.
      */
@@ -102,7 +102,7 @@ public final class Workload {
     /**
      * The same fan-out on virtual threads. One thread per task, no pool to size: a virtual
      * thread parked on a blocking call releases its carrier, so the cost of waiting is a
-     * heap object rather than an OS thread. The code is the ordinary blocking shape —
+     * heap object rather than an OS thread. The code is the ordinary blocking shape, and
      * that is the whole argument for the feature. Structured concurrency: the executor
      * closes only when every task it started has finished.
      */
@@ -113,7 +113,7 @@ public final class Workload {
     /**
      * The same, with each task reporting the thread it ran on.
      *
-     * Timing alone cannot tell virtual threads from a cached platform pool — both overlap
+     * Timing alone cannot tell virtual threads from a cached platform pool. Both overlap
      * blocking work and both finish this fan-out in well under the serial time. A test
      * that measures only elapsed milliseconds passes identically against the fixed pool
      * this method exists to contrast with, which makes it a proof of concurrency and not

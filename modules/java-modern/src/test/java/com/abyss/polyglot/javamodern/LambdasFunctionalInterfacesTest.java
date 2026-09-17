@@ -30,7 +30,7 @@ class LambdasFunctionalInterfacesTest {
         // Identical filtering is not identical bytecode. A lambda compiles to an
         // invokedynamic call site resolved by LambdaMetafactory at first use, so the
         // instance it produces carries a synthetic "$$Lambda" class name and no compiled
-        // .class file of its own — an anonymous inner class instead gets a real, numbered
+        // .class file of its own. An anonymous inner class instead gets a real, numbered
         // nested class (Queries$1, Queries$2, ...) that the compiler writes to disk. Both
         // produce a working Predicate; only one is what "lambda" claims.
         String className = Queries.filterFor(null, null).getClass().getName();

@@ -14,7 +14,7 @@ public class ApiExceptionHandler {
     /**
      * One handler, composed into every controller. The advice is discovered at startup
      * and consulted whenever a handler throws, so error shape is decided in one place
-     * instead of being repeated in each method — and the controllers stay free of
+     * instead of being repeated in each method, and the controllers stay free of
      * try/catch that has nothing to do with what they are for.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)

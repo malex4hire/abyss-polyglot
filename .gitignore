@@ -37,7 +37,7 @@ code-review/
 # a locally-run demo.py transcript, never an artifact
 demo-dev.log
 
-# raw browser recordings, the source for docs/media — regenerated, never an artifact
+# raw browser recordings, the source for docs/media; regenerated, never an artifact
 visual/media/
 
 # left behind by `pip install -e .`; never an artifact

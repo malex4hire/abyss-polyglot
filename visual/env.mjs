@@ -2,7 +2,7 @@
 //
 // A default would be worse than nothing here. These drivers used to fall back to a
 // hard-coded origin, so running one with the variable unset silently drove whichever
-// frontend happened to be on that port — reporting green about a stack nobody asked
+// frontend happened to be on that port, reporting green about a stack nobody asked
 // about. Missing configuration should stop, not guess.
 export function requireEnv(name) {
   const value = process.env[name];

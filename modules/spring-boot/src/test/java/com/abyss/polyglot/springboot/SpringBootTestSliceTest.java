@@ -27,8 +27,8 @@ class SpringBootTestSliceTest {
     WorkItemRepository repository;
 
     /**
-     * The whole application, started for a test. @SpringBootTest boots the real context —
-     * every auto-configuration, the real datasource, the real repository proxy — so what
+     * The whole application, started for a test. @SpringBootTest boots the real context
+     * (every auto-configuration, the real datasource, the real repository proxy), so what
      * is exercised is the wiring as well as the code.
      *
      * That is the trade against the traditional module's standalone MockMvc setup: this

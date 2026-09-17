@@ -17,7 +17,7 @@ whose full text is reproduced at licenses/OFL-1.1.txt. The OFL permits this
 redistribution and requires that the license text travel with the binaries,
 which is what this file and that one are for.
 
-The subset files below are derived from the upstream releases — reduced to the
+The subset files below are derived from the upstream releases, reduced to the
 glyphs this demo actually renders, which is what makes them small enough to
 ship. Subsetting is a Modified Version under the OFL, so each entry names the
 upstream copyright holder and the family's Reserved Font Name.
@@ -33,7 +33,7 @@ Fraunces
   Copyright:    Copyright 2020 The Fraunces Project Authors
                 (https://github.com/undercasetype/Fraunces)
   Reserved Font Name: "Fraunces"
-  License:      SIL Open Font License 1.1 — licenses/OFL-1.1.txt
+  License:      SIL Open Font License 1.1 (licenses/OFL-1.1.txt)
   Used for:     headings and display text
 
 
@@ -48,7 +48,7 @@ Public Sans
                 Libre Franklin Project Authors
                 (https://github.com/impallari/Libre-Franklin)
   Reserved Font Name: "Public Sans"
-  License:      SIL Open Font License 1.1 — licenses/OFL-1.1.txt
+  License:      SIL Open Font License 1.1 (licenses/OFL-1.1.txt)
   Used for:     prose and interface text
 
 
@@ -60,7 +60,7 @@ JetBrains Mono
   Copyright:    Copyright 2020 The JetBrains Mono Project Authors
                 (https://github.com/JetBrains/JetBrainsMono)
   Reserved Font Name: "JetBrains Mono"
-  License:      SIL Open Font License 1.1 — licenses/OFL-1.1.txt
+  License:      SIL Open Font License 1.1 (licenses/OFL-1.1.txt)
   Used for:     rendered code and tabular figures
 
 

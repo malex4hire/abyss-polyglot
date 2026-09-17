@@ -7,8 +7,8 @@ const page = await browser.newPage();
 const errors = [];
 page.on("pageerror", (e) => errors.push(String(e)));
 const out = [];
-const ok = (n, d = "") => out.push(`  OK    ${n}${d ? "  — " + d : ""}`);
-const bad = (n, d = "") => { out.push(`  FAIL  ${n}${d ? "  — " + d : ""}`); process.exitCode = 1; };
+const ok = (n, d = "") => out.push(`  OK    ${n}${d ? "  (" + d + ")" : ""}`);
+const bad = (n, d = "") => { out.push(`  FAIL  ${n}${d ? "  (" + d + ")" : ""}`); process.exitCode = 1; };
 
 await page.goto(base + "/", { waitUntil: "domcontentloaded" });
 await page.waitForSelector("[data-testid=tracker] [data-testid=row]", { timeout: 30000 });
@@ -29,7 +29,7 @@ for (const backend of await at("backend-select").locator("option").evaluateAll((
   version && server ? ok(`${backend} reports its runtime`, `${version} · ${server.split(".").pop()} · ${artifacts}`)
                     : bad(`${backend} reports its runtime`, `${version} ${server}`);
 
-  // Not "a version is shown" — the exact build the runtime reports. Asserting non-empty
+  // Not "a version is shown", but the exact build the runtime reports. Asserting non-empty
   // would have passed against the short marketing version, which is what the panel used to
   // print and what this change exists to replace. Read from the endpoint, not written here.
   const exact = await page.evaluate(async (b) => {
@@ -80,9 +80,9 @@ servers.size >= 3 ? ok("the four backends report genuinely different runtimes", 
 await at("backend-select").selectOption("spring-traditional");
 await page.waitForTimeout(1800);
 // Read from the panel, not written here. The counts were pinned at 36 and 101, which the
-// version upgrade moved to 38 and 121 — a check failing on a number the panel derives
-// correctly. The claim is that both stacks are named with a count and the counts differ;
-// the values themselves belong to whatever is running.
+// version upgrade moved to 38 and 121, leaving a check that failed on a number the panel
+// derives correctly. The claim is that both stacks are named with a count and the counts
+// differ; the values themselves belong to whatever is running.
 const pairText = (await at("runtime-pair").innerText()).replace(/\s+/g, " ").trim();
 const counts = Object.fromEntries(
   [...pairText.matchAll(/(spring-traditional|spring-boot):\s*(\d+)/g)].map((m) => [m[1], Number(m[2])]),

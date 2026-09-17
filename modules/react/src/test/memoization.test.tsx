@@ -27,7 +27,7 @@ it("memoization: caches against a dependency array", () => {
 });
 
 it("memoization: recomputes only when the dependency array changes", () => {
-  // The test above passes against recomputing on every render — the totals are correct
+  // The test above passes against recomputing on every render. The totals are correct
   // either way, which is why it survived as vacuous. This counts the actual work: a
   // rerender with the same items reference must not call summarise again, and a rerender
   // with a new reference must.

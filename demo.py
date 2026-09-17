@@ -8,9 +8,9 @@ both standard library only, which is why the first thing this repository asks of
 is a single command rather than a setup section.
 
 What it does: starts the Python backend on a free port, waits for it to answer, then
-walks stacks/../contract/openapi.yaml one operation at a time — printing the request it
-is about to make and the response it got, so the contract is legible from the terminal
-rather than from a specification.
+walks stacks/../contract/openapi.yaml one operation at a time, printing the request it
+is about to make and the response it got, so that the contract is legible from the
+terminal rather than from a specification.
 
     create                     a work item, by a key the caller chose
     create again               the same key: 200 and one row, not 201 and two
@@ -23,8 +23,9 @@ rather than from a specification.
 Then it leaves the server running and prints curl lines, because the useful thing after
 a walkthrough is a prompt in front of the same server.
 
-The same contract is served by three other backends — two JVM frameworks and a
-framework-free JDK one. Those need docker; see the README. This one needs an interpreter.
+The same contract is served by three other backends: two JVM frameworks and a
+framework-free JDK one. Those need docker, and the README explains how. This one needs
+nothing but an interpreter.
 """
 
 from __future__ import annotations
@@ -48,21 +49,21 @@ STARTUP_TIMEOUT = 20.0
 
 # --- presentation ------------------------------------------------------------
 #
-# Colour through a capability check, not unconditionally. A terminal that is not a tty —
-# a pipe into `less`, a CI log, a file — gets escape codes rendered as garbage, and the
-# transcript this script exists to produce becomes unreadable in exactly the places
-# someone would paste it.
+# Colour through a capability check, not unconditionally. A terminal that is not a tty,
+# such as a pipe into `less`, a CI log, or a file, gets escape codes rendered as garbage,
+# and the transcript this script exists to produce becomes unreadable in exactly the
+# places someone would paste it.
 
 _COLOUR = sys.stdout.isatty() and os.environ.get("TERM", "") not in ("", "dumb")
 
 # Line buffering when the output is a pipe. Python block-buffers a redirected stdout, and
-# the last thing this script prints is followed by a wait that never returns — so the
-# handover message, the whole point of the ending, sat in an 8KB buffer and was never
-# written. Anything watching this through a pipe, `tee`, or a CI log saw a walkthrough
+# the last thing this script prints is followed by a wait that never returns. So the
+# handover message, which is the whole point of the ending, sat in an 8KB buffer and was
+# never written. Anything watching this through a pipe, `tee`, or a CI log saw a walkthrough
 # that produced nothing and hung.
 try:
     sys.stdout.reconfigure(line_buffering=True)
-except AttributeError:  # pragma: no cover — only on an interpreter older than 3.7
+except AttributeError:  # pragma: no cover, only on an interpreter older than 3.7
     pass
 
 
@@ -162,7 +163,7 @@ def expect(response: Response, status: int, what: str) -> Response:
     """
     if response.status != status:
         print()
-        print(warn(f"   EXPECTED {status} — {what}"))
+        print(warn(f"   EXPECTED {status}: {what}"))
         print(warn(f"   GOT      {response.status}: {response.raw.decode(errors='replace')[:400]}"))
         raise SystemExit(1)
     return response
@@ -194,8 +195,8 @@ def start_backend(port: int) -> subprocess.Popen:
     )
 
     # Drain the child's output on a thread. A pipe nobody reads fills, and the server
-    # then blocks on its next write — a backend that answers four requests and hangs on
-    # the fifth, with nothing on screen to say why.
+    # then blocks on its next write. That is a backend which answers four requests and
+    # hangs on the fifth, with nothing on screen to say why.
     captured: list[str] = []
 
     def drain() -> None:
@@ -211,8 +212,9 @@ def await_health(base: str, process: subprocess.Popen) -> dict:
     """Poll until it answers, and give up loudly rather than hanging.
 
     Checking the child is still alive on every pass matters more than the timeout: a
-    backend that exits immediately — a syntax error, a port already taken — otherwise
-    produces twenty seconds of silence and a timeout message that blames the wrong thing.
+    backend that exits immediately, because of a syntax error or a port already taken,
+    otherwise produces twenty seconds of silence and a timeout message that blames the
+    wrong thing.
     """
     deadline = time.monotonic() + STARTUP_TIMEOUT
     while time.monotonic() < deadline:
@@ -225,7 +227,7 @@ def await_health(base: str, process: subprocess.Popen) -> dict:
             with urllib.request.urlopen(base + "/health", timeout=1) as raw:
                 if raw.status == 200:
                     return json.loads(raw.read())
-        except Exception:  # noqa: BLE001 — still coming up
+        except Exception:  # noqa: BLE001, still coming up
             time.sleep(0.1)
     raise SystemExit(f"the backend did not answer {base}/health within {STARTUP_TIMEOUT:.0f}s")
 
@@ -233,8 +235,9 @@ def await_health(base: str, process: subprocess.Popen) -> dict:
 def read_events(base: str, want: int, timeout: float = 5.0) -> list[str]:
     """Read a few frames off the change stream and stop.
 
-    The stream never ends — that is what a stream is — so this reads until it has what it
-    came for or the clock runs out, rather than iterating to EOF and waiting forever.
+    The stream never ends, because that is what a stream is, so this reads until it has
+    what it came for or the clock runs out, rather than iterating to EOF and waiting
+    forever.
     """
     lines: list[str] = []
     try:
@@ -247,7 +250,7 @@ def read_events(base: str, want: int, timeout: float = 5.0) -> list[str]:
                 text = raw.decode(errors="replace").rstrip("\n")
                 if text:
                     lines.append(text)
-    except Exception as exc:  # noqa: BLE001 — a stream that closes is a fact to report
+    except Exception as exc:  # noqa: BLE001, a stream that closes is a fact to report
         lines.append(f"(stream ended: {exc})")
     return lines
 
@@ -259,7 +262,7 @@ def walk(base: str, health: dict) -> str:
     item_id = f"DEMO-{uuid.uuid4().hex[:8]}"
 
     print()
-    print(bold("  Work Item API — one contract, walked end to end"))
+    print(bold("  Work Item API: one contract, walked end to end"))
     print(f"  {dim(base)}")
     seeded = health.get("items", 0)
     print(f"  {dim(f'seeded with {seeded} work items')}")
@@ -281,13 +284,13 @@ def walk(base: str, health: dict) -> str:
         "the second call returned a different row, so it wrote one"
     )
 
-    step(3, "transition — legal",
+    step(3, "transition, legal",
          "the status control is a state machine, not a dropdown that writes whatever it is given")
     moved = expect(call("POST", base, f"/work-items/{item_id}/transition",
                         {"status": "IN_PROGRESS"}), 200, "OPEN -> IN_PROGRESS is legal")
     assert moved.json["item"]["status"] == "IN_PROGRESS"
 
-    step(4, "transition — illegal",
+    step(4, "transition, illegal",
          "refused with a typed rejection, and the refusal writes nothing")
     refused = expect(call("POST", base, f"/work-items/{item_id}/transition",
                           {"status": "OPEN"}), 422,
@@ -298,7 +301,7 @@ def walk(base: str, health: dict) -> str:
         summarise=lambda doc: [f"{doc['item']['id']}  status={doc['item']['status']}"],
     ), 200, "the item still resolves")
     assert after.json["item"]["status"] == "IN_PROGRESS", "a refused transition changed the row"
-    print(f"   {good('unchanged')} {dim('— still IN_PROGRESS, so the refusal cost nothing')}")
+    print(f"   {good('unchanged')}{dim(': still IN_PROGRESS, so the refusal cost nothing')}")
 
     step(5, "workload", "the rollup each backend fans out however its runtime makes natural")
     rollup = expect(call("GET", base, "/workload"), 200, "the rollup is part of the contract")
@@ -325,8 +328,8 @@ def walk(base: str, health: dict) -> str:
         ],
     ), 200, "and must stay retrievable by id")
     assert fetched.json["item"]["archivedAt"], "archivedAt says which"
-    print(f"   {good('gone from the list, still addressable')} "
-          f"{dim('— archivedAt = ' + str(fetched.json['item']['archivedAt']))}")
+    print(f"   {good('gone from the list, still addressable')}"
+          f"{dim(', archivedAt = ' + str(fetched.json['item']['archivedAt']))}")
 
     step(7, "events", "the change stream: a notification, not a second source of truth")
     print(f"   {bold('GET')} /events  {dim('(reading a few frames, then moving on)')}")
@@ -346,8 +349,8 @@ def walk(base: str, health: dict) -> str:
     if frames:
         for line in frames:
             print(dim("   " + line))
-        print(f"   {good('the stream announced the write')} "
-              f"{dim('— this is how a change in one browser reaches the other')}")
+        print(f"   {good('the stream announced the write.')} "
+              f"{dim('This is how a change in one browser reaches the other.')}")
     else:
         print(warn("   the stream produced nothing in the time allowed"))
 

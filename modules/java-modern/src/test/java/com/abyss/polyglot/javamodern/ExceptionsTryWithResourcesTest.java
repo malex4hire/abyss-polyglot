@@ -31,10 +31,10 @@ class ExceptionsTryWithResourcesTest {
     @Test
     void aCloseFailureWhileAnExceptionIsInFlightIsAttachedAsSuppressed() throws Exception {
         // load(Instant) hardcodes its classpath resource, so there is no seam to hand it a
-        // resource whose close() throws on demand — the suppression behaviour has to be
+        // resource whose close() throws on demand, so the suppression behaviour has to be
         // read from what the compiler actually emitted instead. try-with-resources
         // generates a call to Throwable.addSuppressed for exactly this case; a
-        // hand-written finally block with an empty catch — the plainer alternative —
+        // hand-written finally block with an empty catch (the plainer alternative)
         // never emits one. This is the compiled-output layer, not a guess about source.
         Path classFile = Path.of(Seed.class.getResource("Seed.class").toURI());
         Process javap = new ProcessBuilder("javap", "-p", "-c", classFile.toString())

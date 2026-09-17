@@ -20,8 +20,8 @@ class AutoConfigurationTest {
     @Test
     void conventionIsAReadableReportNotVagueness() {
         // "> 0" was the original bar, and a stub returning a constant cleared it. A real
-        // Boot application matches dozens of conditions at startup — web, jackson, jpa,
-        // datasource, transaction, actuator — so the bar that separates a report from a
+        // Boot application matches dozens of conditions at startup (web, jackson, jpa,
+        // datasource, transaction, actuator), so the bar that separates a report from a
         // number somebody wrote is an order of magnitude, not one.
         int applied = report.autoConfigurationsApplied();
 

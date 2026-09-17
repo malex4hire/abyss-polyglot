@@ -1,4 +1,4 @@
-"""R-8 — `python3 demo.py` works with nothing installed.
+"""R-8: `python3 demo.py` works with nothing installed.
 
 This is the repository's first line and its strongest claim, so it is the one most worth
 checking mechanically. "Runs with nothing installed" decays the moment somebody adds an
@@ -10,7 +10,7 @@ Three things are checked, and the third is the one that actually settles it.
 1. Neither demo.py nor the backend it starts imports anything outside the standard
    library. Read from the source, so it fails at the moment the import is added.
 2. requirements.txt does not pin a runtime dependency. A pin nothing imports is worse
-   than a missing one — it is a declaration that the module needs something it does not,
+   than a missing one: it is a declaration that the module needs something it does not,
    and it stood in this repository for the life of the build.
 3. The script is run with site-packages disabled, so nothing installed on this machine
    can satisfy an import. That is the only version of this claim that cannot be true by
@@ -153,8 +153,8 @@ def test_the_walkthrough_completes_with_site_packages_disabled():
     """-S, so nothing installed on this machine can satisfy an import.
 
     The check above reads the source and is the fast one. This one is the evidence: a
-    conditional import, an import inside a function, a package vendored into the tree —
-    none of those are caught by reading, and all of them break the promise on a stranger's
+    conditional import, an import inside a function, a package vendored into the tree.
+    None of those are caught by reading, and all of them break the promise on a stranger's
     laptop. It is also the only test here that exercises the walkthrough at all.
     """
     spine.require_file(spine.DEMO, "demo.py")
@@ -166,7 +166,7 @@ def test_the_walkthrough_completes_with_site_packages_disabled():
     )
     lines: list[str] = []
     # A wall clock as well as a marker. The walkthrough blocks on purpose once it hands the
-    # server over, so reading to EOF would hang — and a version of this that waited only
+    # server over, so reading to EOF would hang, and a version of this that waited only
     # for the marker DID hang, for a reason worth keeping: a redirected stdout is
     # block-buffered, so the final line never left the child's buffer. The deadline turns
     # that class of failure into a report instead of a stuck run.

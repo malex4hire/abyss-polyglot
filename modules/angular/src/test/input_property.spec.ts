@@ -19,7 +19,7 @@ it("input-property: a setter observes the value changing", () => {
 
 it("input-property: the setter is declared as an input, not just a setter", () => {
   // Assigning the property directly exercises the setter and passes whether or not the
-  // decorator is there — that assertion was vacuous, and a rival version without
+  // decorator is there. That assertion was vacuous, and a rival version without
   // @Input proved it. What @Input adds is that the property joins the component's
   // public interface, so a template can bind to it with [] and Angular sets it during
   // change detection. That is metadata, and it is readable.

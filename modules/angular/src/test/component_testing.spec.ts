@@ -12,7 +12,7 @@ import { EmptyStateComponent } from "../app/empty-state.component";
  *
  * detectChanges is the part that surprises people: Angular does not re-render because a
  * field changed, it re-renders when change detection runs, and in a test that is manual.
- * Forgetting it is why an assertion sees the previous value — which is asserted below
+ * Forgetting it is why an assertion sees the previous value, which is asserted below
  * rather than described, because it is the whole difference from a framework that
  * re-renders on its own.
  *

@@ -2,7 +2,7 @@
  * Do not edit; edit design/app.css and re-render. */
 /* The application surface. One stylesheet, both frontends.
  *
- * Deliberately not the type-specimen treatment the side-by-side page wears — paper,
+ * Deliberately not the type-specimen treatment the side-by-side page wears: paper,
  * serif, editorial margins. Applying that to a work item tracker produced a styled
  * document rather than an application. Here: dark by default, a fixed bar, a left rail,
  * content on elevated cards over a recessed ground.
@@ -12,7 +12,7 @@
  * hairline token exists for the two places elevation genuinely cannot do the work.
  *
  * Every value resolves through design/tokens.yaml. No component library, no CSS framework,
- * no icon set — the icons are inline SVG in each component, hand-authored.
+ * no icon set. The icons are inline SVG in each component, hand-authored.
  */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -33,7 +33,7 @@ body {
 
 /* --- layout --------------------------------------------------------------- */
 
-/* Embedded, the frame is sized to us rather than the other way round — see
+/* Embedded, the frame is sized to us rather than the other way round. See
  * lib/embed.ts. Inside an iframe `100vh` is the FRAME's height, so asserting it stretched
  * the grid whenever the frame was taller than the content and left the slack sitting
  * between the rail and the table. */
@@ -150,7 +150,8 @@ input[type="text"], input:not([type]), select {
 }
 
 /* Full width only where the container is a column. In the bar a stretched select ate the
- * whole row and pushed the brand off the top — a width rule with no container in mind. */
+ * whole row and pushed the brand off the top, which is a width rule with no container in
+ * mind. */
 .rail input, .rail select, .main form input { width: 100%; }
 .bar select { min-width: var(--app-control-min); }
 
@@ -353,7 +354,7 @@ tr.leaving { animation: row-leave var(--seam-reveal) ease-in both; }
 /* --- aggregate ------------------------------------------------------------ */
 
 /* The meter, not ".bar". The top chrome is .bar, and a descendant rule written for the
- * workload meter painted every span in the header — two different things wearing one
+ * workload meter painted every span in the header: two different things wearing one
  * class name, which is a collision no amount of care survives. */
 .bars { display: grid; gap: var(--space-1); }
 .bar-row { display: grid; grid-template-columns: var(--app-meter-label) 1fr var(--app-meter-value); gap: var(--space-2); align-items: center; }
@@ -402,7 +403,7 @@ tr.leaving { animation: row-leave var(--seam-reveal) ease-in both; }
 
 /* --- runtime panel -------------------------------------------------------- */
 
-/* Fully-qualified class names are long — DataSourceConfiguration$Hikari and its kin — and
+/* Fully-qualified class names are long (DataSourceConfiguration$Hikari and its kin) and
  * an unconstrained table let one of them push the whole document 300px wider than the
  * window, so every page scrolled sideways whenever spring-boot was selected. Fixed layout
  * gives the columns their share, and the name breaks inside its cell rather than deciding

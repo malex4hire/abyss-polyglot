@@ -7,7 +7,7 @@ import { Observable, map } from "rxjs";
  * Read the parameter that selected this view.
  *
  * paramMap is an Observable, not a snapshot, because Angular reuses a component when only
- * the parameter changes — navigating from /items/1 to /items/2 does not recreate this
+ * the parameter changes. Navigating from /items/1 to /items/2 does not recreate this
  * class. Reading the snapshot once is the bug that follows from assuming it does: the
  * view shows the first id forever.
  */
@@ -28,7 +28,7 @@ export class DetailComponent {
    * Follow the route parameter as it changes.
    *
    * paramMap is an Observable rather than a snapshot because Angular reuses a component
-   * when only the parameter changes — navigating from /items/1 to /items/2 does not
+   * when only the parameter changes. Navigating from /items/1 to /items/2 does not
    * construct this class again. Reading the snapshot once is the bug that follows from
    * assuming it does, and the symptom is a view stuck on the first id forever.
    */

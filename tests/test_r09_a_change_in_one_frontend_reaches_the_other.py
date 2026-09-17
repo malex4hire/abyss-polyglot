@@ -1,4 +1,4 @@
-"""R-9 — a change made in one frontend arrives in the other with nobody touching it.
+"""R-9: a change made in one frontend arrives in the other with nobody touching it.
 
 This is the claim the whole repository is built to support, and it is the only one that
 cannot be demonstrated by reading anything. Two different frameworks, two separate
@@ -7,8 +7,8 @@ it in React and it leaves Angular. No refresh, no polling loop, no click on the 
 
 The evidence is a real browser, because nothing short of one settles it. A unit test for
 the stream proves a subscription calls its callback. It does not prove that a rendered
-list re-renders, that the re-render reached the DOM, or that the other framework — with a
-completely different change-detection model — noticed at all.
+list re-renders, that the re-render reached the DOM, or that the other framework (with a
+completely different change-detection model) noticed at all.
 
 The declarative half runs on the host and is checked here. The behavioural half is driven
 by visual/live-drive.mjs under Playwright, invoked by scripts/visual.sh, and this file
@@ -77,7 +77,7 @@ def test_no_frontend_refreshes_its_data_on_a_timer():
     """A poll looks identical on screen and is not the same claim.
 
     It would make "with no user action" true and "live" false, and it would keep working
-    with the stream completely broken — which is the kind of green that teaches you to
+    with the stream completely broken, which is the kind of green that teaches you to
     stop trusting the check.
 
     The subject is the interval's BODY, not the call. Banning setInterval outright was the
@@ -134,7 +134,7 @@ def test_a_change_in_one_frontend_reaches_the_other_in_a_real_browser():
     if not spine.docker_available():
         pytest.skip(
             "docker is not available, so the browser image cannot run. The live-update "
-            "claim is NOT verified by this run — `make visual` is what verifies it"
+            "claim is NOT verified by this run: `make visual` is what verifies it"
         )
     frontends = spine.frontends()
     assert len(frontends) >= 2, "fewer than two active frontends; there is no pair to drive"

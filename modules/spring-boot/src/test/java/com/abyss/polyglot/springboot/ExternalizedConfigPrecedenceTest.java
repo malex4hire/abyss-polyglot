@@ -24,7 +24,7 @@ class ExternalizedConfigPrecedenceTest {
         int env = order.indexOf("systemEnvironment");
         int file = order.indexOf("Config resource 'class path resource [application.properties]' via location 'optional:classpath:/'");
         assertTrue(env >= 0, "environment variables are a source");
-        // Was `if (file >= 0) { assertTrue(...) }` — a test that can pass having asserted
+        // Was `if (file >= 0) { assertTrue(...) }`, a test that can pass having asserted
         // nothing about precedence at all, if a Spring upgrade ever reshapes this
         // property source's name. Asserting the lookup itself makes that failure loud
         // instead of silent: the ordering claim below only means something once this line

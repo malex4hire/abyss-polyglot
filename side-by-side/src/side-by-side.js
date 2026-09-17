@@ -2,7 +2,7 @@
 //
 // Re-pointing an iframe at the same application with a backend named in the query string
 // is the whole mechanism: each application already reads that parameter on arrival, so
-// nothing here knows anything about either framework — not a component name, not a route,
+// nothing here knows anything about either framework: not a component name, not a route,
 // not a bundle. The page could not tell you which frame is Angular.
 
 // --- frames size themselves ------------------------------------------------------
@@ -33,7 +33,7 @@ window.addEventListener("message", (event) => {
 
   // The reported height is CONTENT. This stylesheet puts a border on the frame and sets
   // box-sizing: border-box, so assigning the content height directly leaves the border
-  // eating two pixels off it — enough for a scrollbar to appear inside a frame that was
+  // eating two pixels off it, enough for a scrollbar to appear inside a frame that was
   // just sized to need none. offsetHeight - clientHeight is exactly that difference,
   // measured rather than assumed, so a border change does not silently reintroduce it.
   const chrome = frame.offsetHeight - frame.clientHeight;

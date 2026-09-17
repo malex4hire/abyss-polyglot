@@ -6,7 +6,7 @@ export interface EmptyStateProps {
  * A component is a function that takes props and returns what to render.
  *
  * That is the whole model. There is no lifecycle to implement and no base class to
- * extend — the function runs top to bottom on every render, and hooks give it memory
+ * extend. The function runs top to bottom on every render, and hooks give it memory
  * between runs. Rendering must stay pure: anything with an effect belongs in useEffect,
  * or it runs twice in development and at unpredictable times under concurrent rendering.
  *

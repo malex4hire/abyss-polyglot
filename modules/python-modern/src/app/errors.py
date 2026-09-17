@@ -10,7 +10,7 @@ class TransitionRefused(Exception):
         """Carry the data that explains the failure, not just a message.
 
         A named exception subclass lets a caller catch this specific failure without
-        catching everything else that might go wrong — `except TransitionRefused` says
+        catching everything else that might go wrong. `except TransitionRefused` says
         something a bare `except ValueError` cannot.
 
         Attaching the states as attributes is the other half: a caller reads `frm` and

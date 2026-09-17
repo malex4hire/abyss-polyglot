@@ -30,7 +30,7 @@ public class ChangeStreamController {
      *
      * startAsync is the whole mechanism. Without it the container closes the response when
      * this method returns and every client sees an immediately-finished stream. With it,
-     * the request survives the handler and the writer stays usable — which also means
+     * the request survives the handler and the writer stays usable, which also means
      * nothing will ever close it for us, so the listeners below are not optional.
      *
      * Timeout zero means no timeout. The container's default would otherwise end the

@@ -30,7 +30,7 @@ class ExecutorServiceTest {
 
     @Test
     void tasksRunOnPoolThreadsNotTheCallingThread() {
-        // Scores alone cannot tell a pool from a loop — both produce the same numbers.
+        // Scores alone cannot tell a pool from a loop. Both produce the same numbers.
         // Every task reports the thread it ran on: a bounded pool never hands work to the
         // thread that called it, and a serial loop never hands it to anything else.
         Map<String, List<WorkItem>> grouped = Map.of(

@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 
 import { WorkItem } from "../lib/types";
 
-// DraftForm's submit handler calls validateDraft before deciding whether to reset — so
+// DraftForm's submit handler calls validateDraft before deciding whether to reset, so
 // this file would go red whenever validation broke, even though what it covers is the
 // controlled input. Stubbing validateDraft to always pass keeps a failure here about the
 // input alone, never about the validation logic another test already covers.
@@ -36,11 +36,11 @@ it("controlled-input: the DOM node holds no truth of its own", async () => {
 });
 
 it("controlled-input: submitting resets the field from state, not from user action", async () => {
-  // The test above passes identically against an uncontrolled input — typing then
+  // The test above passes identically against an uncontrolled input. Typing then
   // clearing leaves value === "" either way, since a native <input> already tracks its
   // own text. What only a controlled input can do: go blank because *state* changed,
   // with no keystroke or user action touching the node at all. DraftForm's own onSubmit
-  // already does exactly this (setDraft(EMPTY) after a valid submit) — an uncontrolled
+  // already does exactly this (setDraft(EMPTY) after a valid submit). An uncontrolled
   // title input has no value prop for that reset to reach, and would still show what was
   // typed after the form clears.
   render(<DraftForm onSubmit={() => undefined} />);

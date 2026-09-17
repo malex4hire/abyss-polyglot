@@ -19,7 +19,7 @@ it("property-binding: sets a DOM property, not an attribute", () => {
   // The lesson, and the thing that fails against `disabled="{{ isBusy }}"`. Square
   // brackets assign the node's *property*, so it is a real boolean and no attribute is
   // written. The interpolated-attribute spelling sets the attribute to the string
-  // "false", which is present and therefore truthy — the button disables forever.
+  // "false", which is present and therefore truthy, so the button disables forever.
   expect(typeof button.disabled).toBe("boolean");
   expect(button.disabled).toBe(true);
 
@@ -30,7 +30,7 @@ it("property-binding: sets a DOM property, not an attribute", () => {
 
   // The discriminating case, and the bug itself. A property binding assigns `false` and
   // writes no attribute. `disabled="{{ isBusy }}"` writes the attribute as the string
-  // "false" — present, therefore truthy, therefore disabled forever. When it is true the
+  // "false": present, therefore truthy, therefore disabled forever. When it is true the
   // browser reflects the property back to the attribute, so only the false case can tell
   // the two spellings apart.
   expect(button.disabled).toBe(false);

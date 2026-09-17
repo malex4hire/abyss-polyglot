@@ -34,7 +34,7 @@ export class DraftFormComponent {
    * the model is testable without rendering anything, and validity is derived from the
    * controls rather than tracked by hand.
    *
-   * React's counterpart is state plus a validate function the component calls itself —
+   * React's counterpart is state plus a validate function the component calls itself:
    * less machinery, and no framework-owned validity to ask.
    */
   private buildForm() {

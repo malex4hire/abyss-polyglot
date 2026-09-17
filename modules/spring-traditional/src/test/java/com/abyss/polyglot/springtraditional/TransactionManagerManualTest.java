@@ -17,7 +17,7 @@ class TransactionManagerManualTest {
     @Test
     void transactionalIsInertWithoutThisBean() {
         // Definitions, not instances. Refreshing the context would instantiate WebConfig's
-        // @EnableWebMvc beans and fail for want of a ServletContext — and instantiation was
+        // @EnableWebMvc beans and fail for want of a ServletContext, and instantiation was
         // never the claim. The point is that the container's definition of this bean IS a
         // factory method on a configuration class, which is readable before anything runs.
         var registry = new org.springframework.beans.factory.support.DefaultListableBeanFactory();
@@ -27,7 +27,7 @@ class TransactionManagerManualTest {
                 .postProcessBeanDefinitionRegistry(registry);
         // Constructing the manager by hand asserted only that a constructor stores its
         // argument, and passed just as well against a configuration that declared no bean
-        // at all — the state RootConfig's own comment warns of, where @Transactional is
+        // at all, the state RootConfig's own comment warns of, where @Transactional is
         // silently ignored and every statement commits alone.
         assertTrue(registry.containsBeanDefinition("transactionManager"),
                 "without this definition @Transactional does nothing, and nothing says so");
@@ -38,7 +38,7 @@ class TransactionManagerManualTest {
         // The definition checks above read the @Bean-annotated method's signature, which
         // an edit to the method body leaves untouched. Call the factory method directly,
         // no context refresh needed, and assert on the instance it actually returns: that
-        // is what a stub body — one that throws, or returns null — fails.
+        // is what a stub body (one that throws, or returns null) fails.
         var dataSource = new DriverManagerDataSource();
         var manager = new RootConfig().transactionManager(dataSource);
         assertInstanceOf(DataSourceTransactionManager.class, manager);

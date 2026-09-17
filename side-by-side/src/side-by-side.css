@@ -19,7 +19,7 @@ body {
 /* The page is full width and the PROSE is what gets constrained, not the frames.
  *
  * It was the other way round: one centred column at --measure-page held everything, so
- * each frame got half of 62rem — about 480px — and the work item table lost its last
+ * each frame got half of 62rem (about 480px), and the work item table lost its last
  * column to the edge. Two half-width applications are two applications nobody can read,
  * which defeats the one thing this page exists to show.
  *
@@ -96,7 +96,7 @@ h1 { font-size: var(--type-xxl); }
   grid-template-columns: var(--split-columns);
   gap: var(--space-3);
   /* Both sides are the same height by construction, so this only matters if one ever
-   * is not — and then they should still start level. */
+   * is not, and then they should still start level. */
   align-items: start;
 }
 
@@ -106,7 +106,7 @@ h1 { font-size: var(--type-xxl); }
   width: 100%;
   /* Tall enough for the whole application, so the frame has no scrollbar of its own and
    * the PAGE is what scrolls. Both frames are the same height, so one scrollbar moves
-   * both sides together and row N stays opposite row N — which two independently
+   * both sides together and row N stays opposite row N, which two independently
    * scrolling boxes cannot do. */
   height: var(--measure-frame);
   border: thin solid var(--surface-panel);
@@ -115,8 +115,8 @@ h1 { font-size: var(--type-xxl); }
 }
 
 /* The identity hue names which framework a frame is, and the glyph in the chip says the
- * same thing without relying on colour — a distinction carried by colour alone is one
- * that disappears for a good share of the people who look at it. */
+ * same thing without relying on colour, because a distinction carried by colour alone is
+ * one that disappears for a good share of the people who look at it. */
 .chip {
   display: inline-block;
   padding: 0 var(--space-1);

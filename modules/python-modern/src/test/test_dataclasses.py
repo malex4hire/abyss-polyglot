@@ -23,7 +23,7 @@ def test_frozen_means_derive_rather_than_mutate(sample):
     assert derived.priority == 99, "the change lands on the new value"
     assert item.priority == 5, "and the original is untouched"
     assert derived.id == item.id, "every other field carried across"
-    # Was `item == sample[0]`, which is `x == x` — true of every object in Python,
+    # Was `item == sample[0]`, which is `x == x`, true of every object in Python,
     # including one with no __eq__ at all. Componentwise equality is only visible against
     # a separately constructed instance carrying the same values.
     twin = evolve(item)
@@ -36,7 +36,7 @@ def test_frozen_means_derive_rather_than_mutate(sample):
     # Everything above is also satisfied by field-by-field reconstruction through the
     # constructor, which is the spelling this replaces. What dataclasses.replace
     # supplies that a hand-rolled version cannot is that it reads the field set off the
-    # type at call time, so it derives any dataclass without being told its fields — and
+    # type at call time, so it derives any dataclass without being told its fields, and
     # keeps working when a field is added to WorkItem, which a hand-rolled list does not.
     @dataclass(frozen=True)
     class Other:

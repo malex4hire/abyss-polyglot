@@ -11,7 +11,7 @@ export interface FetchState {
 /**
  * Load work items, and expose the loading and error states with them.
  *
- * A custom hook is a function that calls other hooks — nothing more. It shares stateful
+ * A custom hook is a function that calls other hooks, nothing more. It shares stateful
  * logic between components without the wrapper nesting that render props and HOCs
  * produced, and because it is a plain function its rules still apply: called
  * unconditionally, at the top level, so React can match each call to its slot.

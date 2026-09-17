@@ -11,7 +11,7 @@ export interface PanelProps {
  *
  * children is just a prop that happens to hold elements, so a wrapper composes by
  * accepting content rather than by inheriting from anything. React has no component
- * inheritance at all — composition is the only mechanism, which is why a slot like this
+ * inheritance at all. Composition is the only mechanism, which is why a slot like this
  * is the idiom rather than a base class.
  *
  * The named `actions` slot shows the same trick where more than one hole is needed.

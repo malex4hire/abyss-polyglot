@@ -1,7 +1,7 @@
 # The fast gate, and the badge.
 #
 # Everything here runs on the host and compiles nothing: no JDK, no Node, no docker, no
-# containers. That is deliberate — it is what lets this run on every push in well under a
+# containers. That is deliberate: it is what lets this run on every push in well under a
 # minute, which is the only kind of gate people actually keep.
 #
 # The full docker gate lives in docker-gate.yml and does NOT run on push. It builds four

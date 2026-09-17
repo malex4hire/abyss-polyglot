@@ -80,7 +80,7 @@ export class BoardComponent implements OnInit, OnDestroy {
    * State the framework can track at the value level.
    *
    * A signal holds a value and knows who read it, so a computed signal recomputes only
-   * when something it actually read has changed — no dependency array to keep in step,
+   * when something it actually read has changed, with no dependency array to keep in step,
    * because the dependencies are discovered by reading them.
    *
    * That is the difference from RxJS here: a signal always has a current value and is
@@ -100,7 +100,7 @@ export class BoardComponent implements OnInit, OnDestroy {
    * Set up when the component starts, tear down when it ends.
    *
    * ngOnInit runs after the first inputs are set, which is why work depending on an
-   * @Input belongs here and not in the constructor — at construction the inputs are
+   * @Input belongs here and not in the constructor: at construction the inputs are
    * still undefined. ngOnDestroy is the other half, and the subscription below is
    * exactly the kind of thing that leaks without it.
    *

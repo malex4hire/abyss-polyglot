@@ -28,7 +28,7 @@ export class CounterComponent {
   /**
    * Context for the property binding in the template fragment above. The demonstration is
    * `[disabled]="isBusy"`; this getter is only what that binding reads, and on its own it
-   * says nothing about Angular — a reader sent here instead of to the template learns
+   * says nothing about Angular. A reader sent here instead of to the template learns
    * type coercion, not binding.
    *
    * Returning a real boolean rather than a truthy value is the same discipline one level
@@ -42,7 +42,7 @@ export class CounterComponent {
    * Respond to a DOM event, bound with (click) in the template.
    *
    * Parentheses bind an event to a statement, and Angular removes the listener when the
-   * component is destroyed — which makes a leak impossible here without doing anything
+   * component is destroyed, which makes a leak impossible here without doing anything
    * to prevent one. $event carries the DOM event when the handler wants it.
    *
    * Unlike interpolation, an event binding may have side effects: it is a statement, not

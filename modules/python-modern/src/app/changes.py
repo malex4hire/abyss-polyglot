@@ -1,7 +1,7 @@
 """B4: the change stream, on the stdlib HTTP server.
 
-No language lesson is claimed here. Server-sent events on this stack are HTTP plumbing — a
-header, a held socket, a flushed line — and `io` belongs to the framework modules, so
+No language lesson is claimed here. Server-sent events on this stack are HTTP plumbing (a
+header, a held socket, a flushed line), and `io` belongs to the framework modules, so
 claiming it as a Python fundamental would blur the split this module sits on. The stack
 serves the endpoint for contract parity and says nothing more.
 

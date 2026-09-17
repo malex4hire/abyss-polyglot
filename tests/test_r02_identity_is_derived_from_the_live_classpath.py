@@ -1,11 +1,11 @@
-"""R-2 — what each stack claims to be, checked against what actually resolved at runtime.
+"""R-2: what each stack claims to be, checked against what actually resolved at runtime.
 
 Verification reads the running process's own resolved classpath or dependency tree.
 Build files and the host toolchain are not inputs: a pom can declare anything, and what
 matters is what the JVM loaded.
 
 The identity endpoint is instrumentation, not contract. It reports resolved runtime
-*data* — versions, the artifact set, the concrete HTTP server class — and never a
+*data* (versions, the artifact set, the concrete HTTP server class) and never a
 claimed identity string, because a module asserting its own identity is not proof of
 anything. Identity is therefore derived here, from the artifact set, against
 `required_artifacts` and `forbidden_artifacts` in the manifest.
@@ -45,16 +45,16 @@ def _names_match(artifact: str, needle: str, rule: str) -> bool:
     """Whether an artifact is the named dependency, under the stack's declared rule.
 
     Substring matching made the forbidden entry "react" match "react-is", a transitive
-    dependency of the Angular toolchain that is not React — matching on presence where
-    the rule is about identity.
+    dependency of the Angular toolchain that is not React. That is matching on presence
+    where the rule is about identity.
 
     Tightening it to a name boundary then broke the JVM side, where "spring-boot" is
     meant to forbid the whole family including spring-boot-autoconfigure. The two
     ecosystems mean different things by a dependency name, so the manifest says which:
 
-      prefix  a family — the Maven coordinate style, where spring-boot covers every
+      prefix  a family: the Maven coordinate style, where spring-boot covers every
               spring-boot-* artifact on the classpath
-      exact   one package — the npm style, where react and react-is are unrelated
+      exact   one package: the npm style, where react and react-is are unrelated
     """
     if rule == "exact":
         # rsplit, not split: a scoped package name begins with @, so splitting on the
@@ -116,7 +116,7 @@ def test_every_active_stack_reports_healthy_and_answers_for_a_reason():
         )
 
         # The status is not the evidence. A frontend's entry surface is "/", and a
-        # single-page app answers that path — and every other path — with its document,
+        # single-page app answers that path, and every other path, with its document,
         # whatever state the application is in. So read what came back: a backend says it
         # is up, and a frontend's document references the bundle it was built with.
         body = response.text
@@ -146,7 +146,7 @@ def test_a_pinned_address_is_the_address_the_container_actually_has():
     Postgres pins an address because the egress-blocked overlay leaves the embedded DNS
     resolver unable to answer, and every JVM client gets that same address written into
     /etc/hosts at create time. The pin is applied when a container is CREATED and not when
-    an existing one is reconnected to a recreated network — so switching between the normal
+    an existing one is reconnected to a recreated network, so switching between the normal
     stack and the overlay silently moved Postgres while its two copies went on naming the
     old address.
 
@@ -277,7 +277,7 @@ def test_the_modern_java_http_surface_resolves_to_the_jdk_module():
         doc = _report(sid, stack)
         # The module, not the package. The running class is
         # sun.net.httpserver.HttpServerImpl, which is that module's implementation of
-        # com.sun.net.httpserver.HttpServer — asserting on the API package name would
+        # com.sun.net.httpserver.HttpServer, so asserting on the API package name would
         # reject the correct answer.
         module = str(doc.get("http_server_module", ""))
         server_class = str(doc["http_server_class"])

@@ -11,7 +11,7 @@ export interface DraftItem {
  *
  * The rules live in a plain function with no React in sight, so they are testable
  * without rendering anything and reusable outside a form. React ships no validation of
- * its own — this is the whole mechanism, where Angular's reactive forms supply
+ * its own. This is the whole mechanism, where Angular's reactive forms supply
  * validators, a validity state machine, and per-control error objects.
  */
 export function validateDraft(draft: DraftItem): Record<string, string> {

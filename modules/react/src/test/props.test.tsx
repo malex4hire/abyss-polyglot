@@ -27,7 +27,7 @@ it("props: are the component's whole input, flowing one way", async () => {
 });
 
 it("props: the signature names what the component needs", () => {
-  // Reading props off the object renders identically — destructuring is notation, and a
+  // Reading props off the object renders identically. Destructuring is notation, and a
   // counter derived from this component by transformation proved nothing on screen can
   // separate them. What the notation does is put the component's interface in its
   // signature, and the signature survives compilation, so it is readable.

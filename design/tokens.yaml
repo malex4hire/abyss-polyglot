@@ -26,7 +26,7 @@ surface:
 # Decoration: colours that are neither a foreground nor a background. A separator draws
 # the edge where one surface meets another and never carries text, and a wash marks a row
 # for a moment. Declaring them under surface made the token check test contrast against a hairline,
-# which is a question with no meaning — the fix is the declaration, not the floor.
+# which is a question with no meaning. The fix is the declaration, not the floor.
 decoration:
   rule: "#E4DED4"
   arrival: "#EFF4F8"
@@ -36,7 +36,7 @@ foreground:
   muted: "#5F584E"    #  6.57:1 on ground,  7.02:1 on panel
 
 # ---------------------------------------------------------------------------
-# Stack identity — six owned hues on an even ring, minimum separation 50.4deg
+# Stack identity: six owned hues on an even ring, minimum separation 50.4deg
 #
 # Framework brand colours are rejected and stay rejected: Angular red, React cyan,
 # Python blue and Spring green put React and Python roughly 11deg apart, which fails
@@ -84,7 +84,7 @@ seam:
   caret_px: 5
 
 # ---------------------------------------------------------------------------
-# Tier — ink weight, not colour. Deliberately not colour-encoded.
+# Tier: ink weight, not colour. Deliberately not colour-encoded.
 #
 # An earlier revision of this file gave tier two quiet hues because the token check
 # demanded a colour token from every member of every set. That was the check being wrong:
@@ -105,7 +105,7 @@ tiers:
       border_style: dashed
 
 # ---------------------------------------------------------------------------
-# Typography — self-hosted from the first commit. A webfont CDN is a blank page on a
+# Typography: self-hosted from the first commit. A webfont CDN is a blank page on a
 # machine with no route out, so it is prohibited from the start rather than at hardening.
 # ---------------------------------------------------------------------------
 
@@ -113,7 +113,7 @@ type:
   faces:
     display:
       family: Fraunces
-      role: headings and stack names only — this is where the character lives
+      role: headings and stack names only; this is where the character lives
       formats: [woff2]
     body:
       family: Public Sans
@@ -155,14 +155,14 @@ spacing:
     #
     # Deliberately modest. It has to be SHORTER than the content, not longer: a frame
     # taller than what it holds stretches the application inside it, and the height it
-    # then reports is the frame's rather than its own — a measurement that can only
+    # then reports is the frame's rather than its own, a measurement that can only
     # ratchet upwards. Short, and the first message corrects it.
     #
     # It is also the whole answer with JavaScript disabled, where that frame scrolls.
     frame: 40
 
 # ---------------------------------------------------------------------------
-# Floors — read at test time by the token check. Not advisory.
+# Floors: read at test time by the token check. Not advisory.
 # ---------------------------------------------------------------------------
 
 floors:
@@ -204,7 +204,7 @@ status:
 # ---------------------------------------------------------------------------
 # The application surface.
 #
-# The type-specimen treatment above — paper ground, serif display, editorial margins — is a
+# The type-specimen treatment above (paper ground, serif display, editorial margins) is a
 # field guide, not an application. Applying it to a work item tracker produced a styled
 # document. This surface has its own scales: dark by default, layered elevation rather than
 # rules, a sans display face, and a decided density.
@@ -235,7 +235,7 @@ app:
       overlay: "rgba(16,20,28,.05)"
 
   # Identity per stack, lifted for a dark ground. The hues above were tuned against warm
-  # paper and go muddy here, so the application carries its own — same hue, different
+  # paper and go muddy here, so the application carries its own: same hue, different
   # lightness, still one declared value per stack.
   accents:
     dark:

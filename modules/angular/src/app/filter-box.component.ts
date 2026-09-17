@@ -20,7 +20,7 @@ export class FilterBoxComponent {
    *
    * @Input marks part of the component's public surface, set by the parent's template
    * binding rather than passed as an argument. Declaring it as a setter is what lets the
-   * component react to a new value — the alternative is ngOnChanges, which fires for
+   * component react to a new value. The alternative is ngOnChanges, which fires for
    * every input at once and hands you a SimpleChanges bag to pick through.
    *
    * The framework writes this, which is why an input is declared with a default or a
@@ -38,7 +38,7 @@ export class FilterBoxComponent {
    *
    * @Output exposes an EventEmitter the parent binds to with (changed)="...". Data flows
    * down through inputs and events flow up through outputs, so a child never writes to
-   * its parent's state — it reports, and the parent decides what that means.
+   * its parent's state. It reports, and the parent decides what that means.
    *
    * The emitter is an Observable underneath, which is why an output composes with the
    * same operators as any other stream. Emitting is a deliberate call, not a side effect

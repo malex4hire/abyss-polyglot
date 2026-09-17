@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  *
  * Every method here answers a question the traditional module answers by pointing at a
  * line of its own configuration. Here there is no such line, so the answer has to be
- * obtained from the container — which is precisely the contrast.
+ * obtained from the container, which is precisely the contrast.
  */
 @Component
 public class StartupReport {
@@ -60,7 +60,7 @@ public class StartupReport {
     /**
      * The conditions that matched. Every auto-configuration class is a guarded set of
      * bean definitions: @ConditionalOnClass, @ConditionalOnMissingBean and friends decide
-     * at startup whether to contribute. "Convention" is not vagueness — it is this report,
+     * at startup whether to contribute. "Convention" is not vagueness. It is this report,
      * and it is readable at runtime.
      *
      * @ConditionalOnMissingBean is the part that matters: declare your own DataSource and
@@ -105,7 +105,7 @@ public class StartupReport {
 
     /**
      * Which profiles are active. A profile gates beans and property files by name, so one
-     * artifact behaves differently per environment without a rebuild — and with no
+     * artifact behaves differently per environment without a rebuild, and with no
      * profile set, "default" is what is active, which is worth knowing before wondering
      * why a bean did not appear.
      */
@@ -134,7 +134,7 @@ public class StartupReport {
     /**
      * The datasource nobody in this module constructed. Boot saw a JDBC driver and a
      * spring.datasource.url, chose a connection pool from what was on the classpath, and
-     * built it — pool included, which the traditional module's DriverManagerDataSource
+     * built it, pool included, which the traditional module's DriverManagerDataSource
      * does not have at all.
      *
      * The convenience is real and so is the cost: when the pool misbehaves, the

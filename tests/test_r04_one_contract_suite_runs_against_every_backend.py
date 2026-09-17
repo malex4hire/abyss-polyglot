@@ -1,4 +1,4 @@
-"""R-4 — one unmodified contract suite, run against every active backend, passing
+"""R-4: one unmodified contract suite, run against every active backend, passing
 identically.
 
 The scope of this file is the BACKENDS, and saying so is the point.
@@ -7,8 +7,8 @@ An earlier version of this docstring claimed the contract was "consumed unmodifi
 every frontend" as well. Every test under it exercised backends only. Nobody had lied on
 purpose: the sentence was written when the suite was planned and never narrowed when the
 tests were written, so a claim about six things stood over evidence about four for the
-life of the build. The frontends' side of that claim is checked in R-6 and R-9 — by
-comparing their server source and by driving a real browser — because it is a different
+life of the build. The frontends' side of that claim is checked in R-6 and R-9, by
+comparing their server source and by driving a real browser, because it is a different
 claim needing different evidence, not a bigger version of this one.
 
 What is checked here: the suite names no stack and branches on nothing, so it cannot be
@@ -88,7 +88,7 @@ def test_the_suite_contains_no_per_stack_branch_name_or_skip():
             elif skip_re.search(line):
                 offenders.append(f"{spine._rel(path)}:{n}: branches on skip/xfail: {line.strip()}")
     assert not offenders, (
-        "the contract suite must be identical across backends — no per-stack branch, "
+        "the contract suite must be identical across backends: no per-stack branch, "
         "name or skip:\n  " + "\n  ".join(offenders)
     )
 

@@ -18,7 +18,7 @@ it("template-interpolation: writes an expression result as text", () => {
 
 it("template-interpolation: the value is interpolated, not bound as a property", () => {
   // Binding [textContent] puts the same text in the same element, so the rendered DOM is
-  // identical and nothing on screen can separate them — a correct counter proved it. The
+  // identical and nothing on screen can separate them. A correct counter proved it. The
   // difference is in what Angular compiled the template to: an interpolation emits a
   // textInterpolate instruction, a property binding emits property. The assertion has to
   // discriminate the two, and compiled output is the one layer where it can.

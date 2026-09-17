@@ -9,7 +9,7 @@ class Status(Enum):
     """The work item lifecycle.
 
     Python enum members are instances of the class, so behaviour is ordinary method
-    definition rather than anything special — which is what makes the rule below able to
+    definition rather than anything special, which is what makes the rule below able to
     live with the data.
     """
 
@@ -26,7 +26,7 @@ class Status(Enum):
         a state cannot leave a transition map elsewhere quietly out of date. Members are
         instances, so this is an ordinary method and `self` is the constant.
 
-        Identity comparison would work here too — enum members are singletons, which is
+        Identity comparison would work here too. Enum members are singletons, which is
         why `is` is the idiomatic test for them and why a member survives a round trip
         through a name lookup unchanged.
         """

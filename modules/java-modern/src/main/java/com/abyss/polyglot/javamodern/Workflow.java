@@ -9,7 +9,7 @@ public final class Workflow {
     }
 
     /**
-     * Apply a requested transition. Orchestration only — the three units it chains are
+     * Apply a requested transition. Orchestration only: the three units it chains are
      * each demonstrated on their own.
      */
     public static TransitionResult apply(WorkItem item, Status next, Instant at) {

@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  *
  * Everything the Boot module gets for free is written out here: the datasource, the
  * transaction manager, the JdbcTemplate, the property resolver, the scanned package.
- * That is not an inconvenience to be tidied away — it is the thing this module exists to
+ * That is not an inconvenience to be tidied away. It is the thing this module exists to
  * show. The autoconfiguration-delta check reads this hand-declared set and the Boot
  * module's live condition-evaluation report, and derives the difference between them.
  */
@@ -30,7 +30,7 @@ public class RootConfig {
 
     /**
      * Resolves ${...} in @Value and in bean definitions. Without this bean the
-     * placeholders arrive as literal text — Boot registers it for you, which is exactly
+     * placeholders arrive as literal text. Boot registers it for you, which is exactly
      * why its absence here is invisible until something reads a property and gets
      * "${db.url}" back.
      */
@@ -69,7 +69,7 @@ public class RootConfig {
     /**
      * A bean declared by a factory method rather than discovered by scanning. The method
      * name is the bean name, the return type is the type the container registers, and the
-     * parameters are the dependencies it must resolve first — the definition and the
+     * parameters are the dependencies it must resolve first, so the definition and the
      * wiring are the same piece of code.
      */
     @Bean

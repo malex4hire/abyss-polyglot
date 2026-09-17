@@ -27,7 +27,7 @@ class StreamsCollectorsTest {
         assertThrows(UnsupportedOperationException.class, () -> result.add(source.get(0)));
         // Both a stream collected via Collectors.toUnmodifiableList() and a mutable list
         // wrapped in Collections.unmodifiableList() reject a mutation, so that assertion
-        // alone cannot tell them apart — the manual wrap is a view over the original list,
+        // alone cannot tell them apart. The manual wrap is a view over the original list,
         // the collector produces a real, independent copy, and the JDK gives each a
         // different concrete class for exactly that reason.
         assertTrue(result.getClass().getName().startsWith("java.util.ImmutableCollections$"),

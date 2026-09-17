@@ -31,7 +31,7 @@ class RestControllerAdviceTest {
         assertEquals(1, ((List<?>) response.getBody().get("fields")).size());
 
         // Calling the method directly asserts the body it builds and nothing about how a
-        // thrown exception reaches it — a plain catch block in the controller produces the
+        // thrown exception reaches it. A plain catch block in the controller produces the
         // identical response, so those assertions alone say nothing about the advice.
         // @ExceptionHandler is what makes this reachable from any handler that throws,
         // and it is the mechanism.

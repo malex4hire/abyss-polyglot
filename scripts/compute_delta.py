@@ -51,7 +51,7 @@ def get(stack: dict, endpoint_field: str) -> dict:
     try:
         with urllib.request.urlopen(url, timeout=15) as response:
             return json.loads(response.read().decode("utf-8"))
-    except Exception as exc:  # noqa: BLE001 — any failure here is a failure to compute
+    except Exception as exc:  # noqa: BLE001 (any failure here is a failure to compute)
         fail(f"{url} did not answer: {exc}")
 
 

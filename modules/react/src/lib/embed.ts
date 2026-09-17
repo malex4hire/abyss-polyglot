@@ -9,12 +9,13 @@
 //
 //  1. The application stops asserting `min-height: 100vh`. Inside an iframe `100vh` is the
 //     FRAME's height, not the window's, so a frame taller than the content stretched the
-//     layout and dropped the slack between the filter rail and the table — a 391px hole in
-//     the middle of the screen that did not exist when the app was viewed on its own.
+//     layout and dropped the slack between the filter rail and the table, which left a
+//     391px hole in the middle of the screen that did not exist when the app was viewed
+//     on its own.
 //     It also makes the measurement below a ratchet: the content can never report itself
 //     shorter than the frame it is already in.
 //
-//  2. It reports its real height, and keeps reporting as that height changes — a row
+//  2. It reports its real height, and keeps reporting as that height changes: a row
 //     added, a filter narrowing the list, the workload panel opening.
 //
 // This file is byte-identical in both frontends and the suite checks that it stays so.
@@ -36,11 +37,11 @@ export function reportHeightToEmbedder(): void {
     // The BODY box, not documentElement.scrollHeight.
     //
     // documentElement fills the viewport when the content is shorter than it, so once the
-    // frame had been made taller than the content it reported the frame's own height back
-    // — a measurement that could only ever grow. It got there via a transient scrollbar:
-    // the frame starts short, the content overflows, a scrollbar appears, the narrower
-    // content is 46px taller, the frame is set to that, the scrollbar goes away and the
-    // real height is never reported again.
+    // frame had been made taller than the content it reported the frame's own height
+    // back, which is a measurement that could only ever grow. It got there via a transient
+    // scrollbar: the frame starts short, the content overflows, a scrollbar appears, the
+    // narrower content is 46px taller, the frame is set to that, the scrollbar goes away
+    // and the real height is never reported again.
     //
     // body carries no margin here and is not stretched, so its box is the content.
     const height = Math.ceil(document.body.getBoundingClientRect().height);

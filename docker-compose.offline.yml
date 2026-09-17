@@ -8,7 +8,7 @@
 # containers talk to each other and to nobody else.
 #
 # `internal: true` is the obvious spelling and the wrong one. It removes the external
-# bridge entirely, which takes port publishing with it — every service comes up healthy
+# bridge entirely, which takes port publishing with it, so every service comes up healthy
 # by its own healthcheck and none of them is reachable from the laptop the demo runs on.
 # What this is protecting against is a machine with no route to the internet, not a
 # machine that cannot reach its own containers.

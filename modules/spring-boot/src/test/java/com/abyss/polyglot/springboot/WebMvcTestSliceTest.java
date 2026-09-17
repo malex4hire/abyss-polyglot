@@ -38,7 +38,7 @@ class WebMvcTestSliceTest {
     /**
      * A slice: the web layer and nothing below it. @WebMvcTest starts the dispatcher, the
      * converters, the validator and the advice, and leaves out the datasource, JPA and
-     * every other auto-configuration — which is why the repository has to be supplied as
+     * every other auto-configuration, which is why the repository has to be supplied as
      * a mock rather than being available.
      *
      * Against the traditional module's standalone MockMvc, the difference is what is

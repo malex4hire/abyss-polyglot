@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-/** Persistence, on JdbcTemplate. No JPA, no repository derivation — SQL is written out. */
+/** Persistence, on JdbcTemplate. No JPA, no repository derivation: SQL is written out. */
 @Repository
 public class WorkItemRepository {
 
@@ -37,7 +37,7 @@ public class WorkItemRepository {
     /**
      * Query through JdbcTemplate. The SQL is visible, the RowMapper says exactly how a
      * row becomes an object, and the template handles the connection, the statement, the
-     * result set and the close — the boilerplate, not the intent. Compare Boot's
+     * result set and the close, which is the boilerplate, not the intent. Compare Boot's
      * spring-data-jpa-repository, where a method name generates the query and the SQL
      * is never written at all.
      */
@@ -75,7 +75,7 @@ public class WorkItemRepository {
     /**
      * B5. Compare and set: the status the caller decided against is part of the WHERE
      * clause, so the check and the write are one statement rather than two. Zero rows
-     * affected means the row was not in the expected state — already moved, by this
+     * affected means the row was not in the expected state: already moved, by this
      * caller's own retry or by somebody else.
      */
     public int updateStatus(String id, Status expected, Status status, Instant at) {

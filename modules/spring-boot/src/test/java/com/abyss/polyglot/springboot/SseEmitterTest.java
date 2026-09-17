@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  *
  * The return type is the mechanism, so the assertion is on what returning that type
  * causes: the request is detached from the container's thread and the
- * response is a stream. A handler returning a body — however correct that body is — leaves
+ * response is a stream. A handler returning a body (however correct that body is) leaves
  * the request synchronous and answers with a different content type, so this fails against
  * any implementation that is not streaming.
  *
@@ -45,7 +45,7 @@ class SseEmitterTest {
 
         // Asserted by calling the handler rather than through MvcResult.getAsyncResult(),
         // which blocks until the async result is set. This emitter's timeout is
-        // Long.MAX_VALUE by design — a change stream has no natural end — so that call
+        // Long.MAX_VALUE by design (a change stream has no natural end), so that call
         // waits forever. The first version of this test hung the suite for fifteen minutes.
         assertInstanceOf(
                 org.springframework.web.servlet.mvc.method.annotation.SseEmitter.class,

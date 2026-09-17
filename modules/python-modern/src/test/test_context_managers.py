@@ -1,5 +1,5 @@
-"""Executable proof that a batch's teardown runs on both exits — applying the staged
-writes on a clean exit and dropping them on an exception — from one function."""
+"""Executable proof that a batch's teardown runs on both exits (applying the staged
+writes on a clean exit and dropping them on an exception) from one function."""
 
 from __future__ import annotations
 
@@ -31,13 +31,13 @@ def test_teardown_runs_when_the_block_raises(sample):
     """`with` receives contextlib's own manager, so setup and teardown are one function.
 
     The point is that one function reads as setup, the block, then teardown, with the
-    two halves of the lifecycle in one place — not that a lifecycle exists. A class
+    two halves of the lifecycle in one place, not that a lifecycle exists. A class
     implementing __enter__ and __exit__ by hand is behaviourally identical on both exits,
     so nothing about what ends up in the repository can tell them apart.
 
     What can is the object `with` receives: the decorator wraps a generator function and
     hands back contextlib's own manager, and a hand-rolled class does not. That is the
-    mark that distinguishes the two — one layer away from the behaviour, and readable.
+    mark that distinguishes the two: one layer away from the behaviour, and readable.
     """
     import contextlib
     import inspect
@@ -50,6 +50,6 @@ def test_teardown_runs_when_the_block_raises(sample):
         f"read top to bottom: got {type(manager).__module__}.{type(manager).__name__}"
     )
     assert inspect.isgenerator(manager.gen), (
-        "and it is driven by a generator — the yield is where the block runs"
+        "and it is driven by a generator, where the yield is where the block runs"
     )
     manager.gen.close()

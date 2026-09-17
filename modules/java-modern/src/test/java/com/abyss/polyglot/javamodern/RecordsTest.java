@@ -21,7 +21,7 @@ class RecordsTest {
         WorkItem moved = original.withStatus(Status.IN_PROGRESS, later);
 
         assertEquals(Status.IN_PROGRESS, moved.status(), "derived value carries the new status");
-        assertEquals(Status.OPEN, original.status(), "the original is untouched — records are immutable");
+        assertEquals(Status.OPEN, original.status(), "the original is untouched, because records are immutable");
         assertEquals(original.id(), moved.id());
         assertEquals(later, moved.updatedAt());
         assertNotEquals(original, moved, "equals is componentwise, so a changed component changes equality");

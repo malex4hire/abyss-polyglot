@@ -4,7 +4,7 @@
 #
 # The application imports nothing from this file. It stores in memory and imports only
 # the standard library, which is what lets `python3 demo.py` run on a bare interpreter
-# with nothing installed — the strongest thing this repository can say in one command.
+# with nothing installed, the strongest thing this repository can say in one command.
 # A database driver was pinned here, and declared a required runtime artifact in the
 # manifest, for the life of the build. Nothing imported it. Both are gone.
 #

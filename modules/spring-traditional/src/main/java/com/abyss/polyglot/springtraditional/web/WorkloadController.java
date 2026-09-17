@@ -14,8 +14,8 @@ public class WorkloadController {
     /**
      * Dependencies arrive through the constructor, so the object cannot exist in a
      * half-wired state and the field can be final. A single constructor needs no
-     * @Autowired — the container infers it. Field injection would hide this dependency
-     * from every caller and leave the class untestable without a container.
+     * @Autowired, because the container infers it. Field injection would hide this
+     * dependency from every caller and leave the class untestable without a container.
      *
      * Constructor injection is demonstrated here rather than on the service, whose
      * constructor three other tests must call to build their fixtures: breaking a

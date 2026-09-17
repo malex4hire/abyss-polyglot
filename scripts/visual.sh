@@ -41,8 +41,8 @@ PY
 
 # The driver library, installed on demand into visual/node_modules.
 #
-# It is not committed — a browser automation package and its binaries do not belong in a
-# repository — so a fresh clone has nothing to import and every driver would die on its
+# It is not committed: a browser automation package and its binaries do not belong in a
+# repository. So a fresh clone has nothing to import and every driver would die on its
 # first line with a module-resolution error. Installed through the same image the drivers
 # run in, so this needs no node on the host, and skipped entirely once it is there.
 ensure_driver() {
@@ -54,7 +54,7 @@ ensure_driver() {
 
 # Failures are collected, not fatal. Under `set -e` the first red aborted the run, so a
 # flaky timing check in the first frontend's drivers meant the second frontend, the
-# cross-frontend live check and the page check never ran at all — and the report named one
+# cross-frontend live check and the page check never ran at all, and the report named one
 # failure out of a suite that had not finished. A verification run reports everything it
 # saw and then fails.
 FAILED=""
@@ -69,7 +69,7 @@ drive() {  # drive <script> [env assignments...]
   fi
 }
 
-# Always exits. Written to exit only on failure, it fell through on success — so
+# Always exits. Written to exit only on failure, it fell through on success, so
 # `visual.sh live`, which exists to run ONE cross-frontend check, carried on and ran the
 # whole suite: nine browser containers, the tracker data mutated twice, and any unrelated
 # driver failure reported by the live-update test as "a change did not reach the other

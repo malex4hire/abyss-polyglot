@@ -37,7 +37,7 @@ def status_code_for(result: TransitionResult) -> int:
     Structural pattern matching destructures the value and binds its parts in the same
     breath as it matches, and the guard lets one case split on a condition without a
     nested if. This is matching on shape, not on a tag field someone has to remember to
-    set — and the wildcard is the honest admission that Python cannot prove the match is
+    set, and the wildcard is the honest admission that Python cannot prove the match is
     exhaustive the way a sealed hierarchy can in Java.
     """
     match result:

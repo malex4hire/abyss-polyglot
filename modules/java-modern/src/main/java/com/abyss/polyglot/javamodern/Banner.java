@@ -15,7 +15,7 @@ public final class Banner {
      * already says what the thing is.
      */
     public static String text(String runtime, int itemCount) {
-        var heading = "modern java — jdk http server, no framework";
+        var heading = "modern java: jdk http server, no framework";
         var body = """
                 runtime : %s
                 surface : com.sun.net.httpserver

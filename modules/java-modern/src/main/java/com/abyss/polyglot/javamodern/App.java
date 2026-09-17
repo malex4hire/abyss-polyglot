@@ -35,7 +35,7 @@ public final class App {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
         // The whole server runs on virtual threads. One line, and every handler becomes
-        // cheap to block in — which is exactly what the workload endpoint relies on.
+        // cheap to block in, which is exactly what the workload endpoint relies on.
         server.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
 
         server.createContext("/health", exchange ->
@@ -58,7 +58,7 @@ public final class App {
      * Without this an unparseable enum or a missing field propagates out of the handler,
      * the server closes the socket, and the caller sees a transport failure rather than
      * the 400 the contract promises. Hand-rolled routing means hand-rolled error
-     * translation — the framework stacks get this from an exception resolver.
+     * translation. The framework stacks get this from an exception resolver.
      */
     private static com.sun.net.httpserver.HttpHandler guarded(com.sun.net.httpserver.HttpHandler inner) {
         return exchange -> {
@@ -77,7 +77,7 @@ public final class App {
      * The methods each shape under /work-items answers to.
      *
      * A route table rather than a chain of prefix guesses, because the chain ended in a
-     * single fallthrough that answered 405 to everything it had not matched — and 405 is a
+     * single fallthrough that answered 405 to everything it had not matched, and 405 is a
      * claim that the path exists and the method does not. Any unmatched sub-path inherited
      * that claim, so it was never one wrong endpoint. With no framework the routing is
      * ours, which means routing correctness is ours too; this is where it is stated once.
@@ -139,7 +139,7 @@ public final class App {
             }
             // B5. The key is the row's identity, so it is checked before anything is
             // built. Reading a missing field with asText() yields "" and a JSON null
-            // yields "null" — both are keys nobody can address, written silently.
+            // yields "null", and both are keys nobody can address, written silently.
             String key = node.hasNonNull("id") ? node.get("id").asText() : "";
             if (key.isBlank()) {
                 json(exchange, 400, Map.of("error", "id is required", "field", "id"));
@@ -198,7 +198,7 @@ public final class App {
             Status next = Status.valueOf(Json.read(body).get("status").asText());
             Instant at = Instant.now();
 
-            // B5. Already there is not an illegal move, it is a move that has happened —
+            // B5. Already there is not an illegal move, it is a move that has happened,
             // which is what a client retrying a dropped response is asking about. Only the
             // self-edge changes; everything the state machine refused, it still refuses.
             if (item.get().status() == next) {

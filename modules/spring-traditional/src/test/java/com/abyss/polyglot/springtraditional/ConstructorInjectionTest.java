@@ -22,7 +22,7 @@ class ConstructorInjectionTest {
 
         assertNotNull(controller);
         assertEquals(1, WorkloadController.class.getDeclaredConstructors().length,
-                "a single constructor needs no @Autowired — the container infers it");
+                "a single constructor needs no @Autowired, because the container infers it");
         assertEquals(WorkItemService.class,
                 WorkloadController.class.getDeclaredConstructors()[0].getParameterTypes()[0],
                 "the dependency is visible in the signature, not hidden in a field");

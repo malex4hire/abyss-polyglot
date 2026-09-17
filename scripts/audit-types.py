@@ -5,7 +5,7 @@ Both frontends carried three type errors apiece for the entire build, through ev
 gate, in a repository whose stated premise is that the Angular and the React were written by
 hand. Nothing was looking: Vite strips types with esbuild rather than checking them, vitest
 checks none, and no target ever invoked the compiler. The version-floor gap had the same
-shape — a check covers what someone thought to name, and everything outside it is trusted
+shape: a check covers what someone thought to name, and everything outside it is trusted
 because nothing ever reports it.
 
 The stack set is read from stacks/manifest.yaml, so activating a seventh TypeScript stack
@@ -95,7 +95,7 @@ def main() -> int:
             problems.append(f"{stack_id}: does not type-check\n{shown}{more}")
 
     if problems:
-        print("TYPE AUDIT FAILED — a hand-written frontend does not compile:\n", file=sys.stderr)
+        print("TYPE AUDIT FAILED. A hand-written frontend does not compile:\n", file=sys.stderr)
         for problem in problems:
             print(f"  {problem}\n", file=sys.stderr)
         return 1

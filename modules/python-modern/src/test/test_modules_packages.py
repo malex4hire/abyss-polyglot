@@ -15,7 +15,7 @@ def test_the_inventory_comes_from_the_filesystem():
 
     # Compared against an independent walk of the package rather than against two names
     # this test also knows. Naming a few modules is satisfied by any list containing them,
-    # including a hand-written one that has quietly stopped matching the directory — which
+    # including a hand-written one that has quietly stopped matching the directory, which
     # is the failure discovering the list from disk makes impossible.
     import pkgutil
 

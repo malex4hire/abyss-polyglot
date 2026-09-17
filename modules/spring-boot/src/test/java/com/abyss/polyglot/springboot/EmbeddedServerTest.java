@@ -23,7 +23,7 @@ class EmbeddedServerTest {
     @Test
     void theApplicationStartsAServerInsideItself() {
         // Asserted against the bean, not against the word. "contains tomcat" was true of
-        // a hardcoded string, so the test could not tell a reading from a claim — and a
+        // a hardcoded string, so the test could not tell a reading from a claim, and a
         // claim stays right until somebody swaps the container, which is when you need it.
         var factory = context.getBean(
                 org.springframework.boot.web.server.servlet.ServletWebServerFactory.class);

@@ -3,7 +3,7 @@
 
 Ports are declared once, in the manifest. Compose therefore reads every port from an
 environment variable generated here, so a port moves in one file and every consumer
-follows — and the host suite can assert that no port literal lives anywhere else.
+follows, and the host suite can assert that no port literal lives anywhere else.
 """
 import json
 from pathlib import Path
@@ -13,7 +13,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 manifest = yaml.safe_load((ROOT / "stacks" / "manifest.yaml").read_text())
 
-lines = ["# GENERATED from stacks/manifest.yaml by scripts/render-env.py — do not edit.",
+lines = ["# GENERATED from stacks/manifest.yaml by scripts/render-env.py. Do not edit.",
          "# Ports are declared only in the manifest; this file is the bridge to compose.",
          ""]
 
@@ -42,7 +42,7 @@ backends = {
         # The declared pair, so the runtime panel can put the two side by side. The
         # frontends still name no stack: they read this, which reads the manifest.
         "pair": stack.get("pair") or "",
-        # The artifact whose resolved version IS the framework version — read against
+        # The artifact whose resolved version IS the framework version, read against
         # the runtime's own artifact list, never typed by hand. "none" means the stack has
         # no framework by design; the panel falls back to the runtime version for those
         # rather than showing a version that does not exist. Normalised to "" here,

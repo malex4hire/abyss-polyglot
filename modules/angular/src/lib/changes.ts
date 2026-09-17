@@ -6,7 +6,7 @@ import { Observable } from "rxjs";
  * The wrapping is the point. An Observable's teardown function runs when the last
  * subscriber unsubscribes, so closing the connection is part of the stream's definition
  * rather than something a component has to remember in ngOnDestroy. Combined with the async
- * pipe — which subscribes and unsubscribes with the view — a browser connection is opened
+ * pipe (which subscribes and unsubscribes with the view), a browser connection is opened
  * and closed by the template, and nothing in the component touches it.
  *
  * The React counterpart puts the same close in an effect's cleanup return. Both are correct
@@ -26,7 +26,7 @@ export function changes(base: string): Observable<{ kind: string; id: string }> 
     });
 
     // EventSource reconnects on its own, so an error is not terminal and must not be
-    // reported as one — completing here would close a stream the browser is about to
+    // reported as one. Completing here would close a stream the browser is about to
     // reopen, and the view would silently stop updating.
     source.onerror = () => undefined;
 

@@ -8,7 +8,7 @@ export interface FetchStatesProps extends FetchState {
 /**
  * Render the three states a request can be in.
  *
- * Loading, failed and loaded are not decorations on the happy path — they are the states
+ * Loading, failed and loaded are not decorations on the happy path. They are the states
  * the component actually has, and naming all three is what stops a UI that renders an
  * empty list while it is still loading, or nothing at all when the request failed.
  *

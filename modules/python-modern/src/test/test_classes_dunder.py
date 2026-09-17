@@ -1,5 +1,5 @@
-"""Executable proof that rendering goes through the language's own protocol methods —
-len() dispatching to __len__ — rather than through a loop that reaches the same number."""
+"""Executable proof that rendering goes through the language's own protocol methods
+(len() dispatching to __len__) rather than through a loop that reaches the same number."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def test_the_protocol_methods_are_what_get_called(sample):
     """The count comes from len() dispatching to __len__, not from a counting loop.
 
     The assertions above are about the rendered string, and a version that reaches into
-    the object and counts with a loop produces it exactly — which is how a counter passed
+    the object and counts with a loop produces it exactly, which is how a counter passed
     them. The existing comment already named the mechanism, "len() reached the tuple's
     __len__", and nothing was checking it.
 

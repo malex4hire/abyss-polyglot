@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Enforce: a name means one thing (five defects, one family).
 
-Recorded as a lesson after four instances, and hit a fifth two commits later — which is
+Recorded as a lesson after four instances, and hit a fifth two commits later, which is
 the whole point of this file. A rule written down is a rule someone has to remember at the
 moment it matters; a rule that runs is a rule.
 
@@ -18,7 +18,7 @@ rolled-up state. Two shapes are checkable and both would have caught real defect
      the CSS version. `.bar` was a <header> and a <span>, and `.bar > span` painted the
      header.
 
-Deliberately narrow. It does not try to decide what a name means in general — it refuses
+Deliberately narrow. It does not try to decide what a name means in general. It refuses
 the two shapes that have already gone wrong, and says so where it cannot tell.
 """
 from __future__ import annotations
@@ -45,7 +45,7 @@ KEY_SHAPED = re.compile(r"[a-z0-9-]+/[a-z0-9-]+")
 ATTR_USE = re.compile(r'data-([a-z][a-z0-9-]*)\s*=\s*["\']([^"\']*)["\']')
 ATTR_BIND = re.compile(r'\[attr\.data-([a-z][a-z0-9-]*)\]\s*=\s*"([^"]*)"')
 
-# .foo > bar, .foo bar — a rule reaching into whatever the class contains.
+# .foo > bar, .foo bar: a rule reaching into whatever the class contains.
 DESCENDANT = re.compile(r"\.([a-z][a-z0-9-]*)\s*(?:>\s*)?([a-z][a-z0-9-]*)\s*(?:,|\{)")
 
 # <tag ... class="a b"> in any of the template dialects here.
@@ -68,7 +68,7 @@ def attribute_collisions(files: list[Path], problems: list[str]) -> None:
     """An attribute the code selects on must be written in exactly one place.
 
     Shape-matching the values does not work: in a renderer both sides are interpolated, so
-    a compound key and a state word look identical at rest — which is exactly how
+    a compound key and a state word look identical at rest, which is exactly how
     the original offender passed a first version of this check while being the defect it was
     written for. What is visible is where an attribute is *written*. If JavaScript looks up
     `[data-x]` to find one element, and more than one place in the surface emits
@@ -139,7 +139,7 @@ def main() -> int:
         problems.extend(f"[{surface}] {p}" for p in found)
 
     if problems:
-        print("NAME AUDIT FAILED — a name is carrying more than one meaning:\n", file=sys.stderr)
+        print("NAME AUDIT FAILED. A name is carrying more than one meaning:\n", file=sys.stderr)
         for problem in problems:
             print(f"  {problem}\n", file=sys.stderr)
         return 1

@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  * handler returns void, so the only thing keeping the response open is the startAsync
  * call, and everything the container would otherwise have done has to be visible.
  *
- * Each assertion names one of those acts — the detach, the timeout that has to be chosen,
+ * Each assertion names one of those acts: the detach, the timeout that has to be chosen,
  * the listeners that have to be registered because nothing will close this for us. A
  * handler that wrote the same bytes without startAsync passes none of them, and would also
  * be a stream the container closes the moment the method returns.
@@ -73,7 +73,7 @@ class SseAsyncContextTest {
         // after: the response was not finished when the method was.
         assertTrue(result.getResponse().getContentAsString().startsWith(": open"),
                 "the opening comment frame was written by hand and flushed");
-        // Committed, because flushing a frame commits it — and still async, because the
+        // Committed, because flushing a frame commits it, and still async, because the
         // detach is what keeps it usable afterwards. Committed is not closed, which is the
         // distinction this stream depends on and the reason nothing here asserts otherwise.
         assertTrue(result.getRequest().isAsyncStarted(),
@@ -84,7 +84,7 @@ class SseAsyncContextTest {
      * There is deliberately no assertion here that emit() reaches this response.
      *
      * MockAsyncContext holds whatever response startAsync was given, and the no-argument
-     * form gives it none — so context.getResponse() is null under MockMvc, emit()'s writer
+     * form gives it none, so context.getResponse() is null under MockMvc, emit()'s writer
      * lookup throws, and the broad catch drops the subscriber without a sound. An assertion
      * on the response content would therefore have been reading an object the operation
      * never touched, and it would have passed or failed for reasons unrelated to async

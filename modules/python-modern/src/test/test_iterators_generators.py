@@ -15,7 +15,7 @@ def test_pages_are_produced_on_demand(sample):
 
     pages = repo.pages(2, sample)
     # hasattr(__next__) is true of any iterator, including one over a list that was
-    # built in full first — which is what a counter returned. Laziness is the whole
+    # built in full first, which is what a counter returned. Laziness is the whole
     # point, so the assertion names it: the function suspends and resumes rather
     # than returning a finished collection.
     import inspect

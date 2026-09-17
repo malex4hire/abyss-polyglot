@@ -33,7 +33,7 @@ class InheritanceVsCompositionTest {
         // 42, not some other fixed number: the subject is passed in and its own
         // computation must be the source of the value. A version that took timing from an
         // inherited hook instead would answer with whatever that hook hardcodes,
-        // regardless of what this particular subject reports — coincidentally 300 before
+        // regardless of what this particular subject reports, coincidentally 300 before
         // this fixture changed, which is exactly why that value never caught it.
         assertEquals(42, entry.staleSeconds());
         assertEquals(1, trail.entries().size());

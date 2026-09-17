@@ -18,7 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  * request itself, and hands back an object whose whole surface is send, complete, and the
  * callbacks for when either happens.
  *
- * The timeout still has to be chosen — the default would end the stream — which is the
+ * The timeout still has to be chosen (the default would end the stream), which is the
  * honest limit of the abstraction: it removes the plumbing, not the decision.
  */
 @RestController
@@ -63,7 +63,7 @@ public class ChangeStreamController {
             } catch (Exception gone) {
                 // Deliberately broad. A dead subscriber surfaces as an IOException, an
                 // IllegalStateException from the container, or an
-                // AsyncRequestNotUsableException depending on how far the response got —
+                // AsyncRequestNotUsableException depending on how far the response got,
                 // and an uncaught one here fails the create that triggered the
                 // notification. A stream nobody is reading must never break the write it
                 // was reporting.

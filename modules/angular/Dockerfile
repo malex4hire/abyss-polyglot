@@ -15,7 +15,7 @@ RUN npm run build \
 COPY serve.mjs ./
 EXPOSE 8080
 # Build the mounted source at start, then serve it. dist is produced at image build,
-# and every edit lands in the bind mount — so a container serving the baked dist serves
+# and every edit lands in the bind mount, so a container serving the baked dist serves
 # whatever the source looked like when the image was made. Recreating the container
 # silently reverted the application to an older build twice while this was being written.
 CMD ["sh", "-lc", "npm run build && RESOLVED_ARTIFACTS=$(cat artifacts.json) exec node serve.mjs"]

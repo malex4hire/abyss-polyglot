@@ -30,10 +30,10 @@ class ConfigurationPropertiesTest {
     @Test
     void bindingProducesTypedFieldsNotStrings() {
         // Real Spring binding, not a hand-built POJO: kebab-case in the property source,
-        // camelCase on the field, a string value converted to int — the three things a
-        // manually constructed and manually set DemoProperties can never exercise, which
-        // is exactly what let an earlier version of this test pass against a
-        // DemoProperties that had never been through binding at all.
+        // camelCase on the field, a string value converted to int. Those are the three
+        // things a manually constructed and manually set DemoProperties can never
+        // exercise, which is exactly what let an earlier version of this test pass
+        // against a DemoProperties that had never been through binding at all.
         runner.withPropertyValues("demo.label=probe", "demo.seed-count=41").run((context) -> {
             var properties = context.getBean(DemoProperties.class);
             assertEquals("probe expects 41 seeded items", properties.describe(),
@@ -46,7 +46,7 @@ class ConfigurationPropertiesTest {
     void aValueThatDoesNotConvertFailsAtBindingNotAtFirstRead() {
         // The docstring's other claim: a bad value fails the context at startup rather
         // than surfacing later. A hand-constructed properties.setSeedCount(...) call
-        // cannot fail this way — there is no string to convert, only an int already typed.
+        // cannot fail this way: there is no string to convert, only an int already typed.
         runner.withPropertyValues("demo.seed-count=not-a-number").run((context) ->
                 assertTrue(context.getStartupFailure() != null,
                         "an unconvertible value should fail context startup, not read as 0"));

@@ -5,7 +5,7 @@ package com.abyss.polyglot.javamodern;
  *
  * Sealed: the compiler knows Applied and Rejected are the only implementations, which is
  * what lets a switch over this type be exhaustive with no default branch. Add a third
- * variant and every switch stops compiling until it is handled — the failure lands at
+ * variant and every switch stops compiling until it is handled, so the failure lands at
  * build time instead of at runtime.
  */
 public sealed interface TransitionResult permits TransitionResult.Applied, TransitionResult.Rejected {
@@ -16,7 +16,7 @@ public sealed interface TransitionResult permits TransitionResult.Applied, Trans
 
     /**
      * Build the outcome. The return type names the closed hierarchy, so a caller cannot
-     * receive some other implementation of this interface — there are no others. It is
+     * receive some other implementation of this interface. There are no others. It is
      * the sealed declaration above that makes that guarantee.
      */
     static TransitionResult of(boolean allowed, WorkItem moved, Status from, Status to) {

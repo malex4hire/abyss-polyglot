@@ -30,8 +30,8 @@ it("lifecycle-hooks: the work is declared as a hook the framework calls", () => 
   // Advancing the clock cannot separate this from constructor work: Angular's zoneless
   // TestBed runs ngOnInit at createComponent, so there is no window in which the component
   // exists uninitialised. What distinguishes them is that ngOnInit is a method the
-  // framework looks for and calls at a defined moment — present on the prototype, and
-  // absent entirely from a component that does its start-up in the constructor.
+  // framework looks for and calls at a defined moment. It is present on the prototype,
+  // and absent entirely from a component that does its start-up in the constructor.
   expect(typeof TickerComponent.prototype.ngOnInit).toBe("function");
   expect(typeof TickerComponent.prototype.ngOnDestroy).toBe("function");
 });

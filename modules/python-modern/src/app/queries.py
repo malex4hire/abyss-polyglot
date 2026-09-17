@@ -13,7 +13,7 @@ def matching(items: list[WorkItem], status: Status | None, tag: str | None) -> l
 
     The annotations are the documentation and they are checkable: `Status | None` says
     absent is expected here, so a reader knows the None branch is intentional rather than
-    an oversight. Python does not enforce them at runtime — they describe intent to
+    an oversight. Python does not enforce them at runtime. They describe intent to
     readers and to a type checker, which is exactly where the value is.
     """
     return [
@@ -53,7 +53,7 @@ def first_in_order(values: list[T], limit: int) -> list[T]:
 
     The TypeVar is bound to a protocol requiring __lt__, which is what makes sorted()
     legal here and keeps the return type tied to the input's: pass a list of str and you
-    get list[str] back, not list[Any]. The bound is structural — anything comparable
+    get list[str] back, not list[Any]. The bound is structural, so anything comparable
     satisfies it without inheriting from anything.
     """
     return sorted(values)[: max(0, limit)]

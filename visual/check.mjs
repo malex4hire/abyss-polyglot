@@ -3,7 +3,7 @@
 // The host suite proves the parts: that the manifest and compose agree, that identity
 // matches the live classpath, that one contract suite passes against every backend. None
 // of it looks at a rendered page. A page can satisfy every structural assertion and still
-// be blank, unreadable or mis-laid-out — so this drives a real browser against the
+// be blank, unreadable or mis-laid-out, so this drives a real browser against the
 // running stack, asserts what a viewer would actually see, and writes the shots out as
 // evidence rather than as decoration.
 import { chromium } from "playwright";
@@ -27,7 +27,7 @@ const FRONTENDS = requireEnv("FRONTENDS")
 const results = [];
 function check(name, condition, detail = "") {
   results.push({ name, ok: Boolean(condition), detail });
-  console.log(`  ${condition ? "OK  " : "FAIL"}  ${name}${detail ? "  — " + detail : ""}`);
+  console.log(`  ${condition ? "OK  " : "FAIL"}  ${name}${detail ? "  (" + detail + ")" : ""}`);
 }
 
 const browser = await chromium.launch();
@@ -68,7 +68,7 @@ check("every backend is selectable from one control", options > 1, `${options} o
 //
 // The breakpoint was a media query that never fired: this page's stylesheet loads after
 // the generated one and set the same property at the same specificity, so the later sheet
-// won at every width and the two frames stayed side by side down to 400px — 168px each.
+// won at every width and the two frames stayed side by side down to 400px, 168px each.
 // Nothing checked it, because checking a media query needs a browser at two widths, and
 // every check here ran at one.
 const breakpoint = Number(
@@ -104,8 +104,8 @@ check("neither width scrolls the document sideways",
 //
 // The page cannot measure a cross-origin frame, so the applications report their own
 // height and the page resizes them. Before that, the frames were a fixed 1504px and the
-// application inside stretched to fill it — `min-height: 100vh` inside an iframe means the
-// FRAME's height — which put a 391px hole between the filter rail and the table.
+// application inside stretched to fill it, because `min-height: 100vh` inside an iframe
+// means the FRAME's height, which put a 391px hole between the filter rail and the table.
 //
 // Checked against the application measured on its own, at the same width, rather than
 // against a number written here. A frame left at the stylesheet's fallback, or stretched
@@ -118,7 +118,7 @@ const fallback = Number(
 for (const [name, origin] of FRONTENDS) {
   const frame = await page.$(`[data-app-frame="${name}"]`);
   // The frame's CONTENT box, not its border box. The frame carries a 1px border, and the
-  // application wraps differently at 686px than at 688 — 46px differently, as it happens,
+  // application wraps differently at 686px than at 688: 46px differently, as it happens,
   // which is exactly the kind of drift a check comparing the wrong two numbers reports as
   // a defect in the code rather than in itself.
   const inner = await frame.evaluate((el) => ({ w: el.clientWidth, h: el.clientHeight }));
@@ -139,7 +139,7 @@ for (const [name, origin] of FRONTENDS) {
         Math.abs(inner.h - fallback) > 24, `fallback is ${fallback}px`);
 }
 
-// Side by side, both frames hold the same content, so they must be the same height — that
+// Side by side, both frames hold the same content, so they must be the same height, and that
 // is what keeps row N opposite row N under one page scrollbar.
 const pair = await page.$$eval("[data-app-frame]",
   (fs) => fs.map((f) => Math.round(f.getBoundingClientRect().height)));
@@ -183,7 +183,7 @@ for (const [name, origin] of FRONTENDS) {
 //
 // Angular registered two routes and rendered neither: it bootstrapped the tracker
 // directly, so there was no <router-outlet> in the module. The router resolved correctly,
-// had nowhere to put the result, and every URL showed the tracker — with the board and the
+// had nowhere to put the result, and every URL showed the tracker, with the board and the
 // detail view reachable only from their unit tests. Green, and unreachable.
 //
 // Checked in a browser because that is the only place it is observable: the routes are
@@ -219,7 +219,7 @@ for (const [name, origin] of FRONTENDS) {
         !gallery.tracker && gallery.text > 0 && gallery.failures.length === 0,
         gallery.failures[0]
           ?? (gallery.tracker
-                ? "the route resolved but the tracker is still on screen — registered and never rendered"
+                ? "the route resolved but the tracker is still on screen: registered and never rendered"
                 : (gallery.text > 0 ? `${gallery.text} characters` : "blank page")));
 }
 

@@ -38,7 +38,7 @@ export class WorkItemRowComponent {
    *
    * standalone: true means there is no NgModule. Everything the template uses is listed
    * in imports on the component itself, so the unit of compilation is the component
-   * rather than a module declaring a set of them — which removes the indirection where a
+   * rather than a module declaring a set of them, which removes the indirection where a
    * template failed because a directive was declared in a module nobody imported.
    *
    * The decorator is data attached to the class, and reflectComponentType is how the

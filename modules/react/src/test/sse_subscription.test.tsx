@@ -6,7 +6,7 @@ import { useChanges } from "../lib/changes";
 /**
  * The mechanism under test is the cleanup return, so the test is written against what the
  * cleanup does rather than against the data arriving. An effect with no cleanup opens the
- * connection, receives the events and updates the list perfectly well — it fails only on
+ * connection, receives the events and updates the list perfectly well. It fails only on
  * what happens to the previous connection, which is why both closing assertions are here.
  *
  * jsdom has no EventSource, so one is supplied. It records every instance rather than only

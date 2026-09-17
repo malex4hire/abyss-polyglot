@@ -9,8 +9,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** Executable proof that the container orders construction by dependency — building the
- *  dependency first and handing it over — and that beans are singletons by default. */
+/** Executable proof that the container orders construction by dependency (building the
+ *  dependency first and handing it over) and that beans are singletons by default. */
 
 @Tag("ioc-container")
 class IocContainerTest {

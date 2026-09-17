@@ -32,7 +32,7 @@ it("fetch-client: a non-2xx is a normal Response, so the check is explicit", asy
 it("fetch-client: query values are escaped, not pasted into the URL", async () => {
   // The assertions above pass against a query string concatenated by hand, because for
   // ordinary values the two produce byte-identical URLs. The difference is what happens to
-  // a value that means something in a URL — a space, an ampersand — and that is the only
+  // a value that means something in a URL (a space, an ampersand), and that is the only
   // place URLSearchParams earns its keep.
   const seen: string[] = [];
   vi.stubGlobal("fetch", vi.fn(async (url: string) => {

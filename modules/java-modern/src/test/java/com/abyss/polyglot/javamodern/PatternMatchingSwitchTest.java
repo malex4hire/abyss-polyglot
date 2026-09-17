@@ -25,7 +25,7 @@ class PatternMatchingSwitchTest {
                 new TransitionResult.Rejected(Status.DONE, Status.OPEN, "terminal")));
 
         // The status codes above are also satisfied by an if/instanceof/cast chain,
-        // which is the spelling a pattern switch replaces — so on their own they prove
+        // which is the spelling a pattern switch replaces, so on their own they prove
         // nothing. Exhaustiveness is a compile-time property with no runtime handle, but
         // the mechanism leaves a mark: a pattern switch compiles to an invokedynamic
         // against SwitchBootstraps.typeSwitch, and a chain of instanceof does not.

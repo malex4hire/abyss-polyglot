@@ -25,7 +25,7 @@ export function BoardSettingsProvider({
  * Read shared settings without threading them through every component between.
  *
  * Context solves prop drilling, not state management: the provider still owns the value,
- * and every consumer re-renders when it changes — which is why a fast-changing value
+ * and every consumer re-renders when it changes, which is why a fast-changing value
  * belongs somewhere else. Throwing when there is no provider turns a silent undefined
  * into an error naming the missing provider, which is the difference between a
  * five-second fix and an afternoon.

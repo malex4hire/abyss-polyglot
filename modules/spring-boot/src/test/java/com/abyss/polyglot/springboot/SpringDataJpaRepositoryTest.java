@@ -44,7 +44,7 @@ class SpringDataJpaRepositoryTest {
     @Test
     void theQueryComesFromTheNameAndNotFromAnAnnotation() throws Exception {
         // The rows-and-order assertion above passes against the same query written out as
-        // JPQL, because the results are identical — that is the contrast, not the point.
+        // JPQL, because the results are identical. That is the contrast, not the point.
         // The point is that the method signature IS the query, so there is no second
         // spelling to keep in agreement with it. That is visible on the method and
         // nowhere else.

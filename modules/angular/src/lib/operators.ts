@@ -7,7 +7,7 @@ import { WorkItem } from "./types";
  * Operators are pure functions from Observable to Observable, so a pipeline reads as a
  * description of the data flow rather than as a sequence of callbacks. debounceTime and
  * distinctUntilChanged express "wait for typing to settle, and ignore repeats" in two
- * words each — the same behaviour written by hand is a timer, a saved value and two
+ * words each. The same behaviour written by hand is a timer, a saved value and two
  * cleanup paths.
  *
  * combineLatest re-emits whenever either input does, which is the whole reason the

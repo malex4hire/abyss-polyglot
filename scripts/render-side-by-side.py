@@ -2,7 +2,7 @@
 """Render the side-by-side page.
 
 The pair contrast applied to the running software instead of to source. Two frames, two
-frameworks, one stylesheet generated from one token file — so "they look the same" is a
+frameworks, one stylesheet generated from one token file, so "they look the same" is a
 property of how they are built rather than a claim, and a divergence shows up here the
 moment it exists.
 
@@ -13,7 +13,7 @@ this repository that a screenshot cannot fake.
 
 Nothing here is enumerated. Which frontends exist, where they are served, and which
 backends are selectable all come from stacks/manifest.yaml, so a stack activated there
-appears on this page with no edit to this file — and no port literal lives outside the
+appears on this page with no edit to this file, and no port literal lives outside the
 manifest.
 """
 from __future__ import annotations

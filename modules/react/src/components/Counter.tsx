@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
  *
  * useState returns the current value and a setter; calling the setter schedules a
  * re-render rather than mutating anything in place. Updates batch, so reading the state
- * variable straight after setting it gives the old value — which is why the functional
+ * variable straight after setting it gives the old value, which is why the functional
  * form is the safe one when the next value depends on the last.
  */
 export function useSelectionCount(): [number, () => void] {
@@ -17,7 +17,7 @@ export function useSelectionCount(): [number, () => void] {
 /**
  * Synchronise with something outside React.
  *
- * An effect runs after render, and its cleanup runs before the next one and at unmount —
+ * An effect runs after render, and its cleanup runs before the next one and at unmount,
  * which is what makes subscriptions, timers and listeners safe. The dependency array
  * says when to resynchronise; omit it and the effect runs every render, give it an empty
  * one and it never resynchronises.

@@ -22,7 +22,7 @@ infrastructure:
   postgres:
     service: postgres
     # A fixed address on the declared subnet, because under the egress-blocked overlay the
-    # embedded DNS resolver does not answer — measured, not assumed: a service with no
+    # embedded DNS resolver does not answer. Measured, not assumed: a service with no
     # /etc/hosts entry does not resolve there and is unreachable by name. Compose needs
     # this same value in two places (the pinned endpoint, and an /etc/hosts entry on each
     # client), so it is declared HERE and rendered into the environment. Written into
@@ -38,7 +38,7 @@ infrastructure:
 
   # Serves the side-by-side page and nothing else: two frames, one selector.
   #
-  # Deliberately not 8080. Every container in this demo listens on 8080 internally — that
+  # Deliberately not 8080. Every container in this demo listens on 8080 internally, and that
   # is a fixed convention, and it appears as a literal in compose, in each server and in
   # each Dockerfile. Publishing a host port with the same number would make every one of
   # those literals ambiguous: a reader, and the check below, could no longer tell a
@@ -153,7 +153,7 @@ stacks:
     framework_artifact: none
     # Deliberately empty, and declared rather than omitted. This module imports only the
     # standard library, so there is no third-party artifact whose presence could stand
-    # for its identity — the identity IS the absence below. A database driver was listed
+    # for its identity: the identity IS the absence below. A database driver was listed
     # here and pinned in requirements.txt for the life of the build with nothing
     # importing it, which is what a required artifact nobody checks against the running
     # process looks like.

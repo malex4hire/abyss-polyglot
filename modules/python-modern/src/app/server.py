@@ -77,7 +77,7 @@ class Handler(BaseHTTPRequestHandler):
                     "runtime_version_exact": sys.version.split("\n")[0].strip(),
                     "runtime_vendor": platform.python_implementation(),
                     "http_server_class": f"{ThreadingHTTPServer.__module__}.{ThreadingHTTPServer.__name__}",
-                    # Name and version, not name alone — java-modern's classpath entries
+                    # Name and version, not name alone: java-modern's classpath entries
                     # carry their version in the jar filename by construction, and an
                     # artifact list that cannot say which release resolved gives the
                     # runtime-identity check nothing to compare across backends.
@@ -161,7 +161,7 @@ class Handler(BaseHTTPRequestHandler):
                 if parts[2] == "transition":
                     nxt = Status(payload["status"])
                     # B5. Already there is not an illegal move, it is a move that has
-                    # happened — which is what a retry of a dropped response is asking.
+                    # happened, which is what a retry of a dropped response is asking.
                     # Only the self-edge changes; every genuine refusal still refuses.
                     if item.status is nxt:
                         self._send(200, {"item": _as_dict(item)})
@@ -211,7 +211,7 @@ def _allowed_for(path: str) -> set[str]:
     """The methods each shape answers to, stated once.
 
     Without this, an unsupported method falls through to BaseHTTPRequestHandler's default
-    501 — a claim about the whole server rather than about this path — and carries no Allow
+    501 (a claim about the whole server rather than about this path), and carries no Allow
     header, so a client is told "no" and not "what instead".
     """
     parts = path.split("/")

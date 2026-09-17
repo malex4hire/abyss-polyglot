@@ -15,7 +15,7 @@ export class TotalsComponent {
    *
    * By default Angular checks every binding in the tree on every event. OnPush narrows
    * that to when an input reference changes, an event fires from this component, or an
-   * async pipe emits — so this method runs far less often.
+   * async pipe emits, so this method runs far less often.
    *
    * The catch is the reference: mutating the items array in place leaves the reference
    * equal and this view stale. OnPush is a promise the component makes about immutable

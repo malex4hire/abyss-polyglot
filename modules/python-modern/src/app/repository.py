@@ -51,7 +51,7 @@ class Repository:
 
         OrderedDict because iteration order is part of this endpoint's contract. A plain
         dict preserves insertion order in modern Python too, but stating it here says the
-        ordering is relied upon rather than incidental — and move_to_end and the
+        ordering is relied upon rather than incidental, and move_to_end and the
         order-sensitive equality come with it if they are ever needed.
 
         The returned list is a new list, so a caller cannot reach back through it into
@@ -63,7 +63,7 @@ class Repository:
         """Yield successive pages rather than building every page at once.
 
         A generator produces values on demand and holds one page in memory instead of
-        all of them. The caller can stop early — break out of the loop — and the work for
+        all of them. The caller can stop early (break out of the loop), and the work for
         the remaining pages is never done. That laziness is the whole difference from
         returning a list of lists.
         """
@@ -81,7 +81,7 @@ class Repository:
         """Collect writes and apply them on a clean exit.
 
         The code before yield is setup, the code after is teardown, and the teardown runs
-        whether the block returns or raises — that is what a context manager buys over a
+        whether the block returns or raises. That is what a context manager buys over a
         pair of calls the caller must remember to pair. Here an exception escaping the
         block means the staged writes are dropped rather than half-applied.
         """

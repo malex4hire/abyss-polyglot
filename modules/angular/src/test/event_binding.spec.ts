@@ -14,7 +14,7 @@ it("event-binding: binds an event to a statement", () => {
   fixture.detectChanges();
 
   // A real click, not a call to the handler. Calling bump() directly asserts that a method
-  // increments a field, which is true whether or not any binding exists — a counter that
+  // increments a field, which is true whether or not any binding exists. A counter that
   // attached the listener by hand in ngOnInit passed it unchanged. The binding is what
   // connects the element to the statement, so the element has to be clicked.
   const button: HTMLButtonElement = fixture.nativeElement.querySelector("button");
@@ -27,7 +27,7 @@ it("event-binding: binds an event to a statement", () => {
 
 it("event-binding: the listener is declared in the template", () => {
   // Attaching the listener by hand in a lifecycle hook produces the same clicks and the
-  // same count — a counter that does exactly that passes every assertion above. What the
+  // same count. A counter that does exactly that passes every assertion above. What the
   // binding adds is that the element declares what it does, and Angular compiles that into
   // a listener instruction. The compiled template is a function whose source a test reads.
   const compiled = String(

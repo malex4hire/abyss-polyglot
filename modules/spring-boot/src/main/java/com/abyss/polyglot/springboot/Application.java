@@ -17,8 +17,8 @@ public class Application {
     /**
      * The whole bootstrap, in one call against one annotated class.
      *
-     * @SpringBootApplication is three annotations at once — @SpringBootConfiguration,
-     * @EnableAutoConfiguration and @ComponentScan — and SpringApplication.run turns them
+     * @SpringBootApplication is three annotations at once (@SpringBootConfiguration,
+     * @EnableAutoConfiguration and @ComponentScan), and SpringApplication.run turns them
      * into a running context: it reads the configuration, evaluates every
      * auto-configuration condition, scans downward from this class's package, starts an
      * embedded server and returns the context.

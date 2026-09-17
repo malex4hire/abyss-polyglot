@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * B4: the change stream, on the JDK HTTP server and nothing else.
  *
  * No language lesson is claimed here. Server-sent events on this stack are HTTP plumbing
- * — write a header, keep the socket open, flush a line — and `io` belongs to the framework
+ * (write a header, keep the socket open, flush a line), and `io` belongs to the framework
  * modules, so claiming a language fundamental for it would blur the split this module's
  * side of the demo depends on. The stack serves the endpoint for contract parity and says
  * nothing more.

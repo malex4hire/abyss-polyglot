@@ -13,7 +13,7 @@ export class TickerComponent implements OnInit, OnDestroy {
    * Set up when the component starts, tear down when it ends.
    *
    * ngOnInit runs after the first inputs are set, which is why work depending on an
-   * @Input belongs here rather than in the constructor — at construction the inputs are
+   * @Input belongs here rather than in the constructor: at construction the inputs are
    * still undefined. ngOnDestroy is the other half, and an interval is exactly the kind
    * of thing that outlives its component without it.
    *

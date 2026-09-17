@@ -40,7 +40,7 @@ def main() -> int:
 
         # One stylesheet, copied into both. Written once in design/ rather than authored
         # per frontend, because "the two look identical" should be true by construction
-        # rather than kept true by care — and the first divergence would otherwise be
+        # rather than kept true by care, and the first divergence would otherwise be
         # invisible until someone put the two screenshots side by side.
         #
         # The banner is prepended rather than kept in the source file, so design/app.css
@@ -56,7 +56,7 @@ def main() -> int:
 
         # The application wears its own identity hue as its accent. Emitted per module
         # rather than written into the shared stylesheet, because the stylesheet is the
-        # thing that must be identical — the accent is the one value that should not be,
+        # thing that must be identical: the accent is the one value that should not be,
         # and it still resolves to a declared token rather than a literal.
         (module / "src" / "accent.generated.css").write_text(
             "/* GENERATED from design/tokens.yaml. Do not edit; edit the tokens. */\n"

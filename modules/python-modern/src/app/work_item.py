@@ -13,9 +13,10 @@ class WorkItem:
     """The domain record.
 
     frozen makes instances immutable, so a state change derives a new value instead of
-    mutating a shared one — the same decision the Java module makes with a record, taken
-    for the same reason. slots drops the per-instance __dict__, which costs the ability to
-    add attributes at runtime and buys memory and attribute-access speed.
+    mutating a shared one, which is the same decision the Java module makes with a
+    record, taken for the same reason. slots drops the per-instance __dict__, which
+    costs the ability to add attributes at runtime and buys memory and attribute-access
+    speed.
 
     The generated __init__, __repr__ and __eq__ are the point: equality is componentwise
     and nothing here is written by hand.
@@ -35,7 +36,7 @@ class WorkItem:
 def describe(item: WorkItem) -> str:
     """Render an item through the protocol methods rather than by poking at fields.
 
-    format() dispatches to __format__, str() to __str__, len() to __len__ — the dunder
+    format() dispatches to __format__, str() to __str__, len() to __len__. The dunder
     methods are how a type joins the language's own vocabulary instead of requiring
     callers to learn a bespoke one. Here the tuple's __len__ and the enum's __str__ do
     the work, which is why this reads as ordinary Python rather than as an API.
@@ -53,7 +54,7 @@ def evolve(item: WorkItem, **changes) -> WorkItem:
     """Derive a new item with some fields changed.
 
     dataclasses.replace calls the generated __init__ with the current field values and
-    the overrides, which is the only way to "change" a frozen instance — and the reason
+    the overrides, which is the only way to "change" a frozen instance, and the reason
     frozen is worth having: nothing shares a mutable item, so no caller can be surprised.
 
     replace validates the field names against the generated signature, so a typo is a

@@ -10,7 +10,7 @@ import { changes } from "../lib/changes";
  *
  * The second test is the property that distinguishes this from the React counterpart. The
  * lifetime is attached to the stream, not to a component, so it holds without any component
- * existing at all — including the cold-Observable property that a second subscriber gets its
+ * existing at all, including the cold-Observable property that a second subscriber gets its
  * own connection. Neither is observable through a template.
  *
  * jsdom has no EventSource; the stub records every instance, because the defect worth

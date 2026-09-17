@@ -34,7 +34,7 @@ it("control-flow-blocks: @if and @for are template syntax", () => {
 });
 
 it("control-flow-blocks: the block syntax needs no directive imported", () => {
-  // The structural-directive form renders identical DOM — that is the whole contrast, so
+  // The structural-directive form renders identical DOM, and that is the whole contrast, so
   // no assertion about what is on screen can separate them. What @if and @for change is
   // that control flow became part of the template language: it is compiled in, where
   // *ngIf and *ngFor are directives the component must declare before its template will

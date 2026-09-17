@@ -19,8 +19,8 @@ import org.springframework.boot.test.context.SpringBootTest;
  * body runs.
  *
  * An earlier version validated the payload record through a standalone Validator. That
- * proved the constraint annotation works — which is Jakarta Validation's job, not this
- * module's — and never reached the handler carrying @Valid, so it stayed green with the
+ * proved the constraint annotation works (which is Jakarta Validation's job, not this
+ * module's) and never reached the handler carrying @Valid, so it stayed green with the
  * very thing it names removed, which makes it no proof at all.
  *
  * This exercises the annotated handler itself: a valid request must reach the body and
@@ -47,7 +47,7 @@ class BeanValidationTest {
             assertHandlerValidatesAndRuns(id);
         } finally {
             // The probe row lives in the running demo's database. Without this, a failed
-            // assertion leaves it visible in /work-items and /workload for good — once
+            // assertion leaves it visible in /work-items and /workload for good, once
             // per failed run.
             repository.findById(id).ifPresent(item -> {
                 item.setArchivedAt(Instant.now());

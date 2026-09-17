@@ -21,7 +21,7 @@ class ExplicitComponentScanTest {
         assertTrue(context.containsBeanDefinition("workItemService"),
                 "the annotated service was found in the package we named");
         // The scope is the package, not a list. Naming two classes by hand satisfies every
-        // assertion above and stops finding anything nobody remembered to add — which is
+        // assertion above and stops finding anything nobody remembered to add, which is
         // the whole difference, and is only visible by asking for a class that such a
         // hand-written list would not mention.
         assertTrue(context.containsBeanDefinition("workItemRepository")

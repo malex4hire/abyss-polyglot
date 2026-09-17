@@ -12,8 +12,8 @@ const EMPTY: DraftItem = { title: "", priority: "", assignee: "" };
  *
  * The DOM node holds no truth of its own: value comes from state and every keystroke
  * goes through onChange, so the component always knows what is typed and can normalise,
- * disable or validate it. Drop the onChange and the field appears frozen — the classic
- * symptom of a controlled input missing half its wiring.
+ * disable or validate it. Drop the onChange and the field appears frozen, which is the
+ * classic symptom of a controlled input missing half its wiring.
  */
 export function DraftForm({ onSubmit }: DraftFormProps) {
   const [draft, setDraft] = useState<DraftItem>(EMPTY);

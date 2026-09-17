@@ -32,8 +32,8 @@ await page.addInitScript(() => {
 const errors = [];
 page.on("pageerror", (e) => errors.push(String(e)));
 const out = [];
-const ok = (n, d = "") => out.push(`  OK    ${n}${d ? "  — " + d : ""}`);
-const bad = (n, d = "") => { out.push(`  FAIL  ${n}${d ? "  — " + d : ""}`); process.exitCode = 1; };
+const ok = (n, d = "") => out.push(`  OK    ${n}${d ? "  (" + d + ")" : ""}`);
+const bad = (n, d = "") => { out.push(`  FAIL  ${n}${d ? "  (" + d + ")" : ""}`); process.exitCode = 1; };
 
 await page.goto(base + "/", { waitUntil: "domcontentloaded" });
 await page.waitForSelector("[data-testid=tracker] [data-testid=row]", { timeout: 30000 });
@@ -111,7 +111,7 @@ const churn = opensAfterTyping - opensBeforeTyping;
 churn === 0
   ? ok("typing in the filter does not reopen the change stream", `${opensBeforeTyping} open(s), unchanged`)
   : bad("typing in the filter does not reopen the change stream",
-        `${churn} extra stream open(s) for 7 keystrokes — each one a gap a change can fall into`);
+        `${churn} extra stream open(s) for 7 keystrokes, each one a gap a change can fall into`);
 await filter.fill("");
 await page.waitForTimeout(500);
 

@@ -1,18 +1,18 @@
-"""R-6 — the two frontends differ in framework and in nothing else that matters.
+"""R-6: the two frontends differ in framework and in nothing else that matters.
 
 Two things are checked, and they are the two halves of "one contract, consumed unmodified
-by every frontend" — the claim R-4 deliberately does not make.
+by every frontend", which is the claim R-4 deliberately does not make.
 
 First: both static servers are byte-identical. Every frontend has to proxy the contract
 to whichever backend was selected, serve a single-page app's catch-all, and report its
 own runtime. None of that is framework work, so if the two files ever diverge the
-difference is not Angular-versus-React — it is one of them having been given an advantage.
+difference is not Angular-versus-React: it is one of them having been given an advantage.
 Comparing bytes is the cheapest possible way to know, and it is exact.
 
 Second: neither frontend's source contains a list of backends. Both read the selectable
 set from their own server at runtime, which reads it from the generated environment,
 which reads the manifest. A backend activated in the manifest therefore appears as an
-option in both applications with no change to either — and a backend list hard-coded in a
+option in both applications with no change to either, and a backend list hard-coded in a
 component is the kind of thing that stays correct for exactly as long as nobody adds a
 backend.
 """
@@ -26,8 +26,8 @@ import pytest
 import spine
 
 # Files that must be byte-identical in both frontends, relative to the module root.
-# None of this is framework work — serving the bundle, proxying the contract, reporting a
-# height to an embedding page — so a difference in any of them is one application being
+# None of this is framework work (serving the bundle, proxying the contract, reporting a
+# height to an embedding page), so a difference in any of them is one application being
 # given an advantage the other does not have.
 SHARED_FILES = ("serve.mjs", "src/lib/embed.ts")
 SERVER_FILE = "serve.mjs"
@@ -84,9 +84,9 @@ def test_both_frontends_report_their_height_to_an_embedder():
         ]
         assert entry, f"'{sid}' has no main entry point"
         # A CALL, not a mention. The first spelling of this searched for the name and
-        # was satisfied by the import line, so deleting the call left it green — a check
-        # that could not fail for the reason it claimed, caught by deleting the call and
-        # watching it pass.
+        # was satisfied by the import line, so deleting the call left it green, and that
+        # is a check that could not fail for the reason it claimed, caught by deleting
+        # the call and watching it pass.
         called = False
         for path in entry:
             for line in spine.strip_comments(spine.text_of(path)).splitlines():
@@ -150,7 +150,7 @@ def test_no_frontend_source_carries_a_list_of_backends():
         )
         # Stripped, like the source scan above. The comment explaining why two JVM stacks
         # report an identical runtime version is exactly the kind of prose this file exists
-        # to keep — flagging it would teach the next reader to delete the explanation
+        # to keep, because flagging it would teach the next reader to delete the explanation
         # rather than the coupling.
         code = spine.strip_comments(server)
         named = sorted(b for b in stack_ids if b not in {sid} and b in code)
@@ -164,7 +164,7 @@ def test_every_test_id_the_browser_drivers_query_exists_in_a_frontend():
 
     This is the check that was missing. A driver asserted on
     `[data-testid=workload-loading]`, neither frontend carried that attribute, and the
-    count was therefore zero on every run for the life of the build — while the failure
+    count was therefore zero on every run for the life of the build, while the failure
     message blamed the machine for answering too fast. It read as flakiness, so it was
     tolerated rather than investigated.
 
@@ -184,7 +184,7 @@ def test_every_test_id_the_browser_drivers_query_exists_in_a_frontend():
         return found
 
     # Per frontend, not pooled. A union would let one frontend drop an id while the other
-    # kept it — which is the pair silently diverging, and the drivers run against both.
+    # kept it, which is the pair silently diverging, and the drivers run against both.
     per_frontend = {
         sid: ids_in(spine.source_root(sid, stack)) for sid, stack in sorted(frontends.items())
     }
@@ -222,7 +222,7 @@ def test_every_test_id_the_browser_drivers_query_exists_in_a_frontend():
         missing.append(f"{name}  (queried by {where}; {detail})")
     assert not missing, (
         "browser drivers query test ids that not every frontend renders, so those "
-        "assertions cannot pass — or can pass against only one half of the pair:\n  "
+        "assertions cannot pass, or can pass against only one half of the pair:\n  "
         + "\n  ".join(missing)
     )
 
@@ -253,7 +253,7 @@ def test_both_frontends_render_from_the_same_generated_stylesheet():
 
 def test_the_generated_stylesheets_are_generated_and_say_so():
     """A generated file that does not announce itself gets hand-edited, once, by someone
-    in a hurry — and the next render silently reverts their fix."""
+    in a hurry, and the next render silently reverts their fix."""
     unmarked = []
     for sid, stack in sorted(spine.frontends().items()):
         for path in spine.iter_repo_files((".css",), root=spine.source_root(sid, stack)):

@@ -29,7 +29,7 @@ class RestControllerTest {
 
     @Test
     void theResponseBodyDecisionAppliesToTheClassNotOneMethodAtATime() {
-        // The two forms are wire-identical for this one endpoint — calling the method
+        // The two forms are wire-identical for this one endpoint. Calling the method
         // directly, or even dispatching the request, cannot tell @RestController apart
         // from @Controller plus a per-method @ResponseBody, because both cover this
         // handler. What differs is whether the *next* handler is covered without anyone

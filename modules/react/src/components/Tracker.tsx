@@ -23,7 +23,7 @@ function validate(title: string, priority: string, assignee: string): string[] {
  *
  * Angular holds arrivals and departures in signals and binds classes off them; this derives
  * the same two sets with useState and a ref for what has been seen. The rendered output is
- * identical because the stylesheet is one file copied into both — the route to it is the
+ * identical because the stylesheet is one file copied into both. The route to it is the
  * pair's whole point, and it is the part that cannot be faked.
  */
 export function Tracker() {
@@ -307,7 +307,7 @@ export function Tracker() {
             </p>
             {(runtime.identity?.artifacts ?? []).length > 0 && (
               // The count above answers "how many"; this answers "which, and at what
-              // version" — the question the count can't. Collapsed by default so the
+              // version", the question the count can't. Collapsed by default so the
               // panel stays scannable, but the exact resolved versions are one click
               // away rather than only visible in the raw JSON.
               <details data-testid="runtime-artifacts-detail">
@@ -341,7 +341,7 @@ export function Tracker() {
                 </strong>
               </p>
               <p className="sub pair-counts" data-testid="runtime-pair">
-                against its pair — <strong>{runtime.backend}: {(runtime.identity?.artifacts ?? []).length}</strong> artifacts,{" "}
+                against its pair, <strong>{runtime.backend}: {(runtime.identity?.artifacts ?? []).length}</strong> artifacts,{" "}
                 <strong>{runtime.pair.backend}: {(runtime.pair.identity.artifacts ?? []).length}</strong>. Same contract,
                 same behaviour,{" "}
                 {Math.abs((runtime.pair.identity.artifacts ?? []).length - (runtime.identity?.artifacts ?? []).length)}{" "}
@@ -476,7 +476,7 @@ export function Tracker() {
             </label>
             <label className={`field ${errorFor("priority") ? "invalid" : ""}`} style={{ flex: "0 1 7rem" }}>
               <span className="label">priority</span>
-              <input data-testid="new-priority" value={priority} onChange={(e) => setPriority(e.target.value)} placeholder="1–10" />
+              <input data-testid="new-priority" value={priority} onChange={(e) => setPriority(e.target.value)} placeholder="1-10" />
               {errorFor("priority") && <span className="error" data-testid="error-priority">{errorFor("priority")}</span>}
             </label>
             <label className={`field ${errorFor("assignee") ? "invalid" : ""}`} style={{ flex: "1 1 10rem" }}>

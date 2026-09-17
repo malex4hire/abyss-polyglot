@@ -8,7 +8,7 @@
 # forever. `getent hosts` costs nothing once DNS is up (the normal case, first try) and
 # bounds the wait when it is not.
 #
-# Shared by modules/spring-boot/Dockerfile and modules/spring-traditional/Dockerfile —
+# Shared by modules/spring-boot/Dockerfile and modules/spring-traditional/Dockerfile,
 # the two apps that resolve `postgres` by hostname over a fresh JDBC connection at boot.
 # A prior version of this fix was duplicated verbatim in both CMD lines; kept in one file
 # so a future change to the retry count or interval has one place to land, and so the

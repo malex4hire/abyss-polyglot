@@ -17,7 +17,7 @@ class ExplicitBeanDefinitionTest {
     @Test
     void theFactoryMethodIsTheDefinitionAndTheWiring() {
         // Definitions, not instances. Refreshing the context would instantiate WebConfig's
-        // @EnableWebMvc beans and fail for want of a ServletContext — and instantiation was
+        // @EnableWebMvc beans and fail for want of a ServletContext, and instantiation was
         // never the claim. The point is that the container's definition of this bean IS a
         // factory method on a configuration class, which is readable before anything runs.
         var registry = new org.springframework.beans.factory.support.DefaultListableBeanFactory();
@@ -29,7 +29,7 @@ class ExplicitBeanDefinitionTest {
 
         // Asking the class instead of the bean factory proved only that Java calls
         // methods, and passed identically against a version that registered the same bean
-        // by component scanning — where the definition and the wiring stop being one thing.
+        // by component scanning, where the definition and the wiring stop being one thing.
         assertEquals("jdbcTemplate", definition.getFactoryMethodName(),
                 "defined by a factory method, not discovered by a scan");
         assertNotNull(definition.getFactoryBeanName(),
@@ -41,7 +41,7 @@ class ExplicitBeanDefinitionTest {
         // The checks above read the @Bean-annotated method's signature, which an edit to
         // the method body leaves untouched. Call the factory method directly, no context
         // refresh needed, and assert on the instance it actually returns: that is what a
-        // stub body — one that throws, or returns null — fails.
+        // stub body (one that throws, or returns null) fails.
         var dataSource = new DriverManagerDataSource();
         var template = new RootConfig().jdbcTemplate(dataSource);
         assertSame(dataSource, template.getDataSource(),

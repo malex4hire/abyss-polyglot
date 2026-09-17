@@ -14,8 +14,8 @@ const errors = [];
 page.on("pageerror", (e) => errors.push(String(e)));
 
 const out = [];
-const ok = (n, d = "") => out.push(`  OK    ${n}${d ? "  — " + d : ""}`);
-const bad = (n, d = "") => { out.push(`  FAIL  ${n}${d ? "  — " + d : ""}`); process.exitCode = 1; };
+const ok = (n, d = "") => out.push(`  OK    ${n}${d ? "  (" + d + ")" : ""}`);
+const bad = (n, d = "") => { out.push(`  FAIL  ${n}${d ? "  (" + d + ")" : ""}`); process.exitCode = 1; };
 
 await page.goto(base + "/", { waitUntil: "domcontentloaded" });
 await page.waitForSelector("[data-testid=tracker] [data-testid=row]", { timeout: 30000 });
@@ -100,7 +100,7 @@ applied ? ok("legal transition applies") : bad("legal transition applies");
 // B3, and whichever of the two states the click produces first.
 //
 // This counted [data-testid=workload-loading] immediately after the click and failed when
-// it found none. The count was not zero because the answer arrived first — it was zero
+// it found none. The count was not zero because the answer arrived first. It was zero
 // because NEITHER FRONTEND CARRIED THAT TEST ID. Both render a loading card with a
 // progress bar and neither labelled it, so the check was red on every run for the life of
 // the build and its failure message blamed the machine being fast. The test id is now on

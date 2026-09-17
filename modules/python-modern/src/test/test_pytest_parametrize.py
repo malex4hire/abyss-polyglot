@@ -34,7 +34,7 @@ def test_grouping(assignees, expected_groups, request):
 
     assert len(group_by_assignee(items)) == expected_groups
 
-    # A test cannot count its own invocations, which is why this was conceded — but it can
+    # A test cannot count its own invocations, which is why this was conceded, but it can
     # ask what it was invoked with. The collector attaches a callspec when it expands a
     # parametrised function into cases, and never when a test loops over rows itself.
     assert getattr(request.node, "callspec", None) is not None, (

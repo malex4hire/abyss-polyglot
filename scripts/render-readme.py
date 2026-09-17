@@ -3,7 +3,7 @@
 
 The README states ports and counts, because a README that will not tell you which URL to
 open is not doing its job. Both are declared in the manifest, and a second copy of a
-declared value is a copy that goes stale — so the prose carries placeholders and this
+declared value is a copy that goes stale, so the prose carries placeholders and this
 fills them in.
 
     {{port:angular}}          the port that stack publishes on the host

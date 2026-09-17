@@ -17,7 +17,7 @@ class PropertyPlaceholderTest {
     void withoutThisBeanPlaceholdersArriveAsLiteralText() {
         // The method's own name is the assertion, so it has to be executed rather than
         // described. Checking that the returned object is a BeanFactoryPostProcessor
-        // passed against a counter that returns one and resolves nothing — the interface
+        // passed against a counter that returns one and resolves nothing. The interface
         // is the shape, and resolution is the mechanism.
         var factory = new org.springframework.beans.factory.support.DefaultListableBeanFactory();
         var definition = new org.springframework.beans.factory.support.RootBeanDefinition(Holder.class);

@@ -14,4 +14,4 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 
 def pytest_report_header(config):
-    return "abyss-polyglot — host-side verification"
+    return "abyss-polyglot: host-side verification"

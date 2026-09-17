@@ -5,7 +5,7 @@ import { Status, WorkItem } from "./types";
  * Which backend the application talks to, chosen at runtime.
  *
  * The Angular side holds this in an injectable singleton the framework owns. Here it is a
- * hook, so the state is per caller — which is why the selection lives in the top component
+ * hook, so the state is per caller, which is why the selection lives in the top component
  * and is threaded down as props rather than being reachable from anywhere. That difference
  * is not incidental; it is the framework contrast the pair exists to make visible.
  *
@@ -100,7 +100,7 @@ export function useTracker(backend: string) {
   }, [base]);
 
   // Memoised as one object. Each callback is already stable, but returning a fresh
-  // object literal gives the caller a new identity every render — and a caller that puts
+  // object literal gives the caller a new identity every render, and a caller that puts
   // it in a useCallback dependency list then rebuilds its own callback every render, and
   // an effect depending on that runs forever. The page rendered and stayed on "loading…"
   // with no error anywhere: the request was being made, and remade, indefinitely.

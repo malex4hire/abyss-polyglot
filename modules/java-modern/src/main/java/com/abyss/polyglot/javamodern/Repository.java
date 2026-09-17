@@ -19,7 +19,7 @@ public final class Repository {
      * B5. Insert only if the key is free, and say which happened.
      *
      * putIfAbsent returns the incumbent or null, so the caller learns the outcome from
-     * the operation rather than by testing first and writing second — which is two
+     * the operation rather than by testing first and writing second, which is two
      * decisions about a map that can change between them.
      */
     public Optional<WorkItem> putIfAbsent(WorkItem item) {

@@ -55,14 +55,14 @@ class JdbcTemplateRepositoryTest {
     @Test
     void theTemplateTranslatesTheDriversExceptionIntoSpringsHierarchy() {
         // The rows-and-order assertions above pass just as well against raw JDBC written
-        // by hand — identical results either way. What JdbcTemplate does that the JDBC
+        // by hand, with identical results either way. What JdbcTemplate does that the JDBC
         // API does not is translate the driver's SQLException into Spring's
         // DataAccessException hierarchy, so callers depend on a portable exception rather
         // than on vendor error codes.
         //
         // Asserted through findAll(), not through a template built here: a probe that
         // queries its own JdbcTemplate never touches the repository at all, so replacing
-        // the repository could not change its verdict — which is how the first version of
+        // the repository could not change its verdict, which is how the first version of
         // this assertion passed against the very alternative it was written to reject.
         var unreachable = new DriverManagerDataSource();
         unreachable.setDriverClassName("org.postgresql.Driver");

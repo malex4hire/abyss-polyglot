@@ -115,7 +115,7 @@ const STATUSES: Status[] = ["OPEN", "IN_PROGRESS", "BLOCKED", "DONE", "CANCELLED
             </p>
             @if ((info.identity?.artifacts || []).length) {
               <!-- The count above answers "how many"; this answers "which, and at what
-                   version" — the question the count can't. Collapsed by default so the
+                   version", the question the count can't. Collapsed by default so the
                    panel stays scannable, but the exact resolved versions are one click
                    away rather than only visible in the raw JSON. -->
               <details data-testid="runtime-artifacts-detail">
@@ -149,7 +149,7 @@ const STATUSES: Status[] = ["OPEN", "IN_PROGRESS", "BLOCKED", "DONE", "CANCELLED
                 }}</strong>
               </p>
               <p class="sub pair-counts" data-testid="runtime-pair">
-                against its pair — <strong>{{ info.backend }}: {{ (info.identity?.artifacts || []).length }}</strong>
+                against its pair, <strong>{{ info.backend }}: {{ (info.identity?.artifacts || []).length }}</strong>
                 artifacts, <strong>{{ info.pair.backend }}: {{ (info.pair.identity.artifacts || []).length }}</strong>.
                 Same contract, same behaviour, {{ artifactDelta(info) }} {{ artifactComparison(info) }} jars to get there.
               </p>
@@ -281,7 +281,7 @@ const STATUSES: Status[] = ["OPEN", "IN_PROGRESS", "BLOCKED", "DONE", "CANCELLED
             <label class="field" [class.invalid]="errorFor('priority')" style="flex:0 1 7rem">
               <span class="label">priority</span>
               <input data-testid="new-priority" name="priority" [ngModel]="priority()"
-                     (ngModelChange)="priority.set($event)" placeholder="1–10" />
+                     (ngModelChange)="priority.set($event)" placeholder="1-10" />
               @if (errorFor("priority"); as message) {
                 <span class="error" data-testid="error-priority">{{ message }}</span>
               }
@@ -333,7 +333,7 @@ export class TrackerComponent implements OnInit {
   /**
    * Which rows arrived from the stream rather than from this browser, and which are on
    * their way out. Signals hold them and the template binds classes off them, so the
-   * animation is a consequence of state rather than a DOM instruction — which is the
+   * animation is a consequence of state rather than a DOM instruction, which is the
    * Angular half of the pair. React derives the same two sets from hooks.
    */
   readonly arrivals = signal<Set<string>>(new Set());
@@ -389,8 +389,8 @@ export class TrackerComponent implements OnInit {
    * What actually supplied the capability, not the category it belongs to.
    *
    * "auto-configuration" is the answer to a different question. The Boot side should read
-   * as a list of specific things Boot brought — DataSourceConfiguration$Hikari,
-   * DispatcherServletAutoConfiguration — because that is what the traditional module wrote
+   * as a list of specific things Boot brought (DataSourceConfiguration$Hikari,
+   * DispatcherServletAutoConfiguration), because that is what the traditional module wrote
    * by hand and what the contrast is about.
    */
   suppliedBy(row: any): string {
@@ -410,7 +410,7 @@ export class TrackerComponent implements OnInit {
    * "more" or "fewer", from the direction of the difference.
    *
    * The count was absolute, so the sentence said "more" whichever side you were looking
-   * at — and read on the smaller runtime it claimed the opposite of the truth. The number
+   * at, and read on the smaller runtime it claimed the opposite of the truth. The number
    * describes the selected backend against its pair, so the word has to follow the sign.
    */
   artifactComparison(info: any): string {

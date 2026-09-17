@@ -4,8 +4,8 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
  * A range validator, in the ordinary shape: null when valid, an error object when not.
  *
  * Nothing is demonstrated here on purpose. Angular runs every validator when the
- * FormGroup is constructed, so a fault inside one breaks any test that builds the form —
- * three unrelated specs went red rather than the one that covers validation.
+ * FormGroup is constructed, so a fault inside one breaks any test that builds the form.
+ * Three unrelated specs went red rather than the one that covers validation.
  */
 export function priorityRange(min: number, max: number): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -26,7 +26,7 @@ export function priorityRange(min: number, max: number): ValidatorFn {
  * This is the half of validation the framework does not do. Angular decides validity and
  * populates an errors object; what those keys mean to a user is the application's
  * problem, and every project writes this function. The keys are the contract between a
- * validator and its message — `required` and `minlength` come from the built-ins,
+ * validator and its message: `required` and `minlength` come from the built-ins,
  * `range` from the validator above.
  *
  * It runs when a message is rendered rather than when the form is built, which is why a

@@ -7,11 +7,11 @@
 **One OpenAPI contract. {{count:backends}} backends that serve it. {{count:frontends}} frontends that consume it.
 One test suite that runs unmodified against all of them and names none of them.**
 
-![A work item created in the Angular application appearing in the React application, then archived in React and vanishing from Angular — neither side touched by a user](docs/media/live-update.gif)
+![A work item created in the Angular application appearing in the React application, then archived in React and vanishing from Angular, with neither side touched by a user](docs/media/live-update.gif)
 
 An item is created on the **left**, in Angular. It appears on the **right**, in React, with
 nobody touching the right. Then it is archived on the right and leaves the left. That is a
-server-sent event stream both applications consume, not a refresh — and it is the one claim
+server-sent event stream both applications consume, not a refresh. It is the one claim
 here that reading the code cannot settle, so a Playwright driver asserts it in both
 directions on every run.
 
@@ -34,7 +34,7 @@ No pip, no virtualenv, no docker, no network. It starts the Python backend on a 
 and walks the contract one operation at a time, printing each request and each response:
 
 ```
-4. transition — illegal
+4. transition, illegal
    refused with a typed rejection, and the refusal writes nothing
    POST /work-items/DEMO-4c11a615/transition
    → {"status": "OPEN"}
@@ -49,7 +49,7 @@ and walks the contract one operation at a time, printing each request and each r
    GET /work-items/DEMO-4c11a615
    200
    DEMO-4c11a615  status=IN_PROGRESS
-   unchanged — still IN_PROGRESS, so the refusal cost nothing
+   unchanged: still IN_PROGRESS, so the refusal cost nothing
 ```
 
 Seven steps: create, create again with the same key, a legal transition, the illegal one
@@ -85,7 +85,7 @@ make down
 
 Open the side-by-side page, create an item in the left frame, and watch it appear in the
 right one. Nobody clicks anything on the right. That is the change stream, and it is the
-one claim here that no amount of reading settles — which is why a Playwright driver
+one claim here that no amount of reading settles, which is why a Playwright driver
 asserts it in both directions.
 
 ## The contract
@@ -101,7 +101,7 @@ needs exactly the things that are interesting to implement four times:
 | B4 | a change stream, so a write in one client reaches the other |
 | B5 | idempotent create on a caller-supplied key |
 
-The ordering is part of the contract — priority descending, then title ascending — so it
+The ordering is part of the contract, priority descending and then title ascending, so it
 is total, and every backend returns the same sequence for the same data. Left unspecified,
 each runtime's natural sort would produce four defensible orderings and the parity suite
 would have to stop asserting the one thing a client actually sees.
@@ -120,8 +120,8 @@ becomes a comparison of APIs.
 
 | stack | what it is | what it deliberately is not |
 |---|---|---|
-| `java-modern` | `com.sun.net.httpserver`, records, sealed interfaces, virtual threads, Jackson scoped to serialization | no web framework at all — no Spring, Javalin, Jetty, Vert.x, Micronaut, Quarkus, Tomcat, Undertow |
-| `python-modern` | `http.server`, dataclasses, pattern matching, in-memory store | no Django, Flask, FastAPI, Starlette, uvicorn — and no third-party import of any kind |
+| `java-modern` | `com.sun.net.httpserver`, records, sealed interfaces, virtual threads, Jackson scoped to serialization | no web framework at all: no Spring, Javalin, Jetty, Vert.x, Micronaut, Quarkus, Tomcat, Undertow |
+| `python-modern` | `http.server`, dataclasses, pattern matching, in-memory store | no Django, Flask, FastAPI, Starlette, uvicorn, and no third-party import of any kind |
 | `spring-traditional` | explicit `@Configuration`, hand-wired `DataSource`, `JdbcTemplate`, `DispatcherServlet` registered by hand | no Boot, no starter, no auto-configuration |
 | `spring-boot` | auto-configuration, starters, Spring Data JPA, Actuator | nothing hand-wired that auto-configuration would supply |
 
@@ -135,21 +135,22 @@ never read from a label.
 Each backend serves `/__instrumentation/identity`, which reports what actually resolved at
 runtime: the version, the artifact set, the concrete HTTP server class. It reports data. It
 never reports a name, and the host suite fails if the response carries a key like
-`framework` or `stack` — a module asserting its own identity is not evidence of anything.
+`framework` or `stack`, because a module asserting its own identity is not evidence of
+anything.
 
 Identity is then *derived* from that artifact set against the manifest's
 `required_artifacts` and `forbidden_artifacts`. The absent half is the load-bearing one:
 "traditional Spring" means nothing unless no `spring-boot*` artifact is on that classpath,
 and the only way to know is to ask the running process.
 
-The alternative — reading `pom.xml` — would have been easier and would have proved that
+The alternative, reading `pom.xml`, would have been easier and would have proved only that
 somebody wrote a line in a build file. A pom declares intent. A classpath is what happened.
 
 Dependency names mean different things in different ecosystems, so the manifest says which
 rule applies per stack. `prefix` is the Maven sense, where `spring-boot` covers the whole
 `spring-boot-*` family. `exact` is the npm sense, where `react` and `react-is` are unrelated
-packages — matching those by prefix made the Angular module fail its own forbidden-artifact
-check because a transitive toolchain dependency happens to start with the right letters.
+packages. Matching those by prefix made the Angular module fail its own forbidden-artifact
+check, because a transitive toolchain dependency happens to start with the right letters.
 
 ### What Boot's auto-configuration actually eliminates
 
@@ -172,13 +173,13 @@ to either.
 
 Angular and React render the same screen, from the same stylesheet, generated out of the
 same token file by `scripts/render-app-tokens.py`. "They look identical" is a property of
-how they are built rather than a claim somebody keeps true by care — and the host suite
+how they are built rather than a claim somebody keeps true by care. The host suite
 compares the generated bytes in both modules, so the first divergence is a failure rather
 than something you notice when the screenshots are next to each other.
 
 Both `serve.mjs` files are byte-identical, and that is checked. Everything in that file is
-framework-independent work — proxying the contract to whichever backend was selected, the
-single-page catch-all, the runtime report — so a difference there is not Angular versus
+framework-independent work: proxying the contract to whichever backend was selected, the
+single-page catch-all, and the runtime report. So a difference there is not Angular versus
 React, it is one of them having been given an advantage the other does not have.
 
 Neither module's source contains a list of backends. The selector is populated at runtime
@@ -188,13 +189,13 @@ frontend change, and the suite fails if a backend id appears in frontend source 
 
 Neither module calls `setInterval`. A poll would look identical on screen, keep working
 with the stream completely broken, and make "with no user action" true while "live" was
-false — which is the kind of green that teaches you to stop trusting the check.
+false, which is the kind of green that teaches you to stop trusting the check.
 
 They are served as static bundles, not by a dev server. `vite dev` spawns an esbuild child
 per transform and does not reap them; a healthcheck polling every few seconds left hundreds
 of zombies and a heavily loaded machine after an hour. The toolchain stays in the image so
 the module's own tests can run inside the running container, but nothing compiles at demo
-time — which is also what makes the offline check pass.
+time, which is also what makes the offline check pass.
 
 ## Ports live in exactly one file
 
@@ -204,7 +205,7 @@ artifacts. `scripts/render-env.py` turns the ports into environment variables; c
 those; the browser checks, the side-by-side page and this README all derive from the same
 place.
 
-A check fails on a port literal anywhere else — in a script, in a test, in a driver, in
+A check fails on a port literal anywhere else: in a script, in a test, in a driver, or in
 markdown. The README is rendered from `README.in.md` with `{{!port:angular}}`-style
 placeholders precisely so it can state a URL without being a second place the number lives,
 and prose is not allowed to state a count of the stack set either. Both exemptions are
@@ -223,7 +224,7 @@ back at the edit.
 | | |
 |---|---|
 | R-1 | manifest and compose agree both ways; no port literal outside the manifest; every generated file is reproducible |
-| R-2 | identity derived from the live classpath — required artifacts present, forbidden absent, version floors met |
+| R-2 | identity derived from the live classpath: required artifacts present, forbidden absent, version floors met |
 | R-3 | the Boot-versus-traditional delta, computed from two live endpoints and never maintained |
 | R-4 | the contract suite passes identically against every backend, and names none of them |
 | R-5 | the whole demo comes up and serves the contract with egress blocked |
@@ -237,7 +238,7 @@ python3 -m pytest tests -m "not needs_stacks"   # host only, seconds
 make verify                                      # everything, with the stacks up
 ```
 
-Two rules govern the suite. Nothing in it enumerates a set — stacks, ports, token groups and
+Two rules govern the suite. Nothing in it enumerates a set. Stacks, ports, token groups and
 governed members are all read from their declaring files, or the tests would be asserting
 against themselves. And a missing input is a named assertion failure rather than a collection
 error, because an errored suite is not a gate.
@@ -247,8 +248,8 @@ error, because an errored suite is not a gate.
 Every check here has to be able to go red for the reason it claims. Three that were rewritten
 after they turned out not to be:
 
-- A health probe read the status code. Every frontend answers 200 on every path — that is
-  what a single-page app does — so it reported healthy with a broken bundle. It now reads
+- A health probe read the status code. Every frontend answers 200 on every path, because
+  that is what a single-page app does, so it reported healthy with a broken bundle. It now reads
   the document and looks for the built bundle it references, and asks backends an unknown
   path and requires a *different* answer.
 - The offline check asserted properties of an egress-blocked stack without ever proving
@@ -274,14 +275,14 @@ healthcheck and not one of them is reachable from the laptop the demo runs on. B
 way out must not block the way in.
 
 Docker's embedded DNS resolver depends on the same NAT machinery the overlay turns off, so
-under the overlay a lookup at `127.0.0.11` gets no answer at all — not a slow one, none.
+under the overlay a lookup at `127.0.0.11` gets no answer at all, not even a slow one.
 Postgres therefore has a static address on a declared subnet, written into `/etc/hosts` at
 container create, which sidesteps the resolver for exactly the one lookup that has to
 survive it.
 
 This is what self-hosted fonts and digest-pinned images are for. Each is a small
 inconvenience on a laptop with wifi and the difference between a working demo and a blank
-screen on a locked-down network — which is where a demo tends to get shown.
+screen on a locked-down network, which is where a demo tends to get shown.
 
 ## Design tokens
 
@@ -292,12 +293,12 @@ stylesheet.
 
 Contrast and hue-separation floors are read from the token file at test time rather than
 written into the check, so raising a floor is a one-line edit and the check follows.
-Contrast is measured across groups — foreground against background — never within one:
+Contrast is measured across groups, foreground against background, and never within one:
 checking ink as though it were a ground would fail every identity hue against every other
 and prove nothing, since they are never rendered on each other.
 
 Every governed set declares whether it is colour-encoded, and every member of every set
-needs a non-colour encoding regardless — a label, a glyph, a border style, an ink weight.
+needs a non-colour encoding regardless: a label, a glyph, a border style, or an ink weight.
 An earlier version of that check demanded a colour from every member of every set, which
 forced hues onto a set deliberately encoded by ink weight. A check that conflicts with a
 deliberate choice is usually the thing that changed by mistake.
@@ -322,7 +323,7 @@ Declared per stack in the manifest and checked against what the running process 
 JDK 25, Python 3.14, Node 24, Spring 7.0, Spring Boot 4.1, Angular 22.1, React 19.2.
 
 Framework floors were added after the fact, and the gap is the point. The suite checked
-runtime versions and the *presence* of framework artifacts, never their versions — so both
+runtime versions and the *presence* of framework artifacts, never their versions, so both
 frontends sat on superseded majors for the life of the build and nothing in the suite could
 have said so. An artifact declared with no floor is an unchecked default.
 
@@ -331,13 +332,13 @@ have said so. An artifact declared with no floor is an unchecked default.
 - No authentication or multi-tenancy. The contract is deliberately small enough that four
   implementations of it fit in one repository and stay comparable.
 - `java-modern` and `python-modern` store in memory; the Spring pair uses Postgres. That
-  asymmetry is deliberate — it is what makes `python-modern` runnable with no install — but
-  it means the language pair does not exercise a persistence layer.
+  asymmetry is deliberate, because it is what makes `python-modern` runnable with no
+  install, but it means the language pair does not exercise a persistence layer.
 - The full docker gate builds four JVM images and two Node images and takes around an hour.
   It runs on demand and weekly rather than on push: it is flaky against Maven Central and
   npm, and a red badge that means "the registry was slow" is worse than no badge.
 
 ## Licence
 
-MIT, except the bundled fonts. Fraunces, Public Sans and JetBrains Mono are SIL OFL 1.1 —
-see `NOTICE` and `licenses/OFL-1.1.txt`.
+MIT, except the bundled fonts. Fraunces, Public Sans and JetBrains Mono are SIL OFL 1.1.
+See `NOTICE` and `licenses/OFL-1.1.txt`.

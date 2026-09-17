@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Enforce: a validator must read the exact object the operation consumes.
 
-Three defects of one shape, found one at a time over this build. A fourth — a commit
-guard that read the working tree while git commits the index — belonged to tooling this
+Three defects of one shape, found one at a time over this build. A fourth (a commit
+guard that read the working tree while git commits the index) belonged to tooling this
 repository does not ship, so its rule was removed rather than left here asserting against
 a file that does not exist.
 
@@ -16,7 +16,7 @@ That is a pattern, not luck. A rule written down is a rule someone has to rememb
 this is what makes it enforceable.
 
 These are heuristics over source text and they are deliberately coarse. They cannot decide
-whether a check reads the right object in general — that is a judgement. What they can do
+whether a check reads the right object in general. That is a judgement. What they can do
 is refuse the specific shapes that have already cost this build real defects, and say so
 loudly enough that the next one is noticed at the point it is written.
 """
@@ -95,8 +95,8 @@ def rule_checks_do_not_assert_on_category_words(problems: list[str]) -> None:
                 line = text[: match.start()].count("\n") + 1
                 problems.append(
                     f"{path.relative_to(ROOT)}:{line}: asserts on the category word "
-                    f"{word!r}. Assert on what supplied the capability — the declaring "
-                    "class — rather than on the word it is filed under."
+                    f"{word!r}. Assert on what supplied the capability (the declaring "
+                    "class) rather than on the word it is filed under."
                 )
 
 
@@ -107,7 +107,7 @@ def main() -> int:
     rule_checks_do_not_assert_on_category_words(problems)
 
     if problems:
-        print("GUARD AUDIT FAILED — a validator is reading something adjacent to what it "
+        print("GUARD AUDIT FAILED. A validator is reading something adjacent to what it "
               "claims to protect:\n", file=sys.stderr)
         for problem in problems:
             print(f"  {problem}\n", file=sys.stderr)

@@ -1,8 +1,8 @@
-"""R-5 — the whole demo starts and operates with no route out of the containers.
+"""R-5: the whole demo starts and operates with no route out of the containers.
 
 This is what self-hosted fonts, digest-pinned images and a static server instead of a dev
 server are all for. Each of those is a small inconvenience on a laptop with wifi and the
-difference between a working demo and a blank screen on a locked-down network — which is
+difference between a working demo and a blank screen on a locked-down network, which is
 where a demo tends to be shown.
 
 The first test in this file is the one that matters, and it is the one that is easy to
@@ -59,7 +59,7 @@ def test_every_image_is_pinned_by_digest():
 
 
 # Connect to a routable address by IP rather than resolving a hostname. A name that does
-# not resolve is weaker evidence than a connection that does not open — it would report
+# not resolve is weaker evidence than a connection that does not open: it would report
 # BLOCKED on a container that has no resolver but a perfectly good route out. Each image
 # carries a different set of tools, so the probe uses whichever one it finds; a container
 # with none of them is skipped rather than counted as blocked.
@@ -94,7 +94,7 @@ def offline_up():
 
     Each of these observes a property of a running egress-blocked stack, so each needs
     one. Written first as a step inside a single test, which left the others asserting
-    against whatever happened to be running — and passing or failing on that rather than
+    against whatever happened to be running, and passing or failing on that rather than
     on the overlay.
     """
     spine.require_file(spine.OFFLINE_COMPOSE, "offline compose overlay")

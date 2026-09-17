@@ -1,4 +1,4 @@
-"""R-3 — what Spring Boot's auto-configuration actually eliminates, computed from the
+"""R-3: what Spring Boot's auto-configuration actually eliminates, computed from the
 two running artifacts.
 
 The traditional stack reports the capabilities it declares explicitly and the source line
@@ -6,8 +6,8 @@ each was declared on. The Boot stack reports the same capabilities and whether
 auto-configuration supplied them. The delta is the join of those two live reports.
 
 No maintained list exists anywhere, and that is the point. A hand-written "Boot saves you
-these twelve beans" would be true on the day it was written and unfalsifiable afterwards
-— the two frameworks would move underneath it and the page would keep making the same
+these twelve beans" would be true on the day it was written and unfalsifiable afterwards.
+The two frameworks would move underneath it and the page would keep making the same
 claim. Computing it means the claim is re-derived every time the demo comes up, and a
 Boot release that stops auto-configuring something turns this red.
 
@@ -103,7 +103,7 @@ def test_every_explicitly_declared_capability_is_autoconfigured_in_boot():
 
     assert not unmatched, "capabilities with no Boot equivalent:\n  " + "\n  ".join(unmatched)
     assert not hand_wired, (
-        "Boot capabilities hand-wired where auto-configuration would serve — which makes "
+        "Boot capabilities hand-wired where auto-configuration would serve, which makes "
         "the comparison a comparison of two hand-wired applications:\n  "
         + "\n  ".join(hand_wired)
     )

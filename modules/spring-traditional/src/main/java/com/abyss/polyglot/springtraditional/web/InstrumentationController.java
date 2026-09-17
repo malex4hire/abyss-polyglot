@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Instrumentation, not contract: these endpoints report resolved runtime facts and are
- * no part of contract/openapi.yaml. Nothing here is a claimed identity — it is the
+ * no part of contract/openapi.yaml. Nothing here is a claimed identity. It is the
  * artifacts actually on the classpath, and the bean definitions the container resolved
  * together with where each was declared.
  *
@@ -103,11 +103,11 @@ public class InstrumentationController {
                 .split(java.io.File.pathSeparator)) {
             if (!element.isBlank()) {
                 String name = new java.io.File(element).getName();
-                // The classpath carries target/classes itself, not only jars — this
-                // module's own compiled output, listed alongside its actual dependencies.
-                // It is neither a jar nor a version, and reporting it as one is the
-                // defect: an artifact list read for exact versions should never contain
-                // an entry with no version at all.
+                // The classpath carries target/classes itself, not only jars. That
+                // entry is this module's own compiled output, listed alongside its
+                // actual dependencies. It is neither a jar nor a version, and reporting
+                // it as one is the defect: an artifact list read for exact versions
+                // should never contain an entry with no version at all.
                 if (name.endsWith(".jar")) {
                     found.add(name);
                 }

@@ -19,7 +19,7 @@ render:             ## regenerate everything derived from the manifest and the t
 #
 # Postgres holds a pinned address on a declared subnet, because the egress-blocked overlay
 # leaves the embedded DNS resolver unable to answer. That pin is applied when a container
-# is CREATED and never when an existing one is reconnected to a recreated network — and
+# is CREATED and never when an existing one is reconnected to a recreated network, and
 # switching between the normal stack and the overlay recreates the network every time.
 # Compose then reconnects the running containers, Postgres lands on whatever address is
 # free, and the /etc/hosts entry every JVM client was created with still names the old one.

@@ -16,8 +16,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  *
  * It drives the one controller in this module that no other test is written against.
  * Every other controller is the subject of its own test, and standing one of those up
- * here would make a break in it redden this test as well — collateral damage, not a
- * signal.
+ * here would make a break in it redden this test as well. That is collateral damage,
+ * not a signal.
  */
 @Tag("mockmvc-standalone")
 class MockMvcStandaloneTest {
@@ -25,7 +25,7 @@ class MockMvcStandaloneTest {
     /**
      * The MVC stack without a container and without a context. standaloneSetup builds
      * just enough dispatcher to route to one controller, so the test exercises real
-     * request mapping, argument binding and message conversion while starting nothing —
+     * request mapping, argument binding and message conversion while starting nothing, in
      * milliseconds rather than the seconds a full context costs.
      *
      * What it does not test is the wiring. Nothing here proves the controller would be

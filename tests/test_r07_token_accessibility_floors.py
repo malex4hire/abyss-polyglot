@@ -1,8 +1,8 @@
-"""R-7 — every encoded distinction is complete, distinct, and legible.
+"""R-7: every encoded distinction is complete, distinct, and legible.
 
 A governed set declares whether it is colour-encoded. Hue separation applies to
-colour-encoded sets only; a non-colour encoding — a label, a glyph, a border style, an
-ink weight — is required of every set regardless.
+colour-encoded sets only; a non-colour encoding (a label, a glyph, a border style, an
+ink weight) is required of every set regardless.
 
 That second half is the one that gets skipped, and it is the one that matters: a
 distinction carried by colour alone disappears for a meaningful share of the people who
@@ -13,7 +13,7 @@ An earlier version of this file forced a hue onto every member of every set, whi
 it failed the one set that is deliberately encoded by ink weight instead. A check that
 conflicts with a deliberate choice is usually the thing that changed by mistake.
 
-Floors are read from tokens.yaml, never written down here — so raising a floor is a
+Floors are read from tokens.yaml, never written down here, so raising a floor is a
 one-line edit to the declaration and the check follows.
 """
 
@@ -146,7 +146,7 @@ def test_every_foreground_background_pair_meets_the_contrast_floor():
     """Across groups, never within one.
 
     Checking ink as though it were a ground would fail every identity hue against every
-    other identity hue and prove nothing — they are never rendered on each other.
+    other identity hue and prove nothing, because they are never rendered on each other.
     """
     contrast_floor, _ = _floors()
     doc = spine.read_yaml(spine.TOKENS, "design tokens")
@@ -215,7 +215,7 @@ def test_no_visual_literal_survives_in_a_hand_written_stylesheet():
     """Every colour, face and spacing value resolves through a custom property.
 
     A hex value typed into a stylesheet is a second place the palette lives, and it is
-    invisible to every check above — which is the whole reason the tokens exist.
+    invisible to every check above, which is the whole reason the tokens exist.
     """
     import re
     hex_literal = re.compile(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?\b")

@@ -12,8 +12,8 @@ import { Placeholder } from "../components/Placeholder";
  * when the markup is refactored. That is the whole discipline: no shallow rendering, no
  * reaching into state, no asserting on props.
  *
- * userEvent drives real event sequences — a click is pointer-down, focus, pointer-up,
- * click — which is what catches a handler bound to the wrong event, or an element that
+ * userEvent drives real event sequences (a click is pointer-down, focus, pointer-up,
+ * click), which is what catches a handler bound to the wrong event, or an element that
  * cannot actually be reached because something is covering it.
  *
  * Declared demo_only: a test harness is not on a served request path by construction.

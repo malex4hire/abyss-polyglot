@@ -264,7 +264,7 @@ def test_b1_tag_filter_still_excludes_what_it_should(base, fresh):
 # uuid id per call and every test above creates once. No test had ever posted the same key
 # twice or omitted one, so the conflict path and the missing-key path were never entered.
 # Identical passed counts across four backends said only that four backends took the same
-# paths — and the paths that diverged were the ones nothing walked. A parity suite compares
+# paths, and the paths that diverged were the ones nothing walked. A parity suite compares
 # implementations only over the behaviour it actually exercises; everywhere else it compares
 # nothing and reports agreement.
 
@@ -289,7 +289,7 @@ def test_b5_a_repeated_create_with_the_same_key_yields_one_row(base):
 
     second = _create(base, **body)
     # Honest, not merely survivable: the second call did not create anything and must not
-    # claim it did. 200 is the answer — the resource exists and this is its representation.
+    # claim it did. 200 is the answer: the resource exists and this is its representation.
     assert second.status_code == 200, (
         f"a repeated create reported {second.status_code}; it created nothing, so 201 is a lie"
     )
@@ -318,7 +318,7 @@ def test_b5_a_repeated_create_emits_one_change_event(base):
 
     thread.join(timeout=13)
     text = received.get("text", "")
-    # The stream is a hint to refetch, so a spurious frame is not corruption — but it is a
+    # The stream is a hint to refetch, so a spurious frame is not corruption, but it is a
     # write announcing something that did not happen, and a client that trusts the count is
     # entitled to one event per change.
     assert text.count(key) <= 1, (
@@ -391,7 +391,7 @@ def test_b5_the_state_machine_still_refuses_a_genuinely_illegal_transition(base,
 # --- routing correctness -----------------------------------------------------------
 #
 # 404 and 405 are different claims about the world. 405 asserts the path is real and the
-# method is not, which tells a client the resource exists — so answering it for an
+# method is not, which tells a client the resource exists, so answering it for an
 # unmatched path invents a resource. Hand-rolled routing (D1) means routing correctness is
 # the module's own, and prefix matching hands every unmatched sub-path the same answer, so
 # this is a routing defect rather than one wrong endpoint.
@@ -432,7 +432,7 @@ def test_get_by_id_is_not_found_for_an_unknown_id(base):
 
 
 def test_get_by_id_still_resolves_an_archived_item(base, fresh):
-    """Archive is a soft delete, so the record is still addressable — the list is the
+    """Archive is a soft delete, so the record is still addressable: the list is the
     active view, and this addresses the row. The rest of the contract already implies it:
     a transition against an archived item does not 404 either."""
     created = fresh()

@@ -1,5 +1,5 @@
 """Executable proof that the grouping is built by a comprehension rather than by an
-accumulator loop — a difference only the compiled form makes visible."""
+accumulator loop, a difference only the compiled form makes visible."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ def test_the_value_is_built_by_a_comprehension_and_not_by_an_accumulator(sample)
     """The grouping is built by a comprehension, which only the bytecode can show.
 
     The assertions above are about the value, and an accumulator loop with setdefault
-    produces exactly that value — which is how a counter passed them. A comprehension is
+    produces exactly that value, which is how a counter passed them. A comprehension is
     not a different result, it is a different statement about what the loop is for, so the
     only place the difference is observable is the compiled form.
 

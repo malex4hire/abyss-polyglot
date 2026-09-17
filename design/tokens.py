@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """design/tokens.yaml, rendered into CSS custom properties.
 
-Every visual value in this repository — colour, face, step on the type scale, spacing
-step, rule width, transition duration — is declared once in tokens.yaml and emitted from
+Every visual value in this repository (colour, face, step on the type scale, spacing
+step, rule width, transition duration) is declared once in tokens.yaml and emitted from
 here. Both frontends and the side-by-side page import the same generated stylesheet, so
 "the two applications look identical" is a property of how they are built rather than a
 claim two teams keep true by care.
@@ -48,7 +48,7 @@ def member_groups() -> dict:
     """Every governed set in the token file: any top-level group declaring members.
 
     Derived rather than listed. A list of group names here would mean adding a set to
-    tokens.yaml and silently emitting nothing for it — which is how two sets stayed in
+    tokens.yaml and silently emitting nothing for it, which is how two sets stayed in
     this file for weeks after the thing they described was deleted.
     """
     return {
@@ -193,7 +193,7 @@ def token_css() -> str:
                 )
     # The breakpoint, emitted as a custom PROPERTY rather than as a rule.
     #
-    # It was a rule — `.split { grid-template-columns: 1fr }` inside a media query — and it
+    # It was a rule (`.split { grid-template-columns: 1fr }` inside a media query), and it
     # never fired. The page's own stylesheet loads after this one and sets the same
     # property at the same specificity, so the later sheet won at every width and the two
     # frames stayed side by side down to 400px, 168px each. A media query that loses on

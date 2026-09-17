@@ -8,7 +8,7 @@ import { Injectable, computed, signal } from "@angular/core";
  * makes it an option with no change to any file in this module.
  *
  * Switching is a signal write. Every request built from base() picks up the new value on
- * its next call, so there is no rebuild and no reload — which is the point: watching the
+ * its next call, so there is no rebuild and no reload, which is the point: watching the
  * same UI behave identically against each runtime in turn is what makes contract parity
  * something a viewer sees rather than a test result they are told about.
  */

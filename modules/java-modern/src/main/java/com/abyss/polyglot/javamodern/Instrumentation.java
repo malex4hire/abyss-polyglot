@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Instrumentation, not contract. This endpoint reports resolved runtime data — the JVM's
+ * Instrumentation, not contract. This endpoint reports resolved runtime data: the JVM's
  * own version, the artifacts actually on the runtime classpath, and the concrete class of
  * the running HTTP server.
  *
@@ -49,11 +49,11 @@ public final class Instrumentation {
                 continue;
             }
             String name = new File(element).getName();
-            // The classpath carries target/classes itself, not only jars — this
-            // module's own compiled output, listed alongside its actual dependencies. It
-            // is neither a jar nor a version, and reporting it as one is the defect: an
-            // artifact list an operator reads for exact versions should never contain an
-            // entry with no version at all.
+            // The classpath carries target/classes itself, not only jars. That entry
+            // is this module's own compiled output, listed alongside its actual
+            // dependencies. It is neither a jar nor a version, and reporting it as one
+            // is the defect: an artifact list an operator reads for exact versions
+            // should never contain an entry with no version at all.
             if (name.endsWith(".jar")) {
                 found.add(name);
             }

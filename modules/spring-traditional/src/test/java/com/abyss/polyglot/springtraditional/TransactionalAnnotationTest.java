@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
  * runs, commits, and is public, since a non-public method is never proxied.
  *
  * An earlier version only read the annotation reflectively. That asserts the annotation
- * is written, not that the method it marks does anything — gut the method body and such a
+ * is written, not that the method it marks does anything. Gut the method body and such a
  * test stays green, which makes it no proof at all. This runs the annotated method and
  * checks what it wrote.
  */

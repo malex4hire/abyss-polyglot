@@ -7,7 +7,7 @@
 //
 // This serves the bundle built at image build time. The toolchain stays in the image so
 // the test suite can still run inside the running container against bind-mounted source,
-// but nothing compiles at demo time — which is also what lets the demo run with no
+// but nothing compiles at demo time, which is also what lets the demo run with no
 // network.
 import { createReadStream, existsSync, statSync } from "node:fs";
 import { createServer, request as proxyRequest } from "node:http";
@@ -17,7 +17,7 @@ const ROOT = new URL("./dist/", import.meta.url).pathname;
 const PORT = Number(process.env.PORT ?? 8080);
 
 // Vite inlines import.meta.env at build time, so a runtime API base never reaches a built
-// bundle — the page fetched from its own origin and rendered nothing. Rather than bake a
+// bundle. The page fetched from its own origin and rendered nothing. Rather than bake a
 // URL into the image, the contract paths are proxied to the backend named at runtime,
 // which also makes every request same-origin and removes CORS from the picture.
 const API = new URL(process.env.API_BASE ?? "http://localhost:8080");
@@ -29,11 +29,11 @@ const PROXIED = ["/work-items", "/workload", "/health"];
 const BACKENDS = JSON.parse(process.env.BACKENDS_JSON ?? "{}");
 
 // The framework version, not the JVM underneath it. spring-boot and spring-traditional
-// both run the same base image, so their runtime_version is identical by construction —
-// showing it as "the version" told a reader nothing about which framework they were
+// both run the same base image, so their runtime_version is identical by construction.
+// Showing it as "the version" told a reader nothing about which framework they were
 // actually comparing. Read from the artifact whose name and version the framework itself
-// ships as — the same jar-suffix pattern the host-side runtime-identity check uses to
-// read version floors.
+// ships as, which is the same jar-suffix pattern the host-side runtime-identity check
+// uses to read version floors.
 const VERSION_IN_JAR = /-(\d+(?:\.\d+)*)(?:\.[A-Za-z][\w.]*)?\.jar$/;
 function frameworkVersion(frameworkArtifact, identity) {
   if (!frameworkArtifact || !identity?.artifacts) {
@@ -51,7 +51,7 @@ function frameworkVersion(frameworkArtifact, identity) {
 }
 
 function upstreamFor(pathname) {
-  // /api/<backend-id>/<contract path> — the id chosen in the browser, resolved here.
+  // /api/<backend-id>/<contract path>: the id chosen in the browser, resolved here.
   const match = /^\/api\/([^/]+)(\/.*)$/.exec(pathname);
   if (match && BACKENDS[match[1]]) {
     return { origin: new URL(BACKENDS[match[1]].origin), path: match[2] };
@@ -209,7 +209,7 @@ createServer((request, response) => {
     //
     // /events is held open forever by design, so without this every closed tab, every
     // navigation and every re-subscribe left a live upstream connection behind. They do
-    // not time out — the server has nothing to time out, it is streaming — so they
+    // not time out (the server has nothing to time out, it is streaming), so they
     // accumulate for as long as the demo runs.
     response.on("close", () => {
       if (!upstream.destroyed) {

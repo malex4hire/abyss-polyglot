@@ -5,7 +5,7 @@ import { Status } from "../lib/types";
  * Put a value into the DOM as text.
  *
  * The double braces evaluate an expression in the component's context and write the
- * result as text — always as text, so markup in a value is escaped rather than parsed.
+ * result as text, always as text, so markup in a value is escaped rather than parsed.
  * That is the default, and it is why interpolation is not an XSS vector the way
  * innerHTML is.
  *
@@ -27,7 +27,7 @@ export class BadgeComponent {
    * What the double braces evaluate.
    *
    * Interpolation evaluates an expression in the component's context and writes the
-   * result as text — always as text, so markup in a value is escaped rather than parsed.
+   * result as text, always as text, so markup in a value is escaped rather than parsed.
    * That default is why interpolation is not the XSS vector innerHTML is.
    *
    * The expression itself is deliberately restricted: no assignment, no new, no reaching

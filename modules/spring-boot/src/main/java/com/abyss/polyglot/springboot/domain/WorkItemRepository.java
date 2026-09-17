@@ -34,7 +34,7 @@ public interface WorkItemRepository extends JpaRepository<WorkItemEntity, String
     /**
      * The query is the method name. It parses into a where clause and an order clause,
      * and the SQL is generated at startup. There is no body here because there is no
-     * implementation here — that is the feature.
+     * implementation here. That is the feature.
      */
     List<WorkItemEntity> findByArchivedAtIsNullOrderByPriorityDescTitleAsc();
 
@@ -50,7 +50,7 @@ public interface WorkItemRepository extends JpaRepository<WorkItemEntity, String
      * The traditional module writes the same query as SQL with a RowMapper beside it.
      * That one is longer and says exactly what runs; this one is a name and says what is
      * wanted. The cost shows up when the derived query is wrong, because there is no SQL
-     * to read — only a name to re-parse in your head.
+     * to read, only a name to re-parse in your head.
      */
     default List<WorkItemEntity> liveByPriority() {
         return findByArchivedAtIsNullOrderByPriorityDescTitleAsc();

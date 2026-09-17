@@ -76,7 +76,7 @@ function Selected({ id, items }: { id: string; items: WorkItem[] }) {
  *
  * useMemo caches a value against a dependency array; memo caches a whole render against
  * props. Both trade memory and a comparison for work skipped, and both are wrong by
- * default — measure first, because an unnecessary useMemo costs an allocation and a
+ * default. Measure first, because an unnecessary useMemo costs an allocation and a
  * comparison on every render and buys nothing.
  *
  * The dependency array is the contract: leave something out and the cached value goes
@@ -101,8 +101,8 @@ export const Totals = memo(function Totals({ items }: { items: WorkItem[] }) {
  * handler is a prop, not an addEventListener call, which means it is removed with the
  * component and cannot leak.
  *
- * Angular writes the same thing as (input)="..." in the template — a binding rather than
- * a function reference.
+ * Angular writes the same thing as (input)="..." in the template, which is a binding
+ * rather than a function reference.
  */
 export function FilterBox({
   value,

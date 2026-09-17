@@ -1,8 +1,8 @@
-"""R-1 — the manifest and compose agree, and no port literal lives outside the manifest.
+"""R-1: the manifest and compose agree, and no port literal lives outside the manifest.
 
 Every stack declares its service, its port and its health endpoint in one file.
 scripts/render-env.py turns those into environment variables, compose reads them, and
-every other consumer — the browser checks, the side-by-side page, demo.py — derives from
+every other consumer (the browser checks, the side-by-side page, demo.py) derives from
 the same place.
 
 The reason this is a check rather than a convention: a port written in two files is
@@ -23,8 +23,8 @@ import pytest
 
 import spine
 
-# A file a renderer owns may carry a port, because a rendered value is a derived value —
-# that is the whole point of rendering it. The exemption is not taken on trust: the last
+# A file a renderer owns may carry a port, because a rendered value is a derived value,
+# and that is the whole point of rendering it. The exemption is not taken on trust: the last
 # test in this file re-runs every renderer and fails if what is committed differs from
 # what they produce, so hand-editing a generated file to say something the manifest does
 # not is caught rather than excused.
@@ -85,7 +85,7 @@ def test_compose_services_and_the_manifest_agree_in_both_directions():
     """Both directions, because each catches a different mistake.
 
     A manifest entry with no compose service is a stack that cannot start. A compose
-    service absent from the manifest is a process nothing verifies — which is exactly
+    service absent from the manifest is a process nothing verifies, which is exactly
     what the two study-layer services that used to sit in this file were.
     """
     active = spine.active_stacks()
@@ -112,7 +112,7 @@ def test_no_port_literal_appears_outside_the_manifest():
     """Ports are manifest-declared and derived everywhere else, Postgres included.
 
     Markdown is scanned like everything else. A README that types a port is the same
-    defect as a script that types one — it is a second place the number lives, and it is
+    defect as a script that types one: it is a second place the number lives, and it is
     the copy a reader is most likely to trust. The README therefore carries
     `{{port:<stack>}}` placeholders and is rendered by scripts/render-readme.py.
     """
@@ -142,7 +142,7 @@ def test_no_fixed_address_appears_outside_the_manifest():
     """The same rule as ports, for the one address the demo pins.
 
     This is the check that did not exist. The address was written into compose three
-    times — once as the pinned endpoint, twice as an /etc/hosts entry on a client. When
+    times: once as the pinned endpoint, twice as an /etc/hosts entry on a client. When
     the pinned endpoint silently failed to apply, its two copies went on naming an address
     nothing was listening on, and the demo failed offline with a Hibernate dialect error
     three layers from the cause.
@@ -189,7 +189,7 @@ def test_prose_states_no_count_of_a_set_the_manifest_owns():
         if path.name.endswith(".in.md"):
             continue
 
-        # Where a file has a template, the template is what is read — with its
+        # Where a file has a template, the template is what is read, with its
         # placeholders still in place. Reading the rendered output instead would flag
         # every derived count as a typed one, and the only way to pass would be to stop
         # stating counts at all, which is not what this is asking for.

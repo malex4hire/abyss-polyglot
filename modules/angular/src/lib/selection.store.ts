@@ -9,7 +9,7 @@ export class SelectionStore {
    * State the framework tracks at the value level.
    *
    * A signal holds a value and records who read it, so a computed recomputes only when
-   * something it actually read has changed — there is no dependency array to keep in
+   * something it actually read has changed. There is no dependency array to keep in
    * step, because the dependencies are discovered by reading them.
    *
    * That is the difference from an Observable here: a signal always has a current value

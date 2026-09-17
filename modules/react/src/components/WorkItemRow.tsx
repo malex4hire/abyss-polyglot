@@ -9,7 +9,7 @@ export interface WorkItemRowProps {
  * One row, told everything it needs.
  *
  * Props are the component's parameters: read-only, flowing one way, and the whole of its
- * input. This component holds no state and asks for nothing — give it the same props and
+ * input. This component holds no state and asks for nothing: give it the same props and
  * it renders the same output, which is what makes it trivially testable.
  *
  * Angular's equivalent is an @Input, declared on the class and set by the parent's

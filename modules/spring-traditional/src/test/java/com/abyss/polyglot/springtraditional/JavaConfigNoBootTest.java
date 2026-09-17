@@ -18,7 +18,7 @@ class JavaConfigNoBootTest {
                 "RootConfig was handed to the reader by name, not discovered");
         assertTrue(context.containsBeanDefinition("webConfig"));
         assertFalse(context.containsBeanDefinition("workItemService"),
-                "nothing was scanned yet — registration and scanning are separate decisions");
+                "nothing was scanned yet; registration and scanning are separate decisions");
         context.close();
     }
 }

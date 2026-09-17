@@ -24,7 +24,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     # a static address, not a name to resolve. Under the offline
     # overlay's enable_ip_masquerade: false, a raw UDP probe to the embedded DNS
-    # resolver at 127.0.0.11:53 gets no response at all — not a slow answer, no answer,
+    # resolver at 127.0.0.11:53 gets no response at all: not a slow answer, no answer,
     # reproduced with a clean host and nothing else touching this network. Docker's
     # embedded resolver depends on masquerade for its own internal proxying, which the
     # overlay exists specifically to turn off. A pinned address sidesteps the resolver
@@ -33,7 +33,7 @@ services:
     # client resolves at request time.
     networks:
       default:
-        ipv4_address: ${POSTGRES_IP:?run `make render` — a stale .env silently drops this}
+        ipv4_address: ${POSTGRES_IP:?run `make render`; a stale .env silently drops this}
     ports:
       - "${POSTGRES_PORT}:5432"
     healthcheck:
@@ -52,11 +52,11 @@ services:
   java-modern:
     # curl rather than wget: the Temurin 25 base image carries curl and not wget, and the
     # JVM healthchecks failed on the base-image upgrade rather than on anything the
-    # application does. The assertion is unchanged — a body from the health endpoint, and
+    # application does. The assertion is unchanged: a body from the health endpoint, and
     # an unknown path that is not 200.
     build: ./modules/java-modern
     # Running a test runner inside this container leaves children behind. Whatever the
-    # CMD is becomes PID 1, inherits those orphans and never reaps them — an ordinary
+    # CMD is becomes PID 1, inherits those orphans and never reaps them, and an ordinary
     # server process calls wait() for nobody. Docker's init sits in front as PID 1 and
     # does, which is the difference between a suite you can re-run all afternoon and one
     # that leaks a process table entry per iteration.
@@ -80,7 +80,7 @@ services:
       context: .
       dockerfile: modules/spring-traditional/Dockerfile
     # Running a test runner inside this container leaves children behind. Whatever the
-    # CMD is becomes PID 1, inherits those orphans and never reaps them — an ordinary
+    # CMD is becomes PID 1, inherits those orphans and never reaps them, and an ordinary
     # server process calls wait() for nobody. Docker's init sits in front as PID 1 and
     # does, which is the difference between a suite you can re-run all afternoon and one
     # that leaks a process table entry per iteration.
@@ -89,12 +89,12 @@ services:
       postgres:
         condition: service_healthy
     # postgres's static address, written into /etc/hosts at
-    # container create — see the comment on postgres's own service block for why the
+    # container create. See the comment on postgres's own service block for why the
     # embedded DNS resolver cannot be trusted for this lookup under the offline overlay.
     # wait-for-postgres.sh stays as a harmless fallback; with this entry present it
     # should never need to retry.
     extra_hosts:
-      - "postgres:${POSTGRES_IP:?run `make render` — a stale .env writes an empty host entry}"
+      - "postgres:${POSTGRES_IP:?run `make render`; a stale .env writes an empty host entry}"
     environment:
       PORT: 8080
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
@@ -120,7 +120,7 @@ services:
       context: .
       dockerfile: modules/spring-boot/Dockerfile
     # Running a test runner inside this container leaves children behind. Whatever the
-    # CMD is becomes PID 1, inherits those orphans and never reaps them — an ordinary
+    # CMD is becomes PID 1, inherits those orphans and never reaps them, and an ordinary
     # server process calls wait() for nobody. Docker's init sits in front as PID 1 and
     # does, which is the difference between a suite you can re-run all afternoon and one
     # that leaks a process table entry per iteration.
@@ -129,12 +129,12 @@ services:
       postgres:
         condition: service_healthy
     # postgres's static address, written into /etc/hosts at
-    # container create — see the comment on postgres's own service block for why the
+    # container create. See the comment on postgres's own service block for why the
     # embedded DNS resolver cannot be trusted for this lookup under the offline overlay.
     # wait-for-postgres.sh stays as a harmless fallback; with this entry present it
     # should never need to retry.
     extra_hosts:
-      - "postgres:${POSTGRES_IP:?run `make render` — a stale .env writes an empty host entry}"
+      - "postgres:${POSTGRES_IP:?run `make render`; a stale .env writes an empty host entry}"
     environment:
       SERVER_PORT: 8080
       SPRING_PROFILES_ACTIVE: container
@@ -157,7 +157,7 @@ services:
   python-modern:
     build: ./modules/python-modern
     # Running a test runner inside this container leaves children behind. Whatever the
-    # CMD is becomes PID 1, inherits those orphans and never reaps them — an ordinary
+    # CMD is becomes PID 1, inherits those orphans and never reaps them, and an ordinary
     # server process calls wait() for nobody. Docker's init sits in front as PID 1 and
     # does, which is the difference between a suite you can re-run all afternoon and one
     # that leaks a process table entry per iteration.
@@ -179,7 +179,7 @@ services:
   angular:
     build: ./modules/angular
     # Running a test runner inside this container leaves children behind. Whatever the
-    # CMD is becomes PID 1, inherits those orphans and never reaps them — an ordinary
+    # CMD is becomes PID 1, inherits those orphans and never reaps them, and an ordinary
     # server process calls wait() for nobody. Docker's init sits in front as PID 1 and
     # does, which is the difference between a suite you can re-run all afternoon and one
     # that leaks a process table entry per iteration.
@@ -209,7 +209,7 @@ services:
       #
       # The previous check requested "/" and accepted any status under 400. This server
       # answers every unknown path with index.html, so it returned 200 whenever the process
-      # was listening — including with a broken or empty bundle. A frontend reporting
+      # was listening, including with a broken or empty bundle. A frontend reporting
       # healthy with a bundle that renders nothing is the state that lets a demo start
       # broken, and everything that waits on health inherits that blindness.
       test:
@@ -221,7 +221,7 @@ services:
   react:
     build: ./modules/react
     # Running a test runner inside this container leaves children behind. Whatever the
-    # CMD is becomes PID 1, inherits those orphans and never reaps them — an ordinary
+    # CMD is becomes PID 1, inherits those orphans and never reaps them, and an ordinary
     # server process calls wait() for nobody. Docker's init sits in front as PID 1 and
     # does, which is the difference between a suite you can re-run all afternoon and one
     # that leaks a process table entry per iteration.
@@ -248,7 +248,7 @@ services:
       #
       # The previous check requested "/" and accepted any status under 400. This server
       # answers every unknown path with index.html, so it returned 200 whenever the process
-      # was listening — including with a broken or empty bundle. A frontend reporting
+      # was listening, including with a broken or empty bundle. A frontend reporting
       # healthy with a bundle that renders nothing is the state that lets a demo start
       # broken, and everything that waits on health inherits that blindness.
       test:
@@ -273,7 +273,7 @@ services:
       #
       # 127.0.0.1 rather than localhost. Observed here: localhost resolved to ::1 and
       # nginx listens on IPv4 only, so the request was refused. Whether that resolution
-      # order is stable across restarts was never established — which is the reason to
+      # order is stable across restarts was never established, which is the reason to
       # name the address that answers rather than one that sometimes does.
       test:
         ["CMD-SHELL", "wget -qO- http://127.0.0.1/index.html | grep -q data-app-frame && wget -qO- http://127.0.0.1/tokens.generated.css | grep -q -- --surface-ground"]

@@ -16,7 +16,7 @@ def audited(label: str) -> Callable:
     """Record that a computation ran, without the computation knowing.
 
     A decorator is a function returning a replacement function, so the behaviour wraps
-    the call rather than being written inside it — the scorer below has no logging code
+    the call rather than being written inside it. The scorer below has no logging code
     and gains an audit trail anyway. functools.wraps carries the original's name and
     docstring across, which is what stops every decorated function in a traceback being
     called "wrapper".
@@ -42,7 +42,7 @@ async def score_for(assignee: str, items: list[WorkItem]) -> int:
 
     await hands control back to the event loop while this waits, so other coroutines run
     during the pause rather than the whole program stopping. It is cooperative: nothing
-    is pre-empted, and a synchronous time.sleep here would block every other coroutine —
+    is pre-empted, and a synchronous time.sleep here would block every other coroutine,
     which is the mistake this shape exists to make visible.
     """
     await asyncio.sleep(0.05)

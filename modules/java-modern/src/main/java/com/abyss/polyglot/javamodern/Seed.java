@@ -18,7 +18,7 @@ public final class Seed {
 
     /**
      * Read the seed file. Every resource opened in the try header is closed on the way
-     * out, in reverse order, whether the block returns or throws — and if closing itself
+     * out, in reverse order, whether the block returns or throws, and if closing itself
      * throws while an exception is already in flight, the close failure is attached as
      * suppressed rather than replacing the original. That is the part a hand-written
      * finally block almost always gets wrong.

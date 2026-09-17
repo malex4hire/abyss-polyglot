@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Instrumentation, not part of the contract. Reports resolved runtime data — never a
+ * Instrumentation, not part of the contract. Reports resolved runtime data, never a
  * claimed identity.
  *
  * The auto-configuration report is Boot's own condition evaluation, read live. The
@@ -67,7 +67,7 @@ public class InstrumentationController {
 
         // The set of auto-configuration classes whose conditions matched, read from
         // Boot's own report. A bean is auto-configured when its declaring class is one of
-        // these, or nested inside one — which is a fact from the report rather than a
+        // these, or nested inside one, which is a fact from the report rather than a
         // guess from a class name. Matching on the string "AutoConfiguration" got five of
         // six wrong, because most declaring classes are nested Configuration classes
         // whose names do not contain it.
@@ -131,11 +131,11 @@ public class InstrumentationController {
                 .split(java.io.File.pathSeparator)) {
             if (!element.isBlank()) {
                 String name = new java.io.File(element).getName();
-                // The classpath carries target/classes itself, not only jars — this
-                // module's own compiled output, listed alongside its actual dependencies.
-                // It is neither a jar nor a version, and reporting it as one is the
-                // defect: an artifact list read for exact versions should never contain
-                // an entry with no version at all.
+                // The classpath carries target/classes itself, not only jars. That
+                // entry is this module's own compiled output, listed alongside its
+                // actual dependencies. It is neither a jar nor a version, and reporting
+                // it as one is the defect: an artifact list read for exact versions
+                // should never contain an entry with no version at all.
                 if (name.endsWith(".jar")) {
                     found.add(name);
                 }

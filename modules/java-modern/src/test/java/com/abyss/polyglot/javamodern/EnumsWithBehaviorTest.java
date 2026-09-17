@@ -25,8 +25,8 @@ class EnumsWithBehaviorTest {
         // them. The point is that the rule travels *with* the constant, and the
         // observable form of that is per-constant state: each constant is constructed
         // with its own rule and carries it. A lookup table has only static fields, so a
-        // sixth constant can be added and the table left stale — the failure this exists
-        // to prevent, and the one a behaviour-only assertion cannot see.
+        // sixth constant can be added and the table left stale, which is the failure
+        // this exists to prevent, and the one a behaviour-only assertion cannot see.
         var instanceFields = java.util.Arrays.stream(Status.class.getDeclaredFields())
                 .filter(field -> !java.lang.reflect.Modifier.isStatic(field.getModifiers()))
                 .toList();

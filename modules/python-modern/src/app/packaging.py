@@ -12,7 +12,7 @@ def own_modules() -> list[str]:
     A package is a directory the import system understands, and pkgutil walks it, so the
     inventory comes from the filesystem instead of a list someone maintains. import_module
     resolves a name to a loaded module through the same machinery an import statement
-    uses — which is what makes the reported set the one actually importable, not the one
+    uses, which is what makes the reported set the one actually importable, not the one
     someone believed was there.
     """
     package = importlib.import_module(__package__)

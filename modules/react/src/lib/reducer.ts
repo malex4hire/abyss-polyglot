@@ -18,7 +18,7 @@ export type BoardAction =
  * components. That is the trade against useState: more ceremony for one flag, and a
  * single readable answer to "how can this shape change" once there are several.
  *
- * Returning the same object when nothing changes matters — React bails out of the
+ * Returning the same object when nothing changes matters: React bails out of the
  * re-render when the reference is unchanged.
  */
 export function boardReducer(state: BoardState, action: BoardAction): BoardState {

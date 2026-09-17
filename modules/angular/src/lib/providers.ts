@@ -12,7 +12,7 @@ export const BOARD_SETTINGS = new InjectionToken<BoardSettings>("BOARD_SETTINGS"
  *
  * A provider maps a token to a recipe: useValue for a constant, useClass for a type,
  * useFactory when construction needs work or other dependencies. An InjectionToken gives
- * an interface — which has no runtime existence — something the injector can key on.
+ * an interface (which has no runtime existence) something the injector can key on.
  *
  * Providers are hierarchical: one declared on a component overrides the root for that
  * component and its children, which is how a test or a sub-tree substitutes an

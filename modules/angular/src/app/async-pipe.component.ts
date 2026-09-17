@@ -22,7 +22,7 @@ export class TitlesComponent {
    * matching unsubscribe. It also marks the component for check on each emission, so it
    * works with OnPush where assigning to a field would not.
    *
-   * The cost is that each async in a template is its own subscription — piping the same
+   * The cost is that each async in a template is its own subscription: piping the same
    * source twice runs it twice, which is why the shape below derives once and binds once.
    */
   get titles$(): Observable<string> {
