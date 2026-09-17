@@ -5,10 +5,10 @@ reader has to reconstruct from a diff.
 
 ---
 
-## 2026-09-17 — the README shows recorded demo output, above the first heading
+## 2026-09-17 - the README shows recorded demo output, above the first heading
 
 **RST-A1.** A reviewer's first pass is over before any decision to clone is made, so the
-repository's strongest claim — one command, nothing installed — had to be visible without
+repository's strongest claim - one command, nothing installed - had to be visible without
 running the command. `docs/media/demo.svg` is a recording of `python3 demo.py`, rendered as
 an SVG committed in-repo: no external host, no third-party embed, nothing fetched when the
 page renders.
@@ -21,7 +21,7 @@ one is re-recorded by `make record-demo`, and
 compares, so a stale artifact and a hand-edited one both go red.
 
 **Why a window and not the whole run.** The walkthrough prints 147 lines. The artifact
-shows steps 4 to 6 — contiguous, bounded by the demo's own step rules, so nothing is
+shows steps 4 to 6 - contiguous, bounded by the demo's own step rules, so nothing is
 elided inside it. Those three carry a typed refusal that writes nothing, the rollup, and
 archive as a soft delete.
 
@@ -42,7 +42,7 @@ prose around it was kept and re-pointed.
 
 ---
 
-## 2026-09-17 — the zero-dependency claim names the gate that proves it
+## 2026-09-17 - the zero-dependency claim names the gate that proves it
 
 **RST-A2.** The first screenful states `python3 demo.py`, with nothing installed, and names
 **R-8** as the gate. `tests/test_rst_a2_the_zero_dependency_claim_names_its_gate.py` asserts

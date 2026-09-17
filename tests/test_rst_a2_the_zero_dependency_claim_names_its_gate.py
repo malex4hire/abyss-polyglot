@@ -30,7 +30,7 @@ import spine
 # The negations that make this claim the claim. Deliberately a short declared list rather
 # than one sentence matched exactly: the wording is editorial and should be free to
 # improve, while what it has to say is not. This is the only typed string here, and it is
-# not load-bearing on its own — the citation below is what makes the claim checkable.
+# not load-bearing on its own - the citation below is what makes the claim checkable.
 NO_DEPENDENCY_PHRASES = (
     "nothing installed",
     "no install",
