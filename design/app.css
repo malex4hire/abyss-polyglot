@@ -31,6 +31,12 @@ body {
 
 /* --- layout --------------------------------------------------------------- */
 
+/* Embedded, the frame is sized to us rather than the other way round — see
+ * lib/embed.ts. Inside an iframe `100vh` is the FRAME's height, so asserting it stretched
+ * the grid whenever the frame was taller than the content and left the slack sitting
+ * between the rail and the table. */
+html.embedded .app { min-height: 0; }
+
 .app {
   min-height: 100vh;
   display: grid;

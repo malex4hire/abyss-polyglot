@@ -150,17 +150,16 @@ spacing:
     # Two panes that hold running output. Both are layout decisions and belong here rather
     # than in a stylesheet, for the same reason the three above do.
     output: 22
-    # An embedded application frame, tall enough that the application inside it does not
-    # need a scrollbar of its own. Both frames get the same height and the PAGE scrolls,
-    # so one scrollbar moves both sides together and the rows stay lined up — which is the
-    # whole point of putting them beside each other.
+    # What an embedded application frame starts at, before it reports its own height and
+    # the page resizes it to fit exactly (modules/*/src/lib/embed.ts).
     #
-    # Measured against the running applications, at the narrowest width a frame reaches
-    # before the two stack: 1481px of content. 94rem is 1504px, which clears it. A much
-    # longer list than this demo seeds will exceed it and that frame scrolls internally
-    # again; the alternative is sizing for a list nobody has, and a great deal of empty
-    # card at every normal width.
-    frame: 94
+    # Deliberately modest. It has to be SHORTER than the content, not longer: a frame
+    # taller than what it holds stretches the application inside it, and the height it
+    # then reports is the frame's rather than its own — a measurement that can only
+    # ratchet upwards. Short, and the first message corrects it.
+    #
+    # It is also the whole answer with JavaScript disabled, where that frame scrolls.
+    frame: 40
 
 # ---------------------------------------------------------------------------
 # Floors — read at test time by the token check. Not advisory.

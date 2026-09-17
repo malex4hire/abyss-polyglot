@@ -16,6 +16,9 @@ import { TrackerComponent } from "./app/tracker.component";
 import { DetailComponent } from "./app/detail.component";
 import { provideBoardSettings } from "./lib/providers";
 import { API_BASE } from "./lib/types";
+import { reportHeightToEmbedder } from "./lib/embed";
+
+reportHeightToEmbedder();
 
 bootstrapApplication(TrackerComponent, {
   providers: [

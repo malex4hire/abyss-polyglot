@@ -10,6 +10,9 @@ import { Board } from "./components/Board";
 import { Tracker } from "./components/Tracker";
 import { BoardSettingsProvider } from "./lib/BoardContext";
 import { API_BASE } from "./lib/types";
+import { reportHeightToEmbedder } from "./lib/embed";
+
+reportHeightToEmbedder();
 
 // Board is the component gallery: it renders every component in this module, so none of
 // them is dead code kept alive only by a test. It was mounted below the tracker to keep

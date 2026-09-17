@@ -25,6 +25,11 @@ import pytest
 
 import spine
 
+# Files that must be byte-identical in both frontends, relative to the module root.
+# None of this is framework work — serving the bundle, proxying the contract, reporting a
+# height to an embedding page — so a difference in any of them is one application being
+# given an advantage the other does not have.
+SHARED_FILES = ("serve.mjs", "src/lib/embed.ts")
 SERVER_FILE = "serve.mjs"
 
 
@@ -45,25 +50,56 @@ def test_the_manifest_declares_a_pair_of_frontends():
         )
 
 
-def test_every_frontend_static_server_is_byte_identical():
+@pytest.mark.parametrize("shared", SHARED_FILES)
+def test_every_shared_frontend_file_is_byte_identical(shared):
     fes = spine.frontends()
     assert fes, "no active frontends"
 
     contents = {}
     for sid, stack in sorted(fes.items()):
-        path = _frontend_module(sid, stack) / SERVER_FILE
-        spine.require_file(path, f"{sid} static server")
+        path = _frontend_module(sid, stack) / shared
+        spine.require_file(path, f"{sid} {shared}")
         contents[sid] = path.read_bytes()
 
-    distinct = {v for v in contents.values()}
-    if len(distinct) > 1:
+    if len({v for v in contents.values()}) > 1:
         sizes = ", ".join(f"{sid}={len(v)}B" for sid, v in sorted(contents.items()))
         pytest.fail(
-            f"the frontends' {SERVER_FILE} files differ ({sizes}). Everything in that "
-            "file is framework-independent work — proxying, the single-page catch-all, "
-            "the runtime report — so a difference here is one frontend being given an "
-            "advantage the other does not have, which makes the pair comparison worthless"
+            f"the frontends' {shared} files differ ({sizes}). Nothing in that file is "
+            "framework work, so a difference here is one frontend being given an advantage "
+            "the other does not have, which makes the pair comparison worthless"
         )
+
+
+def test_both_frontends_report_their_height_to_an_embedder():
+    """Declared and imported, or the page falls back to a fixed height and stretches them.
+
+    Shipping the helper and never calling it is the shape this repository keeps finding:
+    the file exists, the byte-identical check above passes, and nothing runs.
+    """
+    silent = []
+    for sid, stack in sorted(spine.frontends().items()):
+        entry = [
+            p for p in spine.iter_repo_files((".ts", ".tsx"), root=spine.source_root(sid, stack))
+            if p.stem == "main"
+        ]
+        assert entry, f"'{sid}' has no main entry point"
+        # A CALL, not a mention. The first spelling of this searched for the name and
+        # was satisfied by the import line, so deleting the call left it green — a check
+        # that could not fail for the reason it claimed, caught by deleting the call and
+        # watching it pass.
+        called = False
+        for path in entry:
+            for line in spine.strip_comments(spine.text_of(path)).splitlines():
+                if line.strip().startswith(("import ", "export ")):
+                    continue
+                if re.search(r"\breportHeightToEmbedder\s*\(", line):
+                    called = True
+        if not called:
+            silent.append(sid)
+    assert not silent, (
+        "these frontends never call reportHeightToEmbedder, so the side-by-side page "
+        "cannot size their frames and falls back to a fixed height: " + ", ".join(silent)
+    )
 
 
 def test_no_frontend_source_carries_a_list_of_backends():

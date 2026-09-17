@@ -100,6 +100,51 @@ check("neither width scrolls the document sideways",
       wide.overflow <= 0 && narrow.overflow <= 0,
       `wide ${wide.overflow}px, narrow ${narrow.overflow}px`);
 
+// Each frame is the height of the application inside it.
+//
+// The page cannot measure a cross-origin frame, so the applications report their own
+// height and the page resizes them. Before that, the frames were a fixed 1504px and the
+// application inside stretched to fill it — `min-height: 100vh` inside an iframe means the
+// FRAME's height — which put a 391px hole between the filter rail and the table.
+//
+// Checked against the application measured on its own, at the same width, rather than
+// against a number written here. A frame left at the stylesheet's fallback, or stretched
+// past its content, fails.
+const fallback = Number(
+  (await page.evaluate(() => getComputedStyle(document.documentElement)
+    .getPropertyValue("--measure-frame"))).replace("rem", "").trim(),
+) * 16;
+
+for (const [name, origin] of FRONTENDS) {
+  const frame = await page.$(`[data-app-frame="${name}"]`);
+  // The frame's CONTENT box, not its border box. The frame carries a 1px border, and the
+  // application wraps differently at 686px than at 688 — 46px differently, as it happens,
+  // which is exactly the kind of drift a check comparing the wrong two numbers reports as
+  // a defect in the code rather than in itself.
+  const inner = await frame.evaluate((el) => ({ w: el.clientWidth, h: el.clientHeight }));
+
+  const probe = await browser.newPage({ viewport: { width: inner.w, height: 600 } });
+  await probe.goto(`${origin}/`, { waitUntil: "domcontentloaded" });
+  await probe.waitForFunction(
+    () => document.querySelectorAll("[data-testid=row]").length > 0, null, { timeout: 20000 },
+  ).catch(() => undefined);
+  await probe.waitForTimeout(500);
+  const own = await probe.evaluate(() => document.documentElement.scrollHeight);
+  await probe.close();
+
+  const drift = Math.abs(inner.h - own);
+  check(`the ${name} frame is the height of its application`, drift <= 4,
+        `frame holds ${inner.h}px, application is ${own}px at ${inner.w}px wide`);
+  check(`the ${name} frame was resized rather than left at the fallback`,
+        Math.abs(inner.h - fallback) > 24, `fallback is ${fallback}px`);
+}
+
+// Side by side, both frames hold the same content, so they must be the same height — that
+// is what keeps row N opposite row N under one page scrollbar.
+const pair = await page.$$eval("[data-app-frame]",
+  (fs) => fs.map((f) => Math.round(f.getBoundingClientRect().height)));
+check("both frames are the same height", new Set(pair).size === 1, pair.join(" / "));
+
 // The frames must actually load. An iframe pointing at a dead origin renders an empty
 // box, and the page above it looks entirely correct.
 for (const [name] of FRONTENDS) {
