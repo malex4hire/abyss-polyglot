@@ -3,15 +3,29 @@
 
 # abyss-polyglot
 
-One OpenAPI contract. 4 backends that serve it — modern Java on the JDK's
-own HTTP server, modern Python on the standard library, Spring with explicit configuration,
-Spring Boot with auto-configuration. 2 frontends that consume it — Angular
-and React, rendering the same screen from the same generated stylesheet. One contract test
-suite that runs unmodified against every backend and names none of them.
+[![host gate](https://github.com/malex4hire/abyss-polyglot/actions/workflows/host-gate.yml/badge.svg)](https://github.com/malex4hire/abyss-polyglot/actions/workflows/host-gate.yml)
+[![demo and contract](https://github.com/malex4hire/abyss-polyglot/actions/workflows/demo.yml/badge.svg)](https://github.com/malex4hire/abyss-polyglot/actions/workflows/demo.yml)
+[![licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
-It is a demo of translation-layer work: the thing that is hard about a polyglot estate is
-not writing Java and writing Python, it is holding 6 implementations to one
-promise and being able to prove they still keep it.
+**One OpenAPI contract. 4 backends that serve it. 2 frontends that consume it.
+One test suite that runs unmodified against all of them and names none of them.**
+
+![A work item created in the Angular application appearing in the React application, then archived in React and vanishing from Angular — neither side touched by a user](docs/media/live-update.gif)
+
+An item is created on the **left**, in Angular. It appears on the **right**, in React, with
+nobody touching the right. Then it is archived on the right and leaves the left. That is a
+server-sent event stream both applications consume, not a refresh — and it is the one claim
+here that reading the code cannot settle, so a Playwright driver asserts it in both
+directions on every run.
+
+The backends are modern Java on the JDK's own HTTP server, modern Python on the standard
+library, Spring with explicit configuration, and Spring Boot with auto-configuration. The
+frontends are Angular and React, rendering the same screen from the same generated
+stylesheet.
+
+It is a demo of translation-layer work: the hard part of a polyglot estate is not writing
+Java and writing Python, it is holding 6 implementations to one promise and
+being able to prove they still keep it.
 
 ## Run it
 
@@ -19,11 +33,31 @@ promise and being able to prove they still keep it.
 python3 demo.py
 ```
 
-No pip, no virtualenv, no docker, no network. It starts the Python backend on a free port,
-walks the contract one operation at a time — create, create again with the same key,
-a legal transition, an illegal one refused, the workload rollup, archive as a soft delete,
-a change event off the stream — printing each request and each response, then leaves the
-server running with copy-paste `curl` lines.
+No pip, no virtualenv, no docker, no network. It starts the Python backend on a free port
+and walks the contract one operation at a time, printing each request and each response:
+
+```
+4. transition — illegal
+   refused with a typed rejection, and the refusal writes nothing
+   POST /work-items/DEMO-4c11a615/transition
+   → {"status": "OPEN"}
+   422
+   {
+     "rejected": {
+       "id": "DEMO-4c11a615",
+       "to": "OPEN",
+       "reason": "IN_PROGRESS cannot move to OPEN"
+     }
+   }
+   GET /work-items/DEMO-4c11a615
+   200
+   DEMO-4c11a615  status=IN_PROGRESS
+   unchanged — still IN_PROGRESS, so the refusal cost nothing
+```
+
+Seven steps: create, create again with the same key, a legal transition, the illegal one
+above, the workload rollup, archive as a soft delete, and a change event off the stream.
+Then it leaves the server running with copy-paste `curl` lines.
 
 That is the whole setup section. `demo.py` and the backend it starts are standard library
 only, and the host suite enforces it: one check reads every import in both, another runs the
@@ -39,6 +73,8 @@ make verify      # the host suite: manifest, identity, contract parity, tokens
 make visual      # browser checks, including the live-update one
 make down
 ```
+
+![The side-by-side page: the same work item tracker rendered by Angular and by React, from one generated stylesheet](docs/media/side-by-side.png)
 
 | | |
 |---|---|
