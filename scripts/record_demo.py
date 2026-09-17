@@ -348,9 +348,15 @@ def render(text: str) -> str:
 # ---------------------------------------------------------------------------
 
 def normalise(svg: str) -> str:
-    """Replace every volatile field with its own name, so two runs can be compared."""
+    """Replace every volatile field with its own name, so two runs can be compared.
+
+    Braces rather than angle brackets: the placeholder lands inside an SVG text node, and
+    `<generated-id>` turns a valid document into an unclosed tag. Nothing here depends on
+    the normalised form parsing, but a normaliser that makes valid XML invalid is a trap
+    for whatever reads its output next, and one check now does.
+    """
     for name, pattern in sorted(VOLATILE.items()):
-        svg = pattern.sub(f"<{name}>", svg)
+        svg = pattern.sub(f"{{{name}}}", svg)
     return svg
 
 

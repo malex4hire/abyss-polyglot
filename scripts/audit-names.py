@@ -106,18 +106,34 @@ def tracked_text_files() -> list[Path]:
         print(f"could not list tracked files: {listing.stderr.strip()}", file=sys.stderr)
         return []
 
-    out = []
+    out, unreadable = [], []
     for name in listing.stdout.split("\0"):
         if not name or name.startswith(NOT_OURS):
             continue
         path = ROOT / name
-        if not path.is_file():
-            continue
         try:
             path.read_text(encoding="utf-8")
-        except (UnicodeDecodeError, OSError):
+        except UnicodeDecodeError:
+            # The binaries: fonts, images, the recorded gif. The only legitimate filter
+            # here, because it is the one that means "this is not text".
+            continue
+        except OSError as exc:
+            # A tracked file this cannot open is NOT a binary and NOT a pass. Dropping it
+            # shrinks the population silently and the audit reports green over a file it
+            # never read: `chmod 000 LESSONS.md` took the count from 314 to 313 and passed
+            # over an em dash. The same defect as a set built by discarding what it cannot
+            # parse, which this repository fixed elsewhere and reintroduced here.
+            unreadable.append(f"{name}: {exc.strerror or exc}")
             continue
         out.append(path)
+
+    if unreadable:
+        print(
+            "these tracked files could not be read, so nothing checked them:\n  "
+            + "\n  ".join(unreadable),
+            file=sys.stderr,
+        )
+        return []
     return out
 
 

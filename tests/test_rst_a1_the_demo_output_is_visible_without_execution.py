@@ -73,9 +73,24 @@ ICG_ALLOWLIST = frozenset({"timestamp", "duration", "port", "generated-id"})
 SHAPES = {
     "timestamp": lambda s: bool(re.fullmatch(r"\d{4}-\d{2}-\d{2}T[\d:.+\-Z]+", s)),
     "duration": lambda s: bool(re.fullmatch(r"\d+(?:\.\d+)?\s?(?:ms|s)", s)),
-    "port": lambda s: s.isdigit() and 1 <= len(s) <= 5,
-    "generated-id": lambda s: s.startswith("DEMO-"),
+    # An ephemeral port, not any number. The first version of this accepted any 1-5 digit
+    # run, which a one-token widening to `\d{1,5}` satisfied while normalising every status
+    # code in the transcript. A shape looser than the field it names is not a bound.
+    "port": lambda s: s.isdigit() and 1024 <= int(s) <= 65535,
+    "generated-id": lambda s: bool(re.fullmatch(r"DEMO-[0-9a-f]{8}", s)),
 }
+
+# Tokens the transcript carries that are NOT volatile and must survive normalisation.
+#
+# This is the assertion the shapes above are only a proxy for. A shape says what a match
+# looks like; it cannot say what the pattern LEAVES ALONE, and the property that matters is
+# that the reproduction check is still comparing the transcript's meaning. Each token below
+# is altered in the committed artifact, and normalising the result must differ from
+# normalising the original - otherwise that alteration is invisible to the comparison and a
+# hand-edited artifact reproduces.
+#
+# `422` is the one that matters most: it is the refusal the walkthrough exists to show.
+CANARIES = ("422", "IN_PROGRESS", "byAssignee", "WI-002", "archived")
 
 # How much of the artifact's own text the four fields may account for. Measured at 12.7%
 # when this landed, so a doubling is allowed before it goes red; the demonstrated attack
@@ -281,4 +296,75 @@ def test_the_volatile_fields_do_not_account_for_most_of_the_artifact():
         f"the volatile patterns account for {share:.1%} of the transcript, over the "
         f"{VOLATILE_CEILING:.0%} ceiling. Past that the reproduction check is comparing "
         "more placeholder than recording"
+    )
+
+
+def test_normalisation_leaves_everything_that_is_not_volatile_visible():
+    """What the patterns LEAVE ALONE, which a shape cannot say.
+
+    A shape constrains what a match looks like. It cannot constrain what a pattern reaches,
+    so this alters tokens that are not volatile and requires the comparison to notice.
+
+    Measured, because the first draft of this docstring claimed more than the check does.
+    The two widenings this file is written against are caught by different assertions:
+
+      pattern widened to `\d{1,5}` under `port`   the SHAPE check, and the scaffolding
+                                                  check; not this one, because the mutated
+                                                  token leaves a residue the placeholder
+                                                  does not match
+      pattern widened to `[^<>{}]+`               all four, this one included: the match
+                                                  swallows the mutation whole, so both the
+                                                  committed and the altered artifact
+                                                  normalise to the same placeholder
+
+    This is the one that closes the swallowing class, where a check on form cannot help:
+    any shape is satisfiable by a pattern that eats the line around the thing it matches.
+    """
+    rec = recorder()
+    original = spine.text_of(spine.require_file(rec.ARTIFACT, "the recorded artifact"))
+    baseline = rec.normalise(original)
+
+    missing = [token for token in CANARIES if token not in original]
+    assert not missing, (
+        "these tokens are no longer in the recorded transcript, so they cannot be canaries "
+        "for it: " + ", ".join(missing)
+        + ". The walkthrough's output changed shape; pick tokens it still carries"
+    )
+
+    invisible = []
+    for token in CANARIES:
+        mutated = original.replace(token, token[:-1] + "X" if token[-1] != "X" else token[:-1] + "Y")
+        if rec.normalise(mutated) == baseline:
+            invisible.append(token)
+
+    assert not invisible, (
+        "changing these non-volatile tokens does not change the normalised artifact, so a "
+        "hand-edited transcript would reproduce: " + ", ".join(invisible)
+        + "\n\nA volatile pattern is reaching past the field it is named for"
+    )
+
+
+def test_normalisation_rewrites_the_transcript_and_nothing_else():
+    """The ceiling measures text content; normalise() rewrites the whole SVG.
+
+    Two different strings, so the ceiling was bounding a proxy for its own blast radius,
+    and a widening confined to attributes - coordinates, geometry, the title - would have
+    been invisible to it entirely. Rather than pick a second denominator, this asserts the
+    property: outside the transcript, normalisation changes nothing at all.
+    """
+    import xml.etree.ElementTree as ET
+
+    rec = recorder()
+    original = spine.text_of(spine.require_file(rec.ARTIFACT, "the recorded artifact"))
+
+    def scaffolding(svg: str) -> str:
+        namespace = "{http://www.w3.org/2000/svg}"
+        root = ET.fromstring(svg)
+        for element in root.iter(namespace + "text"):
+            element.text = ""
+        return ET.tostring(root, encoding="unicode")
+
+    assert scaffolding(original) == scaffolding(rec.normalise(original)), (
+        "normalisation changed the SVG outside its text content. Everything it rewrites "
+        "there is unmeasured by the volume ceiling, which reads the transcript only"
     )

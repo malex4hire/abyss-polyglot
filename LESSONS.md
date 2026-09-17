@@ -44,8 +44,23 @@ Nobody writes the real one, because the slot looks filled.
 **And the fix, which generalises past these three: the bound belongs in the test.** A bound
 kept beside the thing it bounds is relaxed by the same edit that widens it, which is not a
 bound at all. `SHAPES` and `VOLATILE_CEILING` live in the RST-A1 test rather than in
-`scripts/record_demo.py` for exactly that reason: widening `VOLATILE` no longer relaxes
-what `VOLATILE` is allowed to match.
+`scripts/record_demo.py` for exactly that reason.
+
+**And then the same defect appeared inside that fix, which is why this paragraph is longer
+than it wants to be.** The first `SHAPES["port"]` accepted any 1-to-5-digit run while the
+pattern it bounded was `(?<=:)\d{4,5}`. A one-token widening to `\d{1,5}` satisfied the
+shape, normalised every status code in the transcript, and let a hand-edited artifact whose
+`422` refusal became `200` reproduce cleanly at 22.2%, under the ceiling. **A bound looser
+than the thing it bounds is not a bound either** - moving it into the test was necessary and
+was not sufficient, and this entry said it was.
+
+**What made the difference was dropping to the property.** A shape says what a match looks
+like; it cannot say what a pattern LEAVES ALONE. So the check now alters tokens the
+transcript carries that are not volatile - the `422` above among them - and requires the
+comparison to notice. Measured, the two are complementary rather than redundant: the
+widened `port` is caught by the shape and by a third assertion that normalisation touches
+nothing outside the transcript, while a swallowing pattern like `[^<>{}]+` is caught by all
+four, this one included, because it eats the mutation whole.
 
 ### A SEPARATE MECHANISM: a check can be CORRECT and still prove nothing, if the pipeline that runs it destroys the evidence first
 

@@ -188,3 +188,54 @@ shape LESSONS.md now leads with, one layer further in.
 
 Now a named failure listing the files it cannot read. Reproduced with `test_rst_a6.py`
 present: red, naming the file.
+
+---
+
+## 2026-09-17 - four more from the auto-review, including the proxy defect inside the proxy fix
+
+**The previous entry and LESSONS.md both overstated what had landed, and the review said
+so.** This corrects the claim rather than quietly restating it.
+
+**`SHAPES["port"]` was looser than the pattern it bounded.** It accepted any 1-to-5-digit
+run while the pattern was `(?<=:)\d{4,5}`. Widening to `\d{1,5}` satisfied the shape,
+normalised every number in the transcript - status codes included - and let a committed
+artifact whose `422` refusal had been hand-edited to `200` reproduce cleanly at 22.2%,
+under the 25% ceiling. **Moving the bound into the test was necessary and was not
+sufficient: a bound looser than the thing it bounds is not a bound.** The shape is now an
+ephemeral port, 1024 to 65535.
+
+**And the property is asserted directly, because a shape cannot express it.** A shape says
+what a match looks like; it cannot say what a pattern LEAVES ALONE. So tokens the
+transcript carries that are not volatile - `422`, `IN_PROGRESS`, `byAssignee`, `WI-002`,
+`archived` - are altered and the comparison must notice. Measured, the checks divide
+cleanly rather than overlapping:
+
+| widening | what goes red |
+|---|---|
+| `\d{1,5}` under `port` | the shape, and the scaffolding check |
+| `[^<>{}]+` under `generated-id` | all four, the canary included, because the match eats the mutation whole |
+
+**The ceiling was measuring a different string from the one it protected.** It reads the
+1,324 characters of text-node content; `normalise()` rewrites the whole 8,096-character
+SVG. So a widening confined to attributes was invisible to it. Rather than pick a second
+denominator, normalisation must now leave everything outside the transcript byte-identical,
+which is the property the ceiling was a proxy for.
+
+**`normalise()` turned valid XML into invalid XML**, substituting `<generated-id>` inside a
+text node. Nothing depended on it parsing until a check did. Placeholders are braces now.
+
+**The em dash check dropped any tracked file it could not open, and reported green over
+it.** `chmod 000 LESSONS.md` took the population from 314 to 313 and passed over a file
+carrying an em dash. `UnicodeDecodeError` is the legitimate binary filter; an `OSError` is
+not, and neither is a failed `is_file()`. **This is the identical shape fixed in `_owed()`
+two commits later** - a set built by discarding what it cannot parse - and the fix named the
+pattern without applying it to the helper introduced alongside. An unreadable tracked file
+now refuses the whole run.
+
+**The anti-squash assertion grades all of history, and the docstring claimed more than
+that.** A constraint is satisfied permanently by one past sole-naming commit, so squashing
+a later branch stays green; only a constraint new to the set can turn it red. The limit is
+accepted and now stated in the docstring: the alternative is a range against `origin/main`,
+which is empty the moment the branch merges and would be green forever for the wrong
+reason. Squashing landed commits means rewriting history, which a separate standing order
+already forbids, and this is not the instrument for it.
