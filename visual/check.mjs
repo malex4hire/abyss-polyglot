@@ -179,6 +179,50 @@ for (const [name, origin] of FRONTENDS) {
   check(`${name} is typeset from the generated tokens`, /Public Sans/.test(codeFace), codeFace);
 }
 
+// Every route a frontend registers actually renders something.
+//
+// Angular registered two routes and rendered neither: it bootstrapped the tracker
+// directly, so there was no <router-outlet> in the module. The router resolved correctly,
+// had nowhere to put the result, and every URL showed the tracker — with the board and the
+// detail view reachable only from their unit tests. Green, and unreachable.
+//
+// Checked in a browser because that is the only place it is observable: the routes are
+// registered in source either way, and the tests that cover those components pass either
+// way. Nothing short of asking for the URL can tell the difference.
+// Asserted through the ONE marker both frontends share: the tracker. "/" renders it, and
+// the gallery route renders something that is not it. The two galleries are different
+// collections of components and label their own contents differently, so naming their
+// internals here would either be a selector that only works against one of them, or a
+// false symmetry imposed on two things that are legitimately not symmetric.
+for (const [name, origin] of FRONTENDS) {
+  const visit = async (path) => {
+    const probe = await browser.newPage({ viewport: { width: 1100, height: 900 } });
+    const failures = [];
+    probe.on("pageerror", (error) => failures.push(String(error).slice(0, 120)));
+    await probe.goto(origin + path, { waitUntil: "domcontentloaded" });
+    await probe.waitForTimeout(2500);
+    const seen = await probe.evaluate(() => ({
+      tracker: Boolean(document.querySelector("[data-testid=tracker]")),
+      text: document.body.innerText.trim().length,
+    }));
+    await probe.close();
+    return { ...seen, failures };
+  };
+
+  const root = await visit("/");
+  check(`${name} renders the application at /`,
+        root.tracker && root.failures.length === 0,
+        root.failures[0] ?? (root.tracker ? "" : "nothing rendered"));
+
+  const gallery = await visit("/components");
+  check(`${name} renders a different view at /components`,
+        !gallery.tracker && gallery.text > 0 && gallery.failures.length === 0,
+        gallery.failures[0]
+          ?? (gallery.tracker
+                ? "the route resolved but the tracker is still on screen — registered and never rendered"
+                : (gallery.text > 0 ? `${gallery.text} characters` : "blank page")));
+}
+
 await browser.close();
 writeFileSync(`${HERE}results.json`, JSON.stringify(results, null, 2));
 const failed = results.filter((r) => !r.ok);
