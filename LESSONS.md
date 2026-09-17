@@ -47,6 +47,48 @@ bound at all. `SHAPES` and `VOLATILE_CEILING` live in the RST-A1 test rather tha
 `scripts/record_demo.py` for exactly that reason: widening `VOLATILE` no longer relaxes
 what `VOLATILE` is allowed to match.
 
+### A SEPARATE MECHANISM: a check can be CORRECT and still prove nothing, if the pipeline that runs it destroys the evidence first
+
+**Not a fourth instance of the above. A different failure with a different detection
+method**, and it is recorded separately because the tells listed above do not find it.
+
+The profile repository's CI ran `render_readme.py` and then ran the test asserting
+`README.md` reproduces from `profile.yaml`. **The assertion was sound.** The recipe made it
+decoration: the render step rewrote `README.md` on the runner before the test looked at it,
+so a hand-edited page pushed to the branch was silently discarded during the run while
+GitHub went on serving it. Green CI, unbound claim on the page a reviewer opens.
+
+**Measured, restoring the broken recipe in a clone** (`-k reproduces`, four combinations):
+
+| tree | check | result under the recipe |
+|---|---|---|
+| clean | present | passed |
+| clean | **removed** | no signal |
+| **dirty** | present | **passed** |
+| **dirty** | **removed** | no signal |
+
+| the same check, run WITHOUT the render step ahead of it | |
+|---|---|
+| dirty, check present | **failed** |
+
+**Read the two halves together and the mechanism is exact.** Outside the pipeline the
+check is correct: dirty tree, red. So removal-testing it in isolation gives it a clean bill
+of health, which is the false all-clear. Inside the pipeline, removing the check produces
+**no signal in either direction** - the recipe was already green with it and stays green
+without it, so the removal test yields nothing to read rather than yielding a wrong answer.
+
+**So the detection method is different from the one the other instances share.** Those are
+found by attacking the check's own logic. This one is found only by **exercising the check
+against a known-dirty tree, inside the pipeline that actually invokes it** - not the test
+alone, not the tree alone, but both, in the recipe. Nothing short of that distinguishes a
+sound check from a sound check whose evidence was destroyed one step earlier.
+
+**The general form: a check's verdict is only worth what its inputs were at the moment it
+ran.** Any pipeline step that writes to the thing a later step asserts about has removed
+the assertion, however correct the assertion is. Render-then-verify, format-then-lint,
+regenerate-then-diff are all this shape. The fix here was one flag: the step became
+`--check`, which writes nothing and returns 1 on drift.
+
 **The corollary that caught the fourth finding.** The same reasoning applies to a check's
 own scope. An em-dash check reading only U+2014 is a proxy for "no em-dash-looking
 punctuation", and a visually identical U+2015 would defeat it while the check stayed green.
