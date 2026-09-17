@@ -293,3 +293,70 @@ content".** `render()` emits a chrome label that is a `<text>` node and is not t
 so a normalisation confined to it was invisible to every check here. Only the text runs
 inside the group are blanked now, tails included. Low impact today and a claim wider than
 its assertion, in the commit whose subject was that exact defect.
+
+---
+
+## 2026-09-17 - correction: the ceiling computed 4.83%, not 0.0%
+
+**Appended, not edited.** The entry above states that with `generated-id` widened to
+`(?<=preserve">)[^<]+` "the ceiling computed 0.0%". **It computed 4.83%.** Re-measured
+against the pre-fix numerator and denominator (both over the extracted `<text>` content,
+1,324 characters): the widened pattern matched nothing there, but `timestamp` still matched
+twice for 64 characters. Baseline 12.69%, attack 4.83%, ceiling 25%.
+
+The same entry says "the shape loop never ran". **It ran, for `timestamp`, and passed.**
+What never ran was the widened pattern's own iteration.
+
+**The conclusion is unchanged and the supporting numbers were wrong**, which is the part
+worth recording: the check was green when it should have been red, and 4.83% under a 25%
+ceiling says that as well as 0.0% would have. The commit message carries the same two
+errors and cannot be corrected, because history is not rewritten here.
+
+**This is the second wrong number in this log in two entries**, the first being the
+"two commits later" off-by-one corrected above. Both were written while arguing that the
+decision log is the copy that survives.
+
+---
+
+## 2026-09-17 - KNOWN LIMITATIONS in the checking apparatus, recorded and not fixed
+
+**Operator ruling, this session.** These two repositories are presentation work under D-2.
+A defect in the published surface gets fixed; a defect confined to the checking apparatus
+is recorded and shipped. The reasoning is that the cost of an apparatus defect here does
+not justify another round, and another round would add checks that the round after it would
+find defects in. Each limitation below carries its reproduction so the next reader does not
+have to rediscover it.
+
+**Everything in this section was found by review and is real. None of it is fixed.**
+
+### The em dash gate passes green over an arbitrarily shrunken population
+
+`scripts/audit-names.py`. A tracked file absent from the worktree is counted, reported and
+non-fatal; the only refusal is at a population of exactly zero. **Reproduced:** in a clone,
+delete every tracked file except `scripts/` and `design/` and the audit prints `15 tracked
+text files carry no em-dash-class character; 313 tracked file(s) are not in the worktree`
+and exits 0. A sparse or partial checkout in CI would therefore report the convention
+holding over 15 of 328 files. The stated rationale, that `git status` already says so, is
+true of a developer's shell and false of a CI job that runs only this script. **A
+proportional threshold is what would make the refusal real.**
+
+### The absent-file count is printed only on success
+
+`main()` returns before the success line when there are problems, so a failing run never
+tells the reader the population was shrunk. **Reproduced:** delete `LESSONS.md`, add an em
+dash to `README.md`, get exit 1 with the em dash reported and no mention of the absent file.
+
+### A `git ls-files` failure is reported as a file-read failure
+
+The error is pushed into the same list as unreadable files and wrapped in a message
+asserting a tracked file could not be read. **Reproduced** with a forced non-zero return:
+the first line a reader sees names a permission fault that did not occur. Exit is still 1
+and the second line names the real cause, so this is noise rather than a silent pass.
+
+### Every file is read twice, and the second read is unguarded
+
+A decode probe, then a scan. A `git rm` or an editor's write-temp-then-rename between the
+two produces a `FileNotFoundError` traceback instead of the named non-fatal path built for
+exactly that state. Also doubled I/O over 314 files. **In the RST-A1 test, the same shape:**
+`_artifact(rec)` sits in the inner iterable of a generator expression, so the artifact is
+re-read once per pattern - four reads where one is meant.
