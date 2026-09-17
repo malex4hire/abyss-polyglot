@@ -39,3 +39,6 @@ demo-dev.log
 
 # raw browser recordings, the source for docs/media — regenerated, never an artifact
 visual/media/
+
+# left behind by `pip install -e .`; never an artifact
+*.egg-info/
