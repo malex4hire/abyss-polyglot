@@ -91,7 +91,7 @@ EM_DASH_CLASS = {
 NOT_OURS = ("licenses/",)
 
 
-def tracked_text_files() -> list[Path]:
+def tracked_text_files() -> tuple[list[Path], list[str], list[str]]:
     """Every tracked file that decodes as text, read from git rather than from a list here.
 
     From git, because a hand-kept set of extensions is the same defect this file is about:
@@ -103,10 +103,9 @@ def tracked_text_files() -> list[Path]:
         ["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, text=True, timeout=60,
     )
     if listing.returncode != 0:
-        print(f"could not list tracked files: {listing.stderr.strip()}", file=sys.stderr)
-        return []
+        return [], [f"git ls-files: {listing.stderr.strip()}"], []
 
-    out, unreadable = [], []
+    out, unreadable, absent = [], [], []
     for name in listing.stdout.split("\0"):
         if not name or name.startswith(NOT_OURS):
             continue
@@ -114,32 +113,37 @@ def tracked_text_files() -> list[Path]:
         try:
             path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
-            # The binaries: fonts, images, the recorded gif. The only legitimate filter
-            # here, because it is the one that means "this is not text".
+            # The binaries: fonts, images, the recorded gif. The only silent filter here,
+            # because it is the one that means "this is not text".
             continue
+        except FileNotFoundError:
+            # Tracked and not in the worktree: an ordinary mid-edit state, and what a
+            # sparse checkout looks like. `git status` already says so, and failing the
+            # audit on it would be a false positive - which is how a check gets disabled by
+            # whoever trusts it next. Counted and named, not fatal.
+            absent.append(name)
         except OSError as exc:
-            # A tracked file this cannot open is NOT a binary and NOT a pass. Dropping it
-            # shrinks the population silently and the audit reports green over a file it
-            # never read: `chmod 000 LESSONS.md` took the count from 314 to 313 and passed
-            # over an em dash. The same defect as a set built by discarding what it cannot
-            # parse, which this repository fixed elsewhere and reintroduced here.
+            # Present and unreadable is neither a binary nor a pass. `chmod 000 LESSONS.md`
+            # took the count from 314 to 313 and the audit reported green over a file
+            # carrying an em dash.
             unreadable.append(f"{name}: {exc.strerror or exc}")
-            continue
-        out.append(path)
-
-    if unreadable:
-        print(
-            "these tracked files could not be read, so nothing checked them:\n  "
-            + "\n  ".join(unreadable),
-            file=sys.stderr,
-        )
-        return []
-    return out
+        else:
+            out.append(path)
+    return out, unreadable, absent
 
 
-def em_dashes(problems: list[str]) -> int:
-    """Returns how many files were scanned, so the caller can report the population."""
-    files = tracked_text_files()
+def em_dashes(problems: list[str]) -> tuple[int, int]:
+    """Returns (files scanned, files tracked but absent), for the caller's report.
+
+    An unreadable file is its OWN named problem and does not cancel the scan. Collapsing
+    the population to zero on one of them discarded the 313 files that had been read, hid
+    every em dash in them, and reported "the exclusions have swallowed it", which named the
+    wrong cause: one refusal became a wrong diagnosis about the whole tree.
+    """
+    files, unreadable, absent = tracked_text_files()
+    for entry in unreadable:
+        problems.append(f"tracked file could not be read, so nothing checked it: {entry}")
+
     if not files:
         # An exclusion widened until nothing is scanned would otherwise pass green, which
         # is the shape this whole file exists to refuse.
@@ -147,7 +151,7 @@ def em_dashes(problems: list[str]) -> int:
             "the em dash check scanned no files at all, so it proved nothing. Either the "
             "tree is not a git checkout or the exclusions have swallowed it"
         )
-        return 0
+        return 0, len(absent)
 
     for path in files:
         for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
@@ -159,7 +163,7 @@ def em_dashes(problems: list[str]) -> int:
                         f"      {line.strip()[:110]}"
                     )
                     break
-    return len(files)
+    return len(files), len(absent)
 
 
 def _files(paths) -> list[Path]:
@@ -241,7 +245,7 @@ def class_collisions(files: list[Path], problems: list[str]) -> None:
 
 def main() -> int:
     problems: list[str] = []
-    scanned = em_dashes(problems)
+    scanned, absent = em_dashes(problems)
     for surface, paths in SURFACES.items():
         found: list[str] = []
         files = _files(paths)
@@ -259,6 +263,7 @@ def main() -> int:
         "name audit: every checked name carries one meaning, and "
         f"{scanned} tracked text files carry no em-dash-class character "
         f"({', '.join(sorted(EM_DASH_CLASS.values()))})"
+        + (f"; {absent} tracked file(s) are not in the worktree" if absent else "")
     )
     return 0
 

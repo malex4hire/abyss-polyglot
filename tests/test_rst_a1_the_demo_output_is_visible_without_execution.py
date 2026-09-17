@@ -243,13 +243,41 @@ def test_a_fresh_recording_matches_the_committed_artifact():
     )
 
 
-def _artifact_text(rec) -> str:
-    """The transcript the artifact renders, with the SVG scaffolding removed."""
+SVG_NS = "{http://www.w3.org/2000/svg}"
+
+
+def _artifact(rec) -> str:
+    """The committed artifact as it is on disk: the string normalise() operates on."""
+    return spine.text_of(spine.require_file(rec.ARTIFACT, "the recorded artifact"))
+
+
+def _parse(svg: str, what: str):
+    """Parse, or fail with a named reason.
+
+    Unguarded, this raised ParseError on most widenings - a swallowing pattern eats tag
+    delimiters - so the check died with an XML traceback before its own message could
+    print, and silently doubled as a well-formedness test on normalise() output. Same
+    discipline the RST-A4 readers already apply.
+    """
     import xml.etree.ElementTree as ET
 
-    svg = spine.text_of(spine.require_file(rec.ARTIFACT, "the recorded artifact"))
-    namespace = "{http://www.w3.org/2000/svg}"
-    return "".join((el.text or "") for el in ET.fromstring(svg).iter(namespace + "text"))
+    try:
+        return ET.fromstring(svg)
+    except ET.ParseError as exc:
+        pytest.fail(
+            f"{what} is not well-formed XML ({exc}). If a volatile pattern is eating tag "
+            "delimiters, that is the defect; this check cannot report on it from here"
+        )
+
+
+def _transcript(rec) -> str:
+    """The recorded lines only: the text runs inside the group, not the window chrome."""
+    root = _parse(_artifact(rec), "the committed artifact")
+    return "".join(
+        (el.text or "")
+        for group in root.iter(SVG_NS + "g")
+        for el in group.iter(SVG_NS + "text")
+    )
 
 
 def test_each_volatile_pattern_matches_only_the_shape_its_name_claims():
@@ -261,8 +289,12 @@ def test_each_volatile_pattern_matches_only_the_shape_its_name_claims():
     allowed name.
     """
     rec = recorder()
-    content = _artifact_text(rec)
-    assert content, "the artifact renders no text, so there is nothing to bound"
+    # The RAW artifact, not the text extracted from it. Reading a derived rendering meant a
+    # pattern anchored on markup - a lookbehind onto an attribute, a literal on a tag -
+    # matched nothing here, so the loop below never ran and this reported green over a
+    # pattern that collapses every transcript line in the file normalise() actually sees.
+    content = _artifact(rec)
+    assert content, "the artifact is empty, so there is nothing to bound"
 
     wrong = []
     for name, pattern in sorted(rec.VOLATILE.items()):
@@ -283,19 +315,29 @@ def test_each_volatile_pattern_matches_only_the_shape_its_name_claims():
 
 
 def test_the_volatile_fields_do_not_account_for_most_of_the_artifact():
-    """A backstop under the shapes, on volume rather than on form."""
+    """A backstop under the shapes, on volume rather than on form.
+
+    The numerator is measured against the RAW artifact, because that is what normalise()
+    consumes and a markup-anchored pattern is invisible anywhere else. The denominator is
+    the transcript, because that is what has to survive: bounding the patterns as a share
+    of the whole file would let a widening eat every recorded line and still read small
+    against eight kilobytes of scaffolding. A ratio above 1 is possible and is exactly the
+    alarm it looks like.
+    """
     rec = recorder()
-    content = _artifact_text(rec)
     taken = sum(
         len(match.group(0))
         for pattern in rec.VOLATILE.values()
-        for match in pattern.finditer(content)
+        for match in pattern.finditer(_artifact(rec))
     )
-    share = taken / len(content)
+    transcript = _transcript(rec)
+    assert transcript, "the artifact renders no transcript, so there is nothing to protect"
+
+    share = taken / len(transcript)
     assert share <= VOLATILE_CEILING, (
-        f"the volatile patterns account for {share:.1%} of the transcript, over the "
-        f"{VOLATILE_CEILING:.0%} ceiling. Past that the reproduction check is comparing "
-        "more placeholder than recording"
+        f"the volatile patterns consume {share:.1%} of the recorded transcript's length, "
+        f"over the {VOLATILE_CEILING:.0%} ceiling. Past that the reproduction check is "
+        "comparing more placeholder than recording"
     )
 
 
@@ -355,16 +397,27 @@ def test_normalisation_rewrites_the_transcript_and_nothing_else():
     import xml.etree.ElementTree as ET
 
     rec = recorder()
-    original = spine.text_of(spine.require_file(rec.ARTIFACT, "the recorded artifact"))
+    original = _artifact(rec)
 
-    def scaffolding(svg: str) -> str:
-        namespace = "{http://www.w3.org/2000/svg}"
-        root = ET.fromstring(svg)
-        for element in root.iter(namespace + "text"):
-            element.text = ""
+    def scaffolding(svg: str, what: str) -> str:
+        """Everything but the recorded lines: geometry, colours, AND the window chrome.
+
+        Only the text runs inside the group are blanked. The chrome label is a <text> node
+        too and it is not transcript, so clearing it along with the rest made this assert
+        "outside all text content", which is weaker than the property it claims and would
+        have let a normalisation confined to the chrome through unseen. Tails are cleared
+        as well; they carry the whitespace between runs.
+        """
+        root = _parse(svg, what)
+        for group in root.iter(SVG_NS + "g"):
+            for element in group.iter(SVG_NS + "text"):
+                element.text = ""
+                element.tail = ""
         return ET.tostring(root, encoding="unicode")
 
-    assert scaffolding(original) == scaffolding(rec.normalise(original)), (
-        "normalisation changed the SVG outside its text content. Everything it rewrites "
-        "there is unmeasured by the volume ceiling, which reads the transcript only"
+    assert scaffolding(original, "the committed artifact") == scaffolding(
+        rec.normalise(original), "the normalised artifact"
+    ), (
+        "normalisation changed the artifact outside the recorded transcript. Everything it "
+        "rewrites there is unmeasured by the volume ceiling, which reads the lines only"
     )

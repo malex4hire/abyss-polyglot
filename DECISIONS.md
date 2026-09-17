@@ -239,3 +239,57 @@ accepted and now stated in the docstring: the alternative is a range against `or
 which is empty the moment the branch merges and would be green forever for the wrong
 reason. Squashing landed commits means rewriting history, which a separate standing order
 already forbids, and this is not the instrument for it.
+
+---
+
+## 2026-09-17 - five more, including a regression the previous entry introduced
+
+**Correction to the entry above, which said the `_owed()` fix landed "two commits later".
+It was one.** `tracked_text_files()` arrived in `f8ca188` and `_owed()` was fixed in
+`90b3c57`, the commit immediately after. The commit message had it right and the decision
+log, which is the copy that survives, was off by one. Appended rather than edited, because
+a record that gets rewritten is not a record.
+
+**The two pattern-bounding checks read a string `normalise()` never sees.** They evaluated
+`VOLATILE` against text extracted from the SVG; `normalise()` runs on the raw file. So a
+pattern anchored on markup matched nothing in the extracted string, the shape loop never
+ran, and the ceiling computed 0.0%. Measured with
+`(?<=preserve">)[^<]+` under `generated-id`, which collapses every transcript line: **8 of
+9 checks green** over a fully disarmed reproduction check, with only the canary red.
+
+**That is the same defect the previous entry claimed to have closed**, one half over. The
+scaffolding check closed the attribute half; this was the markup half, and the entry
+declared the proxy closed while it stood. Both now read the raw artifact. The ceiling's
+denominator stays the transcript, because bounding against the whole file would let a
+widening eat every recorded line and still read small against eight kilobytes of
+scaffolding; a ratio above 1 is possible and is exactly the alarm it looks like. The same
+attack now reddens three of the four.
+
+**A regression this branch introduced: one unreadable file cancelled the whole scan and
+named the wrong cause.** The `OSError` refusal returned an empty population, which
+discarded the 313 files already read, hid every em dash in them, and printed *"the
+exclusions have swallowed it"*. It also dropped the `is_file()` guard with no mention, so a
+tracked file merely absent from the worktree - an ordinary mid-edit state - failed the
+audit and CI with that same wrong message.
+
+Now separated, because they are different facts: **present and unreadable** is its own
+named problem and the scan continues; **tracked and absent** is counted, reported in the
+success line, and not fatal, because `git status` already says so and failing there is a
+false positive that gets a check disabled. Measured:
+
+| state | exit |
+|---|---|
+| unreadable file, plus a real em dash elsewhere | 1, and both are reported |
+| unreadable file only | 1 |
+| absent file only | 0, with the count named |
+| absent file, plus a real em dash | 1, the em dash found |
+
+**`ET.fromstring` was unguarded**, so most widenings died with a ParseError before the
+check's own message printed, and it silently doubled as a well-formedness test on
+`normalise()` output. Parsing now fails with a named reason.
+
+**The scaffolding check claimed "outside the transcript" and asserted "outside all text
+content".** `render()` emits a chrome label that is a `<text>` node and is not transcript,
+so a normalisation confined to it was invisible to every check here. Only the text runs
+inside the group are blanked now, tails included. Low impact today and a claim wider than
+its assertion, in the commit whose subject was that exact defect.
