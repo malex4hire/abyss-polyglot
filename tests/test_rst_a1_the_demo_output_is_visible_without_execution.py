@@ -59,6 +59,30 @@ def recorder():
 # these is a widening, and a widening owes a decision log entry.
 ICG_ALLOWLIST = frozenset({"timestamp", "duration", "port", "generated-id"})
 
+# What each allowed field is allowed to BE.
+#
+# The key set alone is not a bound. A review demonstrated it: broaden an existing pattern
+# to `[^<>]+` under the name `generated-id`, and normalise() collapses every text node in
+# both the committed artifact and the fresh recording to the same skeleton. The
+# reproduction check then compares two identical husks and passes over a fabricated
+# transcript, with no new key and so nothing owed in the decision log.
+#
+# So the bound is on what the patterns MATCH, and it lives here rather than in the
+# recorder on purpose: a bound kept beside the thing it bounds is relaxed by the same edit
+# that widens it.
+SHAPES = {
+    "timestamp": lambda s: bool(re.fullmatch(r"\d{4}-\d{2}-\d{2}T[\d:.+\-Z]+", s)),
+    "duration": lambda s: bool(re.fullmatch(r"\d+(?:\.\d+)?\s?(?:ms|s)", s)),
+    "port": lambda s: s.isdigit() and 1 <= len(s) <= 5,
+    "generated-id": lambda s: s.startswith("DEMO-"),
+}
+
+# How much of the artifact's own text the four fields may account for. Measured at 12.7%
+# when this landed, so a doubling is allowed before it goes red; the demonstrated attack
+# takes it to substantially all of it. A backstop under the shapes above, not a substitute
+# for them.
+VOLATILE_CEILING = 0.25
+
 
 def _readme() -> str:
     return spine.text_of(spine.require_file(spine.REPO_ROOT / "README.md", "the README"))
@@ -201,4 +225,60 @@ def test_a_fresh_recording_matches_the_committed_artifact():
         f"{spine._rel(rec.ARTIFACT)} does not reproduce from a fresh run of the "
         "walkthrough. Either the demo's output changed and the artifact is stale, or the "
         f"artifact was edited by hand. Regenerate it with `make record-demo`.\n\n{diff}"
+    )
+
+
+def _artifact_text(rec) -> str:
+    """The transcript the artifact renders, with the SVG scaffolding removed."""
+    import xml.etree.ElementTree as ET
+
+    svg = spine.text_of(spine.require_file(rec.ARTIFACT, "the recorded artifact"))
+    namespace = "{http://www.w3.org/2000/svg}"
+    return "".join((el.text or "") for el in ET.fromstring(svg).iter(namespace + "text"))
+
+
+def test_each_volatile_pattern_matches_only_the_shape_its_name_claims():
+    """The bound on breadth, which the key check does not provide.
+
+    Every field normalised away is a field the reproduction check stops looking at, and
+    the amount a field takes away is a property of its PATTERN, not of its name. A field
+    called `generated-id` whose pattern eats whole lines is a disarmed check wearing an
+    allowed name.
+    """
+    rec = recorder()
+    content = _artifact_text(rec)
+    assert content, "the artifact renders no text, so there is nothing to bound"
+
+    wrong = []
+    for name, pattern in sorted(rec.VOLATILE.items()):
+        shape = SHAPES.get(name)
+        if shape is None:
+            wrong.append(f"{name}: no declared shape, so its pattern is unbounded")
+            continue
+        for match in pattern.finditer(content):
+            if not shape(match.group(0)):
+                wrong.append(f"{name}: matched {match.group(0)[:60]!r}, which is not a {name}")
+                break
+
+    assert not wrong, (
+        "volatile patterns matching things they are not named for:\n  " + "\n  ".join(wrong)
+        + "\n\nA pattern that matches more than its name says is how the reproduction "
+        "check gets disarmed without anybody editing the reproduction check"
+    )
+
+
+def test_the_volatile_fields_do_not_account_for_most_of_the_artifact():
+    """A backstop under the shapes, on volume rather than on form."""
+    rec = recorder()
+    content = _artifact_text(rec)
+    taken = sum(
+        len(match.group(0))
+        for pattern in rec.VOLATILE.values()
+        for match in pattern.finditer(content)
+    )
+    share = taken / len(content)
+    assert share <= VOLATILE_CEILING, (
+        f"the volatile patterns account for {share:.1%} of the transcript, over the "
+        f"{VOLATILE_CEILING:.0%} ceiling. Past that the reproduction check is comparing "
+        "more placeholder than recording"
     )

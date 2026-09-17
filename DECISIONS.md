@@ -71,3 +71,52 @@ wrong reason.
 host gate. A shallow clone fails this check with a named reason rather than skipping it:
 the history is the input, and a check that passes quietly when its input is absent is
 decoration.
+
+---
+
+## 2026-09-17 - three holes the auto-review found in the checks above, and what closed them
+
+Every one was reproduced by execution before it was believed, and every fix was driven red
+the same way.
+
+**The allowlist keyed on NAMES, so the reproduction check could be disarmed silently.**
+`declared - ICG_ALLOWLIST` only notices a new key. Broaden an existing pattern to
+`[^<>]+` under the name `generated-id` and `normalise()` collapses both the committed
+artifact and the fresh recording to the same husk; the reproduction check then compares
+two skeletons and passes over a fabricated transcript, with nothing owed here. Confirmed:
+with that pattern and `status=IN_PROGRESS` hand-edited to `status=TOTALLY_FAKE`, all five
+RST-A1 checks were green.
+
+Closed by bounding what the patterns MATCH rather than what they are called: a declared
+shape per field, plus a ceiling on the share of the transcript the four may account for
+(12.7% when this landed, ceiling 25%). Both live in the test rather than in the recorder,
+because a bound kept beside the thing it bounds is relaxed by the same edit that widens it.
+The attack now reads 104.8% and goes red on both.
+
+**The anti-squash check counted a union, which a banner subject defeats.**
+`len(set().union(*naming.values())) >= len(owed)` is a cardinality test, not a per-
+constraint assignment. Three commits each subject-lined `RST-A1 RST-A2 RST-A4: ...` gave
+`owed = 3`, `distinct = 3`, green, with no constraint having a commit of its own.
+
+Closed by reading the spec as it is written - "each naming the RST identifier it
+satisfies", singular. A subject naming more than one constraint is evidence for none of
+them, and every constraint must have a commit to itself. The three banner commits now go
+red.
+
+**`RST-A1` matched `RST-A10`**, because the match was a bare case-insensitive substring. A
+single `RST-A10: one commit only` commit reported RST-A1 as satisfied. Latent at three
+constraints and wrong at ten. Closed with a boundary that does not treat a digit as a
+continuation.
+
+**Known and deliberately not closed:** `normalise()` runs on the rendered SVG while `x`
+coordinates are computed from unnormalised character columns, so a volatile value whose
+length varies mid-line would break reproduction for a reason unrelated to content. Not
+reachable today - the only volatile tokens inside the steps 4 to 6 window are the
+fixed-width `DEMO-xxxxxxxx` and two line-final timestamps, and no port appears. It is also
+the loud direction: it fails the gate and someone re-records, rather than passing quietly.
+
+**Reported, not fixed:** the em dash convention is prose with no check anywhere, and four
+em dashes reintroduced themselves inside this branch before a commit removed them by hand.
+The fix is an audit line in `scripts/audit-names.py`, which is already wired into
+`make verify-host` and CI. It is a new check in a repository frozen to presentation work,
+so it is the operator's call rather than this branch's.
