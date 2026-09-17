@@ -4,7 +4,7 @@
 Three defects of one shape, found one at a time over this build. A fourth — a commit
 guard that read the working tree while git commits the index — belonged to tooling this
 repository does not ship, so its rule was removed rather than left here asserting against
-a file that does not exist. The lesson itself is in LESSONS.md.
+a file that does not exist.
 
   - a probe that read HTTP status from a server with a catch-all route, so every path
     answered 200 and every capability read as present;
@@ -12,8 +12,8 @@ a file that does not exist. The lesson itself is in LESSONS.md.
   - a check that asserted on the word "auto-configuration" rather than on the class that
     supplied the capability, and so kept passing when the word stopped being printed.
 
-That is a pattern, not luck. The rule was recorded in DECISIONS.md, and a rule recorded
-is a rule someone has to remember, so this makes it enforceable.
+That is a pattern, not luck. A rule written down is a rule someone has to remember, so
+this is what makes it enforceable.
 
 These are heuristics over source text and they are deliberately coarse. They cannot decide
 whether a check reads the right object in general — that is a judgement. What they can do

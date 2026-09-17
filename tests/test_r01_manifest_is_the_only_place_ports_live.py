@@ -127,7 +127,7 @@ def test_no_port_literal_appears_outside_the_manifest():
         ".yml", ".yaml", ".sh", ".py", ".ts", ".tsx", ".js", ".mjs", ".java",
         ".xml", ".properties", ".env", ".md", ".html", ".css", ".conf",
     )):
-        if path == spine.MANIFEST or path.name in spine.JOURNALS or _is_generated(path):
+        if path == spine.MANIFEST or _is_generated(path):
             continue
         for n, line in enumerate(spine.text_of(path).splitlines(), start=1):
             if pattern.search(line):
@@ -160,7 +160,7 @@ def test_no_fixed_address_appears_outside_the_manifest():
         ".yml", ".yaml", ".sh", ".py", ".ts", ".tsx", ".js", ".mjs", ".java",
         ".xml", ".properties", ".env", ".md", ".conf",
     )):
-        if path == spine.MANIFEST or path.name in spine.JOURNALS or _is_generated(path):
+        if path == spine.MANIFEST or _is_generated(path):
             continue
         for n, line in enumerate(spine.text_of(path).splitlines(), start=1):
             if spine.is_comment_line(line):

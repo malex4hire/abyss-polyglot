@@ -51,12 +51,6 @@ SCAN_EXCLUDE_DIRS = {
     "code-review", "logs",
 }
 
-# The journals are a dated record of what was true when each entry was written. They are
-# excluded from the literal scans below for that reason and no other: nothing reads them,
-# and rewriting an entry to match today's configuration would destroy the thing that makes
-# it worth keeping. The README is NOT excluded on this argument — it is an instruction the
-# reader executes, so it is rendered from the manifest instead.
-JOURNALS = {"LESSONS.md", "DECISIONS.md"}
 
 
 # ---------------------------------------------------------------------------
