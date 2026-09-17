@@ -20,10 +20,17 @@ rolled-up state. Two shapes are checkable and both would have caught real defect
 
 Deliberately narrow. It does not try to decide what a name means in general. It refuses
 the two shapes that have already gone wrong, and says so where it cannot tell.
+
+It also carries one punctuation convention, for the same reason the rest of this file
+exists: the rule was written down, nothing ran it, and it was broken inside the branch that
+wrote it down. It lives here rather than in a new script because this one is already wired
+into `make verify-host` and into the CI audits step, and a second audit script for one rule
+is wiring that buys nothing.
 """
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -50,6 +57,113 @@ DESCENDANT = re.compile(r"\.([a-z][a-z0-9-]*)\s*(?:>\s*)?([a-z][a-z0-9-]*)\s*(?:
 
 # <tag ... class="a b"> in any of the template dialects here.
 TAG_CLASS = re.compile(r"<([a-z][a-z0-9-]*)\b[^>]*?\bclass(?:Name)?=[\"']([^\"']+)[\"']", re.I)
+
+
+# ---------------------------------------------------------------------------
+# One punctuation convention: no em dash.
+#
+# Commit fb2c5dc removed every em dash from this repository. That was the rule, nothing
+# enforced it, and the branch that recorded the rule put SIX of them back across two files
+# before somebody noticed and removed them by hand. A convention maintained by whoever
+# notices is a chore this repository generates forever.
+#
+# The CLASS, not the character. U+2014 is the one the convention named, but U+2015 and the
+# two- and three-em dashes render identically at reading size. Checking only U+2014 would
+# be checking a proxy for the property: the rule is "no em-dash-looking punctuation", and a
+# look-alike would satisfy the narrow check while defeating the rule. This widening is the
+# prompt half of the fix and is recorded in DECISIONS.md, so the rule and its check say the
+# same thing.
+#
+# The en dash (U+2013) is deliberately absent: it is visually distinct and a legitimate
+# range separator. A check with a false positive is worse than no check, because it gets
+# disabled by whoever trusts it next.
+# ---------------------------------------------------------------------------
+
+EM_DASH_CLASS = {
+    "\u2014": "EM DASH",
+    "\u2015": "HORIZONTAL BAR",
+    "\u2e3a": "TWO-EM DASH",
+    "\u2e3b": "THREE-EM DASH",
+}
+
+# Third-party text this repository carries and does not author. Rewriting a vendored
+# licence to satisfy a house style is not a thing this check is allowed to ask for.
+NOT_OURS = ("licenses/",)
+
+
+def tracked_text_files() -> tuple[list[Path], list[str], list[str]]:
+    """Every tracked file that decodes as text, read from git rather than from a list here.
+
+    From git, because a hand-kept set of extensions is the same defect this file is about:
+    it is a second copy of "which files are ours" and it goes stale silently. Undecodable
+    files are the binaries (fonts, images, the recorded gif) and are skipped by decoding,
+    not by name.
+    """
+    listing = subprocess.run(
+        ["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, text=True, timeout=60,
+    )
+    if listing.returncode != 0:
+        return [], [f"git ls-files: {listing.stderr.strip()}"], []
+
+    out, unreadable, absent = [], [], []
+    for name in listing.stdout.split("\0"):
+        if not name or name.startswith(NOT_OURS):
+            continue
+        path = ROOT / name
+        try:
+            path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            # The binaries: fonts, images, the recorded gif. The only silent filter here,
+            # because it is the one that means "this is not text".
+            continue
+        except FileNotFoundError:
+            # Tracked and not in the worktree: an ordinary mid-edit state, and what a
+            # sparse checkout looks like. `git status` already says so, and failing the
+            # audit on it would be a false positive - which is how a check gets disabled by
+            # whoever trusts it next. Counted and named, not fatal.
+            absent.append(name)
+        except OSError as exc:
+            # Present and unreadable is neither a binary nor a pass. `chmod 000 LESSONS.md`
+            # took the count from 314 to 313 and the audit reported green over a file
+            # carrying an em dash.
+            unreadable.append(f"{name}: {exc.strerror or exc}")
+        else:
+            out.append(path)
+    return out, unreadable, absent
+
+
+def em_dashes(problems: list[str]) -> tuple[int, int]:
+    """Returns (files scanned, files tracked but absent), for the caller's report.
+
+    An unreadable file is its OWN named problem and does not cancel the scan. Collapsing
+    the population to zero on one of them discarded the 313 files that had been read, hid
+    every em dash in them, and reported "the exclusions have swallowed it", which named the
+    wrong cause: one refusal became a wrong diagnosis about the whole tree.
+    """
+    files, unreadable, absent = tracked_text_files()
+    for entry in unreadable:
+        problems.append(f"tracked file could not be read, so nothing checked it: {entry}")
+
+    if not files:
+        # An exclusion widened until nothing is scanned would otherwise pass green, which
+        # is the shape this whole file exists to refuse.
+        problems.append(
+            "the em dash check scanned no files at all, so it proved nothing. Either the "
+            "tree is not a git checkout or the exclusions have swallowed it"
+        )
+        return 0, len(absent)
+
+    for path in files:
+        for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+            for char, name in EM_DASH_CLASS.items():
+                if char in line:
+                    problems.append(
+                        f"{path.relative_to(ROOT)}:{n} carries {name} ({char!r}). "
+                        f"This repository writes ordinary punctuation:\n"
+                        f"      {line.strip()[:110]}"
+                    )
+                    break
+    return len(files), len(absent)
 
 
 def _files(paths) -> list[Path]:
@@ -131,6 +245,7 @@ def class_collisions(files: list[Path], problems: list[str]) -> None:
 
 def main() -> int:
     problems: list[str] = []
+    scanned, absent = em_dashes(problems)
     for surface, paths in SURFACES.items():
         found: list[str] = []
         files = _files(paths)
@@ -139,12 +254,17 @@ def main() -> int:
         problems.extend(f"[{surface}] {p}" for p in found)
 
     if problems:
-        print("NAME AUDIT FAILED. A name is carrying more than one meaning:\n", file=sys.stderr)
+        print("NAME AUDIT FAILED:\n", file=sys.stderr)
         for problem in problems:
             print(f"  {problem}\n", file=sys.stderr)
         return 1
 
-    print("name audit: every checked name carries one meaning")
+    print(
+        "name audit: every checked name carries one meaning, and "
+        f"{scanned} tracked text files carry no em-dash-class character "
+        f"({', '.join(sorted(EM_DASH_CLASS.values()))})"
+        + (f"; {absent} tracked file(s) are not in the worktree" if absent else "")
+    )
     return 0
 
 
