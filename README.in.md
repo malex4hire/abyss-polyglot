@@ -229,6 +229,12 @@ python3 -m pytest tests -m "not needs_stacks"   # host only, seconds
 make verify                                      # everything, with the stacks up
 ```
 
+Three further checks sit alongside those and govern the page you are reading rather than
+the stacks. They assert that the transcript above is a recording and still reproduces, that
+the claim in the first screenful names a gate which exists and passes, and that each of
+them arrived as a commit that says which it is. A claim in a README is a control, and an
+unbound one has nothing that goes red when it stops being true.
+
 Two rules govern the suite. Nothing in it enumerates a set. Stacks, ports, token groups and
 governed members are all read from their declaring files, or the tests would be asserting
 against themselves. And a missing input is a named assertion failure rather than a collection

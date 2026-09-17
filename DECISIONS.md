@@ -52,3 +52,22 @@ file in `tests/`, and that the cited gate passes with nothing skipped.
 A claim in a README is a control like any other. Unbound, it has no test that goes red when
 it stops being true, which is the shape `THE ROOT RULE` already refuses everywhere else in
 this repository.
+
+---
+
+## 2026-09-17 - one commit per constraint, and the history is an input
+
+**RST-A4.** Each constraint landed as its own commit naming it.
+`tests/test_rst_a4_the_commit_history_is_legible.py` derives the set from this
+repository's own `tests/test_rst_*.py` files and reads commit subjects, so a check that
+arrives with no commit behind it fails, and so does a branch collapsed into one commit
+claiming all of them.
+
+It reads history rather than a branch range on purpose. A range against `origin/main` is
+empty the moment the branch merges, which would leave the check green forever for the
+wrong reason.
+
+`actions/checkout@v4` fetches one commit by default, so `fetch-depth: 0` was added to the
+host gate. A shallow clone fails this check with a named reason rather than skipping it:
+the history is the input, and a check that passes quietly when its input is absent is
+decoration.

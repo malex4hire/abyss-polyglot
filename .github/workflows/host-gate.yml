@@ -18,6 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The history is an input: one check reads commit subjects to confirm each
+          # constraint landed as its own commit. The default shallow checkout fetches one
+          # commit, and that check fails rather than skips, which is the right way round.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
