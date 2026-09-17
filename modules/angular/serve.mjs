@@ -190,11 +190,31 @@ createServer((request, response) => {
       (upstreamResponse) => {
         response.writeHead(upstreamResponse.statusCode ?? 502, upstreamResponse.headers);
         upstreamResponse.pipe(response);
+        // An upstream that dies mid-body leaves the browser waiting on a response that
+        // will never end. pipe() forwards data and not failure, so this is stated.
+        upstreamResponse.on("error", () => response.destroy());
       },
     );
     upstream.on("error", () => {
-      response.writeHead(502, { "Content-Type": "application/json" });
-      response.end(JSON.stringify({ error: "backend unreachable" }));
+      // Only before the headers go out. After that the status line is already written and
+      // writeHead throws, which takes the process down rather than the request.
+      if (!response.headersSent) {
+        response.writeHead(502, { "Content-Type": "application/json" });
+        response.end(JSON.stringify({ error: "backend unreachable" }));
+      } else {
+        response.destroy();
+      }
+    });
+    // When the client goes away, let go of the backend.
+    //
+    // /events is held open forever by design, so without this every closed tab, every
+    // navigation and every re-subscribe left a live upstream connection behind. They do
+    // not time out — the server has nothing to time out, it is streaming — so they
+    // accumulate for as long as the demo runs.
+    response.on("close", () => {
+      if (!upstream.destroyed) {
+        upstream.destroy();
+      }
     });
     request.pipe(upstream);
     return;

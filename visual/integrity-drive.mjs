@@ -12,6 +12,23 @@ const base = requireEnv("APP");
 const label = process.env.LABEL ?? base;
 const browser = await chromium.launch();
 const page = await browser.newPage();
+
+// Count how many times the application opens a change stream.
+//
+// Installed before any of the application's own code runs, so nothing is missed. The
+// React side re-subscribed on every keystroke in the tag filter, because the effect took
+// its callback as a dependency and that callback closes over the filter text. Each
+// re-subscribe is a gap, and a change announced during one is lost for good: no backend
+// implements Last-Event-ID, so there is no replay.
+await page.addInitScript(() => {
+  const Real = window.EventSource;
+  window.__streamOpens = 0;
+  window.EventSource = function (...args) {
+    window.__streamOpens += 1;
+    return new Real(...args);
+  };
+  window.EventSource.prototype = Real.prototype;
+});
 const errors = [];
 page.on("pageerror", (e) => errors.push(String(e)));
 const out = [];
@@ -80,6 +97,23 @@ for (const backend of backends) {
     : bad(`displayed counts agree with the rows [${backend}]`,
           `${rows} rows on screen, page claims ${wrong.join(", ")}`);
 }
+
+// Typing in the filter must not reopen the change stream.
+const opensBeforeTyping = await page.evaluate(() => window.__streamOpens ?? 0);
+const filter = page.locator("[data-testid=tracker] [data-testid=filter-tag]");
+for (const ch of "backend".split("")) {
+  await filter.press(ch);
+  await page.waitForTimeout(120);
+}
+await page.waitForTimeout(800);
+const opensAfterTyping = await page.evaluate(() => window.__streamOpens ?? 0);
+const churn = opensAfterTyping - opensBeforeTyping;
+churn === 0
+  ? ok("typing in the filter does not reopen the change stream", `${opensBeforeTyping} open(s), unchanged`)
+  : bad("typing in the filter does not reopen the change stream",
+        `${churn} extra stream open(s) for 7 keystrokes — each one a gap a change can fall into`);
+await filter.fill("");
+await page.waitForTimeout(500);
 
 out.push("  note  this run created rows on every backend; make demo-reset restores seed state");
 
