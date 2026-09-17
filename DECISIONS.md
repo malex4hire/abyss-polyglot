@@ -171,3 +171,20 @@ restored after each.
 | every U+2014 swapped for a visually identical U+2015 | **exit 1**, reported as `HORIZONTAL BAR`. The class widening is load-bearing, not decorative |
 
 `make verify-host`: 48 passed, 19 deselected, audit green over 314 tracked text files.
+
+---
+
+## 2026-09-17 - a constraint's test file could escape the history check silently
+
+Found by the auto-review in the sibling repository and present here in the same shape, so
+it is fixed here too.
+
+`_owed()` globs `tests/test_rst_*.py` and matches `^test_(rst_[a-z]\d+)_`, which requires an
+underscore after the digits. A file the glob finds and the pattern rejects was dropped with
+no warning: `test_rst_a6.py` never entered the set, so the check whose job is "a constraint
+with no commit behind it fails" never asked about it. **A set built by discarding what it
+cannot parse is a set that quietly shrinks to nothing** - the same proxy-for-the-property
+shape LESSONS.md now leads with, one layer further in.
+
+Now a named failure listing the files it cannot read. Reproduced with `test_rst_a6.py`
+present: red, naming the file.
