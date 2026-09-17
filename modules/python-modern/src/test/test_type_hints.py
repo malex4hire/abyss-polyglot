@@ -22,7 +22,7 @@ def test_absent_criteria_are_part_of_the_signature(sample):
 def test_the_signature_states_its_intent_where_a_checker_can_read_it():
     """The annotations are kept at runtime, so a checker can read the same claim.
 
-    docs/TEST-AUDIT.md files this as Tier 3, unassertable at runtime, on the reasoning
+    This one is not assertable at runtime, on the reasoning
     that Python does not enforce annotations — which is true and is not the same claim.
     Nothing enforces them, but they are kept: `__annotations__` holds them and
     `typing.get_type_hints` resolves them, which is exactly how a checker reads them.
