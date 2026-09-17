@@ -10,6 +10,18 @@
 **One OpenAPI contract. 4 backends that serve it. 2 frontends that consume it.
 One test suite that runs unmodified against all of them and names none of them.**
 
+`python3 demo.py`, **with nothing installed**. No pip, no virtualenv, no docker, no
+network. The walkthrough and the backend it starts are standard library only, and gate
+**R-8** is what holds them there: it reads every import in both, and then runs the whole
+walkthrough under `python3 -S -I`, so nothing already on this machine can satisfy an import
+by accident. Here is what that command prints.
+
+![A recorded terminal transcript: an illegal status transition refused with a typed rejection that writes nothing, the per-assignee workload rollup, and archive as a soft delete that leaves the list while the item stays addressable by id](docs/media/demo.svg)
+
+Recorded from a run, not typed. Three of the seven steps: a refusal that costs nothing, the
+rollup, and a soft delete. `make record-demo` re-records it, and a check fails when what is
+committed here stops reproducing from a fresh run.
+
 ![A work item created in the Angular application appearing in the React application, then archived in React and vanishing from Angular, with neither side touched by a user](docs/media/live-update.gif)
 
 An item is created on the **left**, in Angular. It appears on the **right**, in React, with
@@ -33,37 +45,16 @@ being able to prove they still keep it.
 python3 demo.py
 ```
 
-No pip, no virtualenv, no docker, no network. It starts the Python backend on a free port
-and walks the contract one operation at a time, printing each request and each response:
-
-```
-4. transition, illegal
-   refused with a typed rejection, and the refusal writes nothing
-   POST /work-items/DEMO-4c11a615/transition
-   → {"status": "OPEN"}
-   422
-   {
-     "rejected": {
-       "id": "DEMO-4c11a615",
-       "to": "OPEN",
-       "reason": "IN_PROGRESS cannot move to OPEN"
-     }
-   }
-   GET /work-items/DEMO-4c11a615
-   200
-   DEMO-4c11a615  status=IN_PROGRESS
-   unchanged: still IN_PROGRESS, so the refusal cost nothing
-```
+It starts the Python backend on a free port and walks the contract one operation at a
+time, printing each request and each response. The transcript at the top of this page is
+that output, recorded; these are the steps it is a window onto.
 
 Seven steps: create, create again with the same key, a legal transition, the illegal one
-above, the workload rollup, archive as a soft delete, and a change event off the stream.
-Then it leaves the server running with copy-paste `curl` lines.
+shown above, the workload rollup, archive as a soft delete, and a change event off the
+stream. Then it leaves the server running with copy-paste `curl` lines.
 
-That is the whole setup section. `demo.py` and the backend it starts are standard library
-only, and the host suite enforces it: one check reads every import in both, another runs the
-walkthrough under `python3 -S -I` so nothing installed on the machine can satisfy an import
-by accident. A dependency would have bought a nicer HTTP client and cost the first line of
-this README.
+That is the whole setup section, and R-8 is why it can be. A dependency would have bought
+a nicer HTTP client and cost the first line of this README.
 
 ### The rest of it
 

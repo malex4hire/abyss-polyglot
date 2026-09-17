@@ -1,6 +1,6 @@
 # Entry points. Every target derives its targets from stacks/manifest.yaml.
 
-.PHONY: help demo render up up-offline down verify verify-host visual delta demo-reset clean
+.PHONY: help demo record-demo render up up-offline down verify verify-host visual delta demo-reset clean
 
 help:               ## this list
 	@grep -hE '^[a-z-]+:.*?##' $(MAKEFILE_LIST) \
@@ -8,6 +8,12 @@ help:               ## this list
 
 demo:               ## the walkthrough, on a bare interpreter, with nothing installed
 	python3 demo.py
+
+# The README shows demo output above its first heading, and there are two ways to put
+# output in a README: type it, or record it. Typing it is a claim about what the program
+# prints, and it decays silently. This is the only supported way to produce that artifact.
+record-demo:        ## re-record the walkthrough into the README's terminal artifact
+	python3 scripts/record_demo.py
 
 render:             ## regenerate everything derived from the manifest and the tokens
 	python3 scripts/render-env.py
