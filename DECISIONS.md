@@ -120,3 +120,54 @@ em dashes reintroduced themselves inside this branch before a commit removed the
 The fix is an audit line in `scripts/audit-names.py`, which is already wired into
 `make verify-host` and CI. It is a new check in a repository frozen to presentation work,
 so it is the operator's call rather than this branch's.
+
+---
+
+## 2026-09-17 - the em dash convention has a check, and D-2 is amended to allow it
+
+**Operator ruling, this session.** D-2's freeze covers product surface: backends,
+frontends, contract endpoints, modules, architectural depth. **It does not cover hygiene
+gates that prevent a recurring manual correction.** A check that stops a convention being
+hand-fixed on every branch is not depth; it is what keeps this repository from generating
+chores after attention moves elsewhere. The previous entry filed this as `wont-fix` on a
+scope reading that the operator has now corrected, so this supersedes it.
+
+**The count was wrong and the record should carry the measured one.** This branch
+reintroduced **six** em dashes across five lines in two files, not four.
+`git show 3f1cdab -U0 | grep '^-' | grep -oP '\\x{2014}' | wc -l` returns 6; one line
+carried two. The codepoint is written as an escape here because this file is inside the
+population the check scans, which it demonstrated by failing on the first draft of this
+very paragraph.
+
+**Where it lives.** `scripts/audit-names.py`, which is already wired into `make
+verify-host` and the CI audits step. A second audit script for one rule is wiring that buys
+nothing.
+
+**The population is read from git**, not from a list of extensions kept in the script. A
+hand-kept set of "which files are ours" is a second copy of a fact and goes stale silently,
+which is the defect that file already exists to refuse. Binaries drop out by failing to
+decode rather than by being named. `licenses/` is excluded: it is third-party text this
+repository carries and does not author, and rewriting a vendored licence to satisfy a house
+style is not something a check gets to ask for. An exclusion widened until nothing is
+scanned would otherwise pass green, so scanning zero files is itself a failure.
+
+**The rule was widened in the same change, so the rule and its check say the same thing.**
+The convention named the em dash, U+2014. The check reads the em-dash CLASS: U+2014, U+2015
+HORIZONTAL BAR, and the two- and three-em dashes, which render identically at reading size.
+Checking only U+2014 would assert a proxy for the property, and a look-alike would defeat
+the rule with the check still green. The en dash U+2013 is deliberately not included: it is
+visually distinct and a legitimate range separator, and a check with a false positive gets
+disabled by whoever trusts it next.
+
+### The reproduction, which is the condition of this landing
+
+Green on a clean tree proves nothing, so the check was driven red three ways and the tree
+restored after each.
+
+| what was done | result |
+|---|---|
+| `git checkout 5cd2568 -- DECISIONS.md tests/test_rst_a2_...py`, restoring the two files exactly as `3f1cdab` found them | **exit 1**, all five lines named with file, line number and the offending text |
+| the same six em dashes present, with `em_dashes(problems)` commented out of `main()` | **exit 0.** The check is what catches them, not something else in the audit |
+| every U+2014 swapped for a visually identical U+2015 | **exit 1**, reported as `HORIZONTAL BAR`. The class widening is load-bearing, not decorative |
+
+`make verify-host`: 48 passed, 19 deselected, audit green over 314 tracked text files.
