@@ -140,6 +140,11 @@ def test_the_cited_gate_passes_and_skips_nothing():
     Skips count as a failure here on purpose. A gate that opts itself out on the machine
     doing the checking is exactly the shape that lets a claim look proven while nothing
     proves it, and the citation in the README makes no distinction.
+
+    A consequence worth stating: citing a gate that needs the stacks up would turn this
+    red on a host with nothing running. That is the intended answer rather than a gap. The
+    first screenful is what a reader sees before deciding to clone, so a claim there should
+    name something provable without bringing six containers up first.
     """
     region = _first_screenful(_readme())
     cited = sorted({m.group(1) for m in GATE.finditer(region)}, key=int)
