@@ -42,3 +42,9 @@ visual/media/
 
 # left behind by `pip install -e .`; never an artifact
 *.egg-info/
+
+# Process, not product. Public repos carry the README, the code and the visual.
+CLAUDE.md
+DECISIONS.md
+LESSONS.md
+PortfolioDecisions.md
